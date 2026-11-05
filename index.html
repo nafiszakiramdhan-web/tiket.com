@@ -97,7 +97,7 @@
       z-index: 20;
     }
 
-    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #0F0F14; }
     ::-webkit-scrollbar-thumb { background: #2A2A38; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #B8A9E3; }
@@ -555,28 +555,50 @@
 
 
     <!-- ================================================================ -->
-    <!-- TAB 2: CEK STATUS & UNDUH TIKET                                  -->
+    <!-- TAB 2: CEK STATUS & UNDUH TIKET (VERIFIKASI GANDA WA + NAMA)     -->
     <!-- ================================================================ -->
     <div id="sectionCheck" class="hidden space-y-6">
       
       <div class="bg-night-card rounded-2xl border border-night-border p-6 sm:p-9 shadow-2xl space-y-6">
         <div>
           <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pastel-yellow/15 text-pastel-yellow text-xs font-semibold uppercase mb-2">
-            <i data-lucide="search" class="w-3.5 h-3.5"></i> Cek Tiket Instan
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Verifikasi Ganda Pemesan
           </div>
           <h3 class="font-display font-bold text-2xl text-white">Cek Status & Unduh E-Ticket</h3>
           <p class="text-xs sm:text-sm text-white/60 mt-1">
-            Masukkan nomor WhatsApp yang Anda gunakan saat pemesanan untuk mengunduh E-Ticket (PDF).
+            Masukkan Nama Lengkap dan Nomor WhatsApp yang digunakan saat memesan untuk mengunduh E-Ticket (PDF).
           </p>
         </div>
 
-        <!-- Input WhatsApp Pencarian -->
-        <div class="space-y-2">
-          <label for="checkWaInput" class="block text-sm font-semibold text-white">
-            Nomor WhatsApp Pemesan
-          </label>
-          <div class="flex flex-col sm:flex-row gap-3">
-            <div class="relative flex-1">
+        <!-- 2 Kolom Input Verifikasi Ganda: Nama Lengkap & Nomor WhatsApp -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Input 1: Nama Lengkap -->
+          <div class="space-y-1.5">
+            <label for="checkNameInput" class="block text-xs uppercase tracking-wider text-white/60 font-semibold">
+              Nama Lengkap Pemesan <span class="text-pastel-yellow">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+                <i data-lucide="user" class="w-4 h-4"></i>
+              </div>
+              <input 
+                type="text" 
+                id="checkNameInput" 
+                placeholder="Contoh: Muhammad Raditya" 
+                class="w-full pl-10 pr-4 py-3 rounded-xl bg-night-input border border-night-border text-white text-sm focus:outline-none focus:border-pastel-purple focus:ring-1 focus:ring-pastel-purple transition duration-200"
+              />
+            </div>
+            <p id="errCheckName" class="text-xs text-red-400 hidden flex items-center gap-1 mt-1">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Nama pemesan wajib diisi.
+            </p>
+          </div>
+
+          <!-- Input 2: Nomor WhatsApp -->
+          <div class="space-y-1.5">
+            <label for="checkWaInput" class="block text-xs uppercase tracking-wider text-white/60 font-semibold">
+              Nomor WhatsApp Pemesan <span class="text-pastel-yellow">*</span>
+            </label>
+            <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
                 <i data-lucide="phone" class="w-4 h-4"></i>
               </div>
@@ -584,48 +606,52 @@
                 type="tel" 
                 id="checkWaInput" 
                 placeholder="Contoh: 08123456789" 
-                class="w-full pl-10 pr-4 py-3.5 rounded-xl bg-night-input border border-night-border text-white text-sm focus:outline-none focus:border-pastel-purple focus:ring-1 focus:ring-pastel-purple transition duration-200"
+                class="w-full pl-10 pr-4 py-3 rounded-xl bg-night-input border border-night-border text-white text-sm focus:outline-none focus:border-pastel-purple focus:ring-1 focus:ring-pastel-purple transition duration-200"
               />
             </div>
-            <button 
-              type="button" 
-              id="btnSearchTicket" 
-              class="py-3.5 px-7 rounded-xl font-display font-bold text-sm uppercase tracking-wider text-night bg-pastel-yellow hover:bg-pastel-yellow-hover active:scale-[0.99] transition-all duration-200 shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer shrink-0 disabled:opacity-60"
-            >
-              <span id="btnSearchText" class="flex items-center gap-2">
-                <i data-lucide="search" class="w-4 h-4"></i>
-                Cek Tiket Saya
-              </span>
-              <span id="btnSearchSpinner" class="hidden flex items-center gap-2">
-                <svg class="animate-spin h-4 w-4 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span>Mengecek...</span>
-              </span>
-            </button>
+            <p id="errCheckWa" class="text-xs text-red-400 hidden flex items-center gap-1 mt-1">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Nomor WhatsApp wajib diisi (min. 10 digit).
+            </p>
           </div>
-          <p id="errCheckWa" class="text-xs text-red-400 hidden flex items-center gap-1 mt-1">
-            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Masukkan nomor WhatsApp yang valid (min. 10 digit).
-          </p>
+        </div>
+
+        <!-- Tombol Cek Tiket Saya -->
+        <div>
+          <button 
+            type="button" 
+            id="btnSearchTicket" 
+            class="w-full py-3.5 px-6 rounded-xl font-display font-bold text-sm uppercase tracking-wider text-night bg-pastel-yellow hover:bg-pastel-yellow-hover active:scale-[0.99] transition-all duration-200 shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+          >
+            <span id="btnSearchText" class="flex items-center gap-2">
+              <i data-lucide="search" class="w-4 h-4"></i>
+              CEK TIKET SAYA
+            </span>
+            <span id="btnSearchSpinner" class="hidden flex items-center gap-2">
+              <svg class="animate-spin h-4 w-4 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              <span>Mencari tiket di server...</span>
+            </span>
+          </button>
         </div>
 
         <!-- ================= DYNAMIC RESULT CARD CONTAINER ================= -->
-        <div id="checkResultContainer" class="hidden pt-4 border-t border-night-border">
+        <div id="checkResultContainer" class="hidden pt-4 border-t border-night-border space-y-4">
 
           <!-- STATE 1: PENDING -->
-          <div id="resultPending" class="hidden rounded-2xl bg-amber-500/10 border border-amber-500/30 p-5 sm:p-6 text-amber-200 space-y-3">
+          <div id="resultPending" class="hidden rounded-2xl bg-amber-500/10 border border-amber-500/30 p-5 sm:p-6 text-amber-200 space-y-2">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
                 <i data-lucide="clock" class="w-5 h-5"></i>
               </div>
               <div>
-                <span class="text-xs uppercase tracking-wider font-semibold text-amber-400">Status Pembayaran: Pending</span>
-                <h4 class="font-display font-bold text-lg text-white">Menunggu Verifikasi Panitia</h4>
+                <span class="text-xs uppercase tracking-wider font-semibold text-amber-400">Verifikasi Panitia</span>
+                <h4 class="font-display font-bold text-base sm:text-lg text-white">Status Pembayaran: PENDING (Menunggu Verifikasi Panitia)</h4>
               </div>
             </div>
             <p class="text-xs sm:text-sm text-white/80 leading-relaxed pl-13">
-              Pembayaran Anda sedang dalam proses verifikasi panitia. Mohon tunggu beberapa saat dan cek kembali halaman ini secara berkala.
+              Mohon periksa kembali secara berkala. Panitia sedang mencocokkan bukti transfer Anda.
             </p>
           </div>
 
@@ -636,22 +662,22 @@
                 <i data-lucide="alert-triangle" class="w-5 h-5"></i>
               </div>
               <div>
-                <h4 class="font-display font-bold text-base text-white">Nomor WhatsApp Tidak Ditemukan</h4>
-                <p class="text-xs text-white/70">
-                  Nomor WhatsApp belum terdaftar. Pastikan nomor yang dimasukkan sama dengan saat memesan tiket.
+                <h4 class="font-display font-bold text-base text-white">Data Tiket Tidak Ditemukan</h4>
+                <p class="text-xs text-white/80 mt-1">
+                  Data tiket tidak ditemukan. Pastikan Nomor WhatsApp dan Nama Lengkap sesuai dengan data saat memesan.
                 </p>
               </div>
             </div>
           </div>
 
-          <!-- STATE 3: APPROVED (ESTHETIC TICKET & DOWNLOAD CTA) -->
-          <div id="resultApproved" class="hidden space-y-5">
+          <!-- STATE 3: APPROVED (RESMI E-TICKET & TOMBOL UNDUH PDF) -->
+          <div id="resultApproved" class="hidden space-y-4">
             <div class="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-4 text-emerald-300 flex items-center justify-between">
               <div class="flex items-center gap-2 text-xs font-semibold">
                 <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-                <span>Status: Pembayaran Lunas / Terverifikasi</span>
+                <span>Status Pembayaran: APPROVED (Terverifikasi)</span>
               </div>
-              <span class="text-[11px] font-mono text-emerald-400 uppercase font-bold">READY TO DOWNLOAD</span>
+              <span class="text-[11px] font-mono text-emerald-400 uppercase font-bold">SIAP DIUNDUH</span>
             </div>
 
             <!-- Verified Ticket Card -->
@@ -676,31 +702,31 @@
                       <span id="approvedName" class="font-semibold text-white truncate block">-</span>
                     </div>
                     <div>
-                      <span class="block text-[10px] uppercase font-mono text-white/40">Varian Tiket</span>
+                      <span class="block text-[10px] uppercase font-mono text-white/40">Varian Pass</span>
                       <span id="approvedVariant" class="font-semibold text-pastel-purple block">-</span>
                     </div>
                   </div>
                 </div>
 
                 <div class="mt-4 flex items-center justify-between text-xs text-white/60">
-                  <span>Akses: 29 - 30 November 2026</span>
-                  <span id="approvedQty" class="font-semibold text-white">- Tiket</span>
+                  <span>Jadwal Akses: 29 - 30 November 2026</span>
+                  <span class="text-emerald-400 font-semibold font-mono">STATUS: LUNAS</span>
                 </div>
               </div>
 
-              <!-- Stub CTA Section -->
+              <!-- Stub CTA Section with Download Button -->
               <div class="w-full md:w-64 p-5 sm:p-6 bg-[#181824] flex flex-col items-center justify-center text-center shrink-0">
-                <span class="text-[11px] font-mono text-white/50 mb-3">E-Ticket File (PDF)</span>
+                <span class="text-[11px] font-mono text-white/50 mb-3">Dokumen E-Ticket Resmi</span>
 
                 <a 
                   id="btnDownloadPdf" 
                   href="#" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  class="w-full py-3.5 px-5 rounded-xl font-display font-bold text-sm uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 text-center"
+                  class="btn-download w-full py-3.5 px-5 rounded-xl font-display font-bold text-sm uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 text-center"
                 >
                   <i data-lucide="download" class="w-4 h-4"></i>
-                  <span>Unduh E-Ticket (PDF)</span>
+                  <span>📥 Unduh E-Ticket (PDF)</span>
                 </a>
                 
                 <span class="text-[10px] text-white/40 mt-2.5">Buka file via Google Drive</span>
@@ -830,7 +856,7 @@
     /**
      * 1. Konfigurasi Endpoint Google Apps Script
      */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXvOR1OG8aFXSg7yoQ1TcyAZNRqGOiq2PeB-l9_X3arDJ6P0kbhaog3gNhIlMF6edC/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbXvOR1OG8aFXSg7yoQ1TcyAZNRqGOiq2PeB-l9_X3arDJ6P0kbhaog3gNhIlMF6edC/exec";
 
     // Inisialisasi Lucide Icons
     lucide.createIcons();
@@ -1067,12 +1093,12 @@
       if (!file) return;
 
       if (!file.type.startsWith("image/")) {
-        alert("Harap pilih file berupa gambar (JPG, PNG, atau WEBP).");
+        alert("Harap pilih berkas berupa gambar (JPG, PNG, atau WEBP).");
         return;
       }
 
       if (file.size > 5 * 1024 * 1024) {
-        alert("Ukuran file maksimal adalah 5MB.");
+        alert("Ukuran berkas maksimal adalah 5MB.");
         return;
       }
 
@@ -1165,65 +1191,6 @@
       }
     }
 
-    btnSubmitPayment.addEventListener("click", async () => {
-      if (!selectedProofBase64TanpaHeader || !selectedProofFile) {
-        errProof.classList.remove("hidden");
-        proofDropzone.scrollIntoView({ behavior: "smooth", block: "center" });
-        return;
-      }
-
-      setSubmittingState(true);
-
-      const currentVariant = VARIANTS[selectedVariantKey];
-      const totalAmount = currentVariant.price * selectedQuantity;
-      const namaValue = inputName.value.trim();
-      const waValue = inputWa.value.trim();
-
-      // Struktur Payload sesuai spesifikasi
-      const payload = {
-        nama: namaValue,
-        whatsapp: waValue,
-        varian: currentVariant.name,
-        jumlah: selectedQuantity,
-        total: totalAmount,
-        namaFile: selectedProofFile.name,
-        fileData: selectedProofBase64TanpaHeader
-      };
-
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-
-        if (result && (result.status === "error" || result.error)) {
-          throw new Error(result.message || "Gagal menyimpan data ke sistem.");
-        }
-
-        // Tampilkan Modal Sukses
-        modalSummaryName.textContent = namaValue;
-        modalSummaryWa.textContent = waValue;
-        modalSummaryQty.textContent = `${selectedQuantity}x (${currentVariant.name})`;
-        modalSummaryTotal.textContent = formatRupiah(totalAmount);
-
-        successModal.classList.remove("opacity-0", "pointer-events-none");
-        modalContainer.classList.remove("scale-95");
-        modalContainer.classList.add("scale-100");
-        lucide.createIcons();
-
-      } catch (err) {
-        console.error("Gagal mengirim pesanan:", err);
-        alert("Terjadi kendala saat mengirim data: " + (err.message || "Koneksi terganggu. Silakan coba beberapa saat lagi."));
-      } finally {
-        setSubmittingState(false);
-      }
-    });
-
     function resetOrderForm() {
       inputName.value = "";
       inputWa.value = "";
@@ -1245,34 +1212,100 @@
       step2Label.classList.add("text-white/40");
     }
 
+    btnSubmitPayment.addEventListener("click", async () => {
+      if (!selectedProofBase64TanpaHeader || !selectedProofFile) {
+        errProof.classList.remove("hidden");
+        proofDropzone.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      setSubmittingState(true);
+
+      const currentVariant = VARIANTS[selectedVariantKey];
+      const totalAmount = currentVariant.price * selectedQuantity;
+      const namaVal = inputName.value.trim();
+      const waVal = inputWa.value.trim();
+
+      // Struktur Payload sesuai spesifikasi
+      const payload = {
+        nama: namaVal,
+        whatsapp: waVal,
+        varian: currentVariant.name,
+        jumlah: selectedQuantity,
+        total: totalAmount,
+        namaFile: selectedProofFile.name,
+        fileData: selectedProofBase64TanpaHeader
+      };
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        // Jika status === "SUCCESS" (atau format success), tampilkan modal konfirmasi pemesanan berhasil dan kosongkan form
+        const isSuccess = result && (
+          result.status === "SUCCESS" || 
+          result.status === "success" || 
+          (!result.error && result.status !== "error")
+        );
+
+        if (!isSuccess) {
+          throw new Error(result.message || "Gagal menyimpan data ke sistem.");
+        }
+
+        // Tampilkan Ringkasan di Modal
+        modalSummaryName.textContent = namaVal;
+        modalSummaryWa.textContent = waVal;
+        modalSummaryQty.textContent = `${selectedQuantity}x (${currentVariant.name})`;
+        modalSummaryTotal.textContent = formatRupiah(totalAmount);
+
+        // Buka modal sukses
+        successModal.classList.remove("opacity-0", "pointer-events-none");
+        modalContainer.classList.remove("scale-95");
+        modalContainer.classList.add("scale-100");
+        lucide.createIcons();
+
+        // Kosongkan form sesuai instruksi
+        resetOrderForm();
+
+      } catch (err) {
+        console.error("Gagal mengirim pesanan:", err);
+        alert("Terjadi kendala saat mengirim data: " + (err.message || "Koneksi terganggu. Silakan coba beberapa saat lagi."));
+      } finally {
+        setSubmittingState(false);
+      }
+    });
+
     btnCloseModal.addEventListener("click", () => {
       modalContainer.classList.remove("scale-100");
       modalContainer.classList.add("scale-95");
       successModal.classList.add("opacity-0", "pointer-events-none");
-      resetOrderForm();
     });
 
     btnModalCheckNow.addEventListener("click", () => {
-      const wa = inputWa.value.trim();
       modalContainer.classList.remove("scale-100");
       modalContainer.classList.add("scale-95");
       successModal.classList.add("opacity-0", "pointer-events-none");
 
-      resetOrderForm();
       switchTab("check");
-      if (wa) {
-        document.getElementById("checkWaInput").value = wa;
-        checkTicketStatus(wa);
-      }
     });
 
 
-    // ================== TAB 2: CEK STATUS & UNDUH TIKET ==================
+    // ================== TAB 2: CEK STATUS & UNDUH TIKET (VERIFIKASI GANDA) ==================
+    const checkNameInput = document.getElementById("checkNameInput");
     const checkWaInput = document.getElementById("checkWaInput");
+    const errCheckName = document.getElementById("errCheckName");
+    const errCheckWa = document.getElementById("errCheckWa");
+
     const btnSearchTicket = document.getElementById("btnSearchTicket");
     const btnSearchText = document.getElementById("btnSearchText");
     const btnSearchSpinner = document.getElementById("btnSearchSpinner");
-    const errCheckWa = document.getElementById("errCheckWa");
 
     const checkResultContainer = document.getElementById("checkResultContainer");
     const resultPending = document.getElementById("resultPending");
@@ -1282,7 +1315,6 @@
     const approvedTicketCode = document.getElementById("approvedTicketCode");
     const approvedName = document.getElementById("approvedName");
     const approvedVariant = document.getElementById("approvedVariant");
-    const approvedQty = document.getElementById("approvedQty");
     const btnDownloadPdf = document.getElementById("btnDownloadPdf");
 
     function setSearchLoading(isLoading) {
@@ -1304,20 +1336,39 @@
       resultApproved.classList.add("hidden");
     }
 
-    async function checkTicketStatus(waNumber) {
-      const cleanWa = waNumber.trim().replace(/\s|-/g, "");
+    async function checkTicketStatus() {
+      const namaInput = checkNameInput.value.trim();
+      const noWaInput = checkWaInput.value.trim().replace(/\s|-/g, "");
       const phoneRegex = /^[0-9+]{10,16}$/;
 
-      if (!cleanWa || !phoneRegex.test(cleanWa)) {
-        errCheckWa.classList.remove("hidden");
-        return;
+      let isValid = true;
+
+      // Validasi kedua input wajib
+      if (!namaInput) {
+        errCheckName.classList.remove("hidden");
+        checkNameInput.classList.add("border-red-500");
+        isValid = false;
+      } else {
+        errCheckName.classList.add("hidden");
+        checkNameInput.classList.remove("border-red-500");
       }
-      errCheckWa.classList.add("hidden");
+
+      if (!noWaInput || !phoneRegex.test(noWaInput)) {
+        errCheckWa.classList.remove("hidden");
+        checkWaInput.classList.add("border-red-500");
+        isValid = false;
+      } else {
+        errCheckWa.classList.add("hidden");
+        checkWaInput.classList.remove("border-red-500");
+      }
+
+      if (!isValid) return;
+
       setSearchLoading(true);
       hideAllResults();
 
       try {
-        // Kirim request POST action "check_ticket" ke SCRIPT_URL
+        // Kirim request POST action "check_ticket" dengan verifikasi ganda (whatsapp + nama)
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
           headers: {
@@ -1325,27 +1376,42 @@
           },
           body: JSON.stringify({
             action: "check_ticket",
-            whatsapp: cleanWa
+            whatsapp: noWaInput,
+            nama: namaInput
           })
         });
 
-        const data = await response.json();
+        const res = await response.json();
 
-        const statusUpper = (data.status || "").toUpperCase();
-
-        if (statusUpper === "NOT_FOUND" || data.found === false) {
+        // 1. Jika NOT_FOUND
+        if (res.status === "NOT_FOUND" || res.found === false) {
           resultNotFound.classList.remove("hidden");
-          alert("Nomor WhatsApp belum terdaftar. Pastikan nomor yang dimasukkan sama dengan saat memesan.");
-        } else if (statusUpper === "PENDING" || data.paymentStatus === "PENDING") {
+        } 
+        // 2. Jika FOUND dan statusBayar === "PENDING"
+        else if (
+          (res.status === "FOUND" && res.statusBayar === "PENDING") ||
+          res.status === "PENDING" || 
+          res.paymentStatus === "PENDING"
+        ) {
+          resultApproved.classList.add("hidden");
           resultPending.classList.remove("hidden");
-        } else if (statusUpper === "APPROVED" || data.paymentStatus === "APPROVED") {
-          approvedTicketCode.textContent = data.ticketCode || ("#BB26-" + cleanWa.slice(-4));
-          approvedName.textContent = data.nama || "Peserta Bingkai Bisu";
-          approvedVariant.textContent = data.varian || "2 Day Pass";
-          approvedQty.textContent = `${data.jumlah || 1} Tiket`;
-          btnDownloadPdf.href = data.linkPdf || data.pdfUrl || "#";
+        } 
+        // 3. Jika FOUND dan statusBayar === "APPROVED"
+        else if (
+          (res.status === "FOUND" && res.statusBayar === "APPROVED") ||
+          res.status === "APPROVED" || 
+          res.paymentStatus === "APPROVED"
+        ) {
+          resultPending.classList.add("hidden");
+
+          approvedName.textContent = res.nama || namaInput;
+          approvedVariant.textContent = (res.varian || "2 Day Pass") + " (" + (res.jumlah || 1) + " Tiket)";
+          approvedTicketCode.textContent = res.kodeTiket || res.ticketCode || ("#BB26-" + noWaInput.slice(-4));
+          btnDownloadPdf.href = res.linkPdf || res.pdfUrl || "#";
+
           resultApproved.classList.remove("hidden");
         } else {
+          // Default jika status lain
           resultPending.classList.remove("hidden");
         }
 
@@ -1358,14 +1424,17 @@
       }
     }
 
-    btnSearchTicket.addEventListener("click", () => {
-      checkTicketStatus(checkWaInput.value);
-    });
+    btnSearchTicket.addEventListener("click", checkTicketStatus);
 
-    checkWaInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        checkTicketStatus(checkWaInput.value);
-      }
+    [checkNameInput, checkWaInput].forEach(inp => {
+      inp.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          checkTicketStatus();
+        }
+      });
+      inp.addEventListener("input", () => {
+        inp.classList.remove("border-red-500");
+      });
     });
   </script>
 </body>

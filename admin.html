@@ -77,15 +77,14 @@
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night/95 backdrop-blur-md"
   >
     <div class="w-full max-w-sm bg-night-card border border-night-border rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
-      <!-- Glow ambient -->
       <div class="absolute -top-12 -right-12 w-32 h-32 bg-pastel-purple/20 rounded-full blur-2xl"></div>
 
       <div class="w-16 h-16 mx-auto rounded-2xl bg-pastel-purple/10 border border-pastel-purple/30 text-pastel-purple flex items-center justify-center mb-4">
         <i data-lucide="shield-check" class="w-8 h-8"></i>
       </div>
 
-      <h2 class="font-display font-bold text-2xl text-white mb-1">Akses Panitia</h2>
-      <p class="text-xs text-white/60 mb-6">Masukkan PIN keamanan panitia untuk membuka dashboard verifikasi.</p>
+      <h2 class="font-display font-bold text-2xl text-white mb-1">Masukkan PIN Panitia</h2>
+      <p class="text-xs text-white/60 mb-6">Masukkan PIN keamanan untuk mengakses panel verifikasi tiket.</p>
 
       <form id="pinForm" class="space-y-4">
         <div>
@@ -93,7 +92,7 @@
             type="password" 
             id="inputPin" 
             maxlength="10" 
-            placeholder="Masukkan PIN" 
+            placeholder="PIN (Default: 2026)" 
             autocomplete="current-password"
             class="w-full text-center text-xl tracking-[0.3em] font-mono py-3.5 px-4 rounded-xl bg-night-input border border-night-border text-white focus:outline-none focus:border-pastel-purple focus:ring-1 focus:ring-pastel-purple transition duration-200"
           />
@@ -136,9 +135,9 @@
           />
           <div class="border-l border-white/10 pl-3">
             <h1 class="font-display font-bold text-base sm:text-lg text-white leading-none">
-              Panel Verifikasi Tiket
+              Panel Verifikasi Tiket - Bingkai Bisu 2026
             </h1>
-            <span class="text-[11px] text-pastel-yellow font-medium">Bingkai Bisu - Fixlens Festival 2026</span>
+            <span class="text-[11px] text-pastel-yellow font-medium">Fixlens Festival 2026 • Hetero Space Banyumas</span>
           </div>
         </div>
 
@@ -147,7 +146,7 @@
           <button 
             type="button" 
             id="btnRefreshData" 
-            class="py-2.5 px-4 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-white hover:border-pastel-purple transition-all duration-200 flex items-center gap-2 cursor-pointer"
+            class="py-2.5 px-4 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-white hover:border-pastel-purple transition-all duration-200 flex items-center gap-2 cursor-pointer shadow-sm"
           >
             <i data-lucide="refresh-cw" id="iconRefresh" class="w-3.5 h-3.5"></i>
             <span>Segarkan Data</span>
@@ -195,21 +194,23 @@
 
         <div class="p-5 rounded-2xl bg-night-card border border-night-border flex items-center justify-between">
           <div>
-            <span class="text-xs text-white/50 block font-medium">Tiket Terverifikasi (ACC)</span>
-            <span id="statAccCount" class="font-display font-extrabold text-2xl sm:text-3xl text-emerald-400">-</span>
+            <span class="text-xs text-white/50 block font-medium">Lokasi Pameran</span>
+            <span class="font-display font-bold text-base text-white">Hetero Space Banyumas</span>
+            <span class="text-[11px] text-white/40 block">29 - 30 November 2026</span>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+          <div class="w-12 h-12 rounded-xl bg-pastel-purple/10 text-pastel-purple flex items-center justify-center">
+            <i data-lucide="map-pin" class="w-6 h-6"></i>
           </div>
         </div>
 
         <div class="p-5 rounded-2xl bg-night-card border border-night-border flex items-center justify-between">
           <div>
-            <span class="text-xs text-white/50 block font-medium">Lokasi Pameran</span>
-            <span class="font-display font-bold text-base text-white">Hetero Space Banyumas</span>
+            <span class="text-xs text-white/50 block font-medium">Status Integrasi</span>
+            <span class="font-display font-bold text-sm text-emerald-400">Google Apps Script</span>
+            <span class="text-[11px] text-white/40 block">Sheet & Drive Connected</span>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-pastel-purple/10 text-pastel-purple flex items-center justify-center">
-            <i data-lucide="map-pin" class="w-6 h-6"></i>
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <i data-lucide="database" class="w-6 h-6"></i>
           </div>
         </div>
 
@@ -220,17 +221,17 @@
         
         <div class="p-5 sm:p-6 border-b border-night-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 class="font-display font-bold text-lg text-white">Antrean Pembayaran Menunggu Konfirmasi</h2>
-            <p class="text-xs text-white/50 mt-0.5">Periksa struk transfer, lalu klik tombol ACC untuk menerbitkan E-Ticket resmi.</p>
+            <h2 class="font-display font-bold text-lg text-white">Antrean Pesanan Tiket (Status: PENDING)</h2>
+            <p class="text-xs text-white/50 mt-0.5">Periksa bukti struk transfer, lalu klik tombol ACC untuk menerbitkan E-Ticket resmi.</p>
           </div>
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-pastel-yellow animate-pulse"></span>
-            <span class="text-xs font-mono text-pastel-yellow font-semibold">Mode Live Database</span>
+            <span class="text-xs font-mono text-pastel-yellow font-semibold">Live Pending Queue</span>
           </div>
         </div>
 
         <!-- Table Responsive Wrapper -->
-        <div class="overflow-x-auto min-h-[280px] relative">
+        <div class="overflow-x-auto min-h-[300px] relative">
           
           <!-- Loading State Overlay -->
           <div id="tableLoading" class="absolute inset-0 bg-night/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-3">
@@ -245,13 +246,13 @@
             <thead>
               <tr class="border-b border-night-border bg-[#14141E] text-white/50 uppercase font-mono tracking-wider text-[11px]">
                 <th class="py-3.5 px-4 w-12 text-center">No</th>
-                <th class="py-3.5 px-4">Tanggal / Waktu</th>
+                <th class="py-3.5 px-4">Waktu Pesan</th>
                 <th class="py-3.5 px-4">Nama Pemesan</th>
                 <th class="py-3.5 px-4">WhatsApp</th>
-                <th class="py-3.5 px-4">Varian & Qty</th>
+                <th class="py-3.5 px-4">Varian & Jumlah</th>
                 <th class="py-3.5 px-4">Total Bayar</th>
-                <th class="py-3.5 px-4 text-center">Bukti Transfer</th>
-                <th class="py-3.5 px-4 text-center">Aksi Verifikasi</th>
+                <th class="py-3.5 px-4 text-center">Bukti Bayar</th>
+                <th class="py-3.5 px-4 text-center">Tindakan</th>
               </tr>
             </thead>
             <tbody id="tableBody" class="divide-y divide-night-border/70 text-white/80">
@@ -266,7 +267,7 @@
             </div>
             <h3 class="font-display font-bold text-base text-white">Semua Pembayaran Telah Terverifikasi!</h3>
             <p class="text-xs text-white/50 max-w-sm mx-auto">
-              Saat ini tidak ada antrean pending. Klik tombol <strong>Segarkan Data</strong> untuk mengecek pesanan baru yang masuk.
+              Saat ini tidak ada antrean pending. Klik tombol <strong>Segarkan Data</strong> untuk mengecek pesanan baru.
             </p>
           </div>
 
@@ -284,9 +285,73 @@
   </div>
 
 
+  <!-- ==================== MODAL PRATINJAU BUKTI PEMBAYARAN ==================== -->
+  <div 
+    id="receiptModal" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div 
+      id="receiptModalContainer" 
+      class="w-full max-w-lg bg-night-card border border-night-border rounded-3xl p-6 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-300 space-y-5"
+    >
+      <div class="flex items-center justify-between border-b border-night-border pb-3">
+        <div>
+          <h3 class="font-display font-bold text-base text-white">Pratinjau Bukti Pembayaran</h3>
+          <p id="receiptModalAttendee" class="text-xs text-pastel-yellow font-medium">Nama: -</p>
+        </div>
+        <button 
+          type="button" 
+          id="btnCloseReceiptModal" 
+          class="p-2 rounded-xl text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Preview Image Container -->
+      <div class="relative w-full max-h-[380px] min-h-[220px] rounded-2xl overflow-hidden bg-night-input border border-night-border flex items-center justify-center p-2">
+        <img 
+          id="receiptModalImg" 
+          src="" 
+          alt="Bukti Transfer" 
+          class="max-h-[360px] w-auto max-w-full object-contain rounded-xl"
+        />
+        <div id="receiptImgFallback" class="hidden text-center text-white/50 text-xs p-6">
+          <i data-lucide="image-off" class="w-8 h-8 mx-auto mb-2 text-white/30"></i>
+          <span>Gambar tidak dapat dimuat langsung atau berupa link Google Drive. Silakan klik tombol "Buka Tab Baru ↗" di bawah.</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons in Modal -->
+      <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+        <a 
+          id="btnReceiptOpenNewTab" 
+          href="#" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="w-full sm:w-auto py-3 px-4 rounded-xl border border-night-border bg-night-input hover:bg-night-border text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+        >
+          <span>Buka Tab Baru ↗</span>
+        </a>
+
+        <button 
+          type="button" 
+          id="btnModalAcc" 
+          class="flex-1 w-full py-3.5 px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>✔ Setujui Pembayaran Ini</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXvOR1OG8aFXSg7yoQ1TcyAZNRqGOiq2PeB-l9_X3arDJ6P0kbhaog3gNhIlMF6edC/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbXvOR1OG8aFXSg7yoQ1TcyAZNRqGOiq2PeB-l9_X3arDJ6P0kbhaog3gNhIlMF6edC/exec";
     const DEFAULT_PIN = "2026";
 
     // Inisialisasi Lucide Icons
@@ -300,7 +365,7 @@
     const pinErrorMsg = document.getElementById("pinErrorMsg");
     const btnLogout = document.getElementById("btnLogout");
 
-    // DOM Elements Data
+    // DOM Elements Data Table
     const tableBody = document.getElementById("tableBody");
     const tableLoading = document.getElementById("tableLoading");
     const tableEmpty = document.getElementById("tableEmpty");
@@ -308,7 +373,19 @@
     const btnRefreshData = document.getElementById("btnRefreshData");
     const iconRefresh = document.getElementById("iconRefresh");
 
-    // Format Rupiah
+    // DOM Elements Modal Receipt
+    const receiptModal = document.getElementById("receiptModal");
+    const receiptModalContainer = document.getElementById("receiptModalContainer");
+    const btnCloseReceiptModal = document.getElementById("btnCloseReceiptModal");
+    const receiptModalAttendee = document.getElementById("receiptModalAttendee");
+    const receiptModalImg = document.getElementById("receiptModalImg");
+    const receiptImgFallback = document.getElementById("receiptImgFallback");
+    const btnReceiptOpenNewTab = document.getElementById("btnReceiptOpenNewTab");
+    const btnModalAcc = document.getElementById("btnModalAcc");
+
+    let currentModalItem = null;
+
+    // Helper Format Rupiah
     function formatRupiah(amount) {
       if (!amount) return "Rp 0";
       const num = parseInt(amount, 10);
@@ -385,7 +462,7 @@
         tableBody.innerHTML = `
           <tr>
             <td colspan="8" class="py-8 text-center text-red-400">
-              Gagal menghubungi server database. Periksa koneksi atau URL Apps Script.
+              Gagal menghubungi server database. Periksa koneksi atau konfigurasi Apps Script.
             </td>
           </tr>
         `;
@@ -396,7 +473,7 @@
       }
     }
 
-    // ================== RENDER TABEL ==================
+    // ================== RENDER TABEL ANTREAN ==================
     function renderTableRows(items) {
       tableBody.innerHTML = "";
 
@@ -413,11 +490,13 @@
 
         const cleanWa = (item.whatsapp || "").toString().replace(/['\s-]/g, "");
         const waLink = `https://wa.me/${cleanWa.replace(/^0/, "62")}?text=Halo%20${encodeURIComponent(item.nama || "")},%20konfirmasi%20tiket%20Bingkai%20Bisu%202026`;
+        const buktiUrl = item.linkBukti || item.fileUrl || "-";
+        const waktuPesan = item.waktu || item.timestamp || "-";
 
         tr.innerHTML = `
           <td class="py-4 px-4 text-center font-mono text-white/50">${index + 1}</td>
           <td class="py-4 px-4 whitespace-nowrap font-mono text-[11px] text-white/60">
-            ${item.timestamp || "-"}
+            ${waktuPesan}
           </td>
           <td class="py-4 px-4 font-semibold text-white">
             ${item.nama || "-"}
@@ -441,16 +520,15 @@
             ${formatRupiah(item.total)}
           </td>
           <td class="py-4 px-4 text-center whitespace-nowrap">
-            ${item.fileUrl && item.fileUrl !== "-" ? `
-              <a 
-                href="${item.fileUrl}" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pastel-purple/10 text-pastel-purple hover:bg-pastel-purple/20 transition-colors font-medium text-xs"
+            ${buktiUrl && buktiUrl !== "-" ? `
+              <button 
+                type="button" 
+                class="btn-preview-receipt inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pastel-purple/15 text-pastel-purple hover:bg-pastel-purple/25 transition-colors font-medium text-xs cursor-pointer"
+                data-index="${index}"
               >
-                <i data-lucide="image" class="w-3.5 h-3.5"></i>
-                <span>Lihat Struk ↗</span>
-              </a>
+                <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                <span>🔍 Lihat Struk</span>
+              </button>
             ` : `<span class="text-white/30 text-xs">-</span>`}
           </td>
           <td class="py-4 px-4 text-center whitespace-nowrap">
@@ -461,7 +539,7 @@
               data-name="${item.nama || 'Peserta'}"
             >
               <i data-lucide="check" class="w-3.5 h-3.5"></i>
-              <span>✔ ACC & Terbitkan</span>
+              <span>✔ ACC & Terbitkan Tiket</span>
             </button>
           </td>
         `;
@@ -469,31 +547,99 @@
         tableBody.appendChild(tr);
       });
 
-      // Bind tombol ACC
+      // Bind Tombol "🔍 Lihat Struk"
+      document.querySelectorAll(".btn-preview-receipt").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const idx = parseInt(e.currentTarget.dataset.index, 10);
+          openReceiptModal(items[idx]);
+        });
+      });
+
+      // Bind Tombol "✔ ACC & Terbitkan Tiket"
       document.querySelectorAll(".btn-acc").forEach(btn => {
-        btn.addEventListener("click", handleAccTicket);
+        btn.addEventListener("click", (e) => {
+          const rowIndex = e.currentTarget.dataset.row;
+          const attendeeName = e.currentTarget.dataset.name;
+          executeAccTicket(rowIndex, attendeeName, e.currentTarget);
+        });
       });
     }
 
-    // ================== HANDLE ACC / VERIFIKASI ==================
-    async function handleAccTicket(e) {
-      const btn = e.currentTarget;
-      const rowIndex = btn.dataset.row;
-      const attendeeName = btn.dataset.name;
+    // ================== MODAL PREVIEW STRUK ==================
+    function openReceiptModal(item) {
+      currentModalItem = item;
+      const buktiUrl = item.linkBukti || item.fileUrl || "";
 
-      if (!confirm(`Konfirmasi pembayaran atas nama "${attendeeName}" dan terbitkan E-Ticket?`)) {
+      receiptModalAttendee.textContent = `Pemesan: ${item.nama || "-"} • ${item.varian || "2 Day Pass"} (${formatRupiah(item.total)})`;
+      btnReceiptOpenNewTab.href = buktiUrl;
+
+      // Handle Drive image preview
+      receiptModalImg.src = "";
+      receiptModalImg.classList.remove("hidden");
+      receiptImgFallback.classList.add("hidden");
+
+      if (buktiUrl && buktiUrl !== "-") {
+        // Coba tampilkan direct preview
+        let directImgUrl = buktiUrl;
+        if (buktiUrl.includes("drive.google.com/file/d/")) {
+          const match = buktiUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+          if (match && match[1]) {
+            directImgUrl = `https://drive.google.com/uc?export=view&id=${match[1]}`;
+          }
+        }
+        receiptModalImg.src = directImgUrl;
+        receiptModalImg.onerror = function() {
+          receiptModalImg.classList.add("hidden");
+          receiptImgFallback.classList.remove("hidden");
+          lucide.createIcons();
+        };
+      } else {
+        receiptModalImg.classList.add("hidden");
+        receiptImgFallback.classList.remove("hidden");
+      }
+
+      receiptModal.classList.remove("opacity-0", "pointer-events-none");
+      receiptModalContainer.classList.remove("scale-95");
+      receiptModalContainer.classList.add("scale-100");
+      lucide.createIcons();
+    }
+
+    function closeReceiptModal() {
+      receiptModalContainer.classList.remove("scale-100");
+      receiptModalContainer.classList.add("scale-95");
+      receiptModal.classList.add("opacity-0", "pointer-events-none");
+      currentModalItem = null;
+    }
+
+    btnCloseReceiptModal.addEventListener("click", closeReceiptModal);
+    receiptModal.addEventListener("click", (e) => {
+      if (e.target === receiptModal) closeReceiptModal();
+    });
+
+    // ACC Langsung dari dalam Modal
+    btnModalAcc.addEventListener("click", () => {
+      if (currentModalItem) {
+        executeAccTicket(currentModalItem.rowIndex, currentModalItem.nama || "Peserta", btnModalAcc);
+      }
+    });
+
+    // ================== EKSEKUSI ACC TIKET ==================
+    async function executeAccTicket(rowIndex, attendeeName, buttonElement) {
+      if (!confirm(`Konfirmasi pembayaran atas nama "${attendeeName}" dan terbitkan E-Ticket (PDF)?`)) {
         return;
       }
 
-      btn.disabled = true;
-      const originalHtml = btn.innerHTML;
-      btn.innerHTML = `
-        <svg class="animate-spin h-3.5 w-3.5 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-        </svg>
-        <span>Menerbitkan...</span>
-      `;
+      const originalHtml = buttonElement ? buttonElement.innerHTML : "";
+      if (buttonElement) {
+        buttonElement.disabled = true;
+        buttonElement.innerHTML = `
+          <svg class="animate-spin h-3.5 w-3.5 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <span>Menerbitkan...</span>
+        `;
+      }
 
       try {
         const response = await fetch(SCRIPT_URL, {
@@ -513,19 +659,22 @@
           throw new Error(res.message || "Gagal verifikasi di server.");
         }
 
-        alert(`Sukses! Pembayaran ${attendeeName} telah di-ACC. E-Ticket telah diterbitkan dan dapat diunduh pemesan.`);
+        alert(`Sukses! Pembayaran "${attendeeName}" telah di-ACC dan E-Ticket (PDF) telah diterbitkan.`);
+        closeReceiptModal();
         loadPendingOrders();
 
       } catch (err) {
         console.error("Gagal ACC tiket:", err);
         alert("Gagal melakukan ACC: " + err.message);
-        btn.disabled = false;
-        btn.innerHTML = originalHtml;
-        lucide.createIcons();
+        if (buttonElement) {
+          buttonElement.disabled = false;
+          buttonElement.innerHTML = originalHtml;
+          lucide.createIcons();
+        }
       }
     }
 
-    // Segarkan Data Manual
+    // Tombol Segarkan Data
     btnRefreshData.addEventListener("click", loadPendingOrders);
 
     // Initial check

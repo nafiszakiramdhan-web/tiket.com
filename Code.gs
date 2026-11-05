@@ -3,9 +3,9 @@
  * 
  * Melayani:
  * 1. Form Pemesanan Publik (Simpan ke Sheets & Upload Bukti Transfer ke Drive)
- * 2. Cek Status & Unduh E-Ticket (action: "check_ticket")
+ * 2. Cek Status & Unduh E-Ticket (action: "check_ticket", verifikasi ganda WA + Nama)
  * 3. Dashboard Admin - Ambil Antrean Pending (action: "admin_get_pending")
- * 4. Dashboard Admin - ACC Tiket (action: "admin_acc")
+ * 4. Dashboard Admin - ACC & Terbitkan Tiket (action: "admin_acc")
  */
 
 var SHEET_NAME = "Pesanan Tiket";
@@ -34,21 +34,25 @@ function doPost(e) {
       for (var i = 1; i < data.length; i++) {
         var rowStatus = (data[i][8] || "PENDING").toString().toUpperCase().trim();
         if (rowStatus === "PENDING") {
+          var fileBukti = data[i][7] || "-";
           pendingList.push({
             rowIndex: i + 1, // Baris 1-indexed untuk SpreadsheetApp
+            waktu: data[i][0] ? data[i][0].toString() : "-",
             timestamp: data[i][0] ? data[i][0].toString() : "-",
+            kodeTiket: data[i][1] || ("#BB26-" + (i + 100)),
             ticketCode: data[i][1] || ("#BB26-" + (i + 100)),
             nama: data[i][2] || "-",
             whatsapp: (data[i][3] || "").toString().replace(/['\s-]/g, ""),
             varian: data[i][4] || "2 Day Pass",
             jumlah: data[i][5] || 1,
             total: data[i][6] || 0,
-            fileUrl: data[i][7] || "-"
+            linkBukti: fileBukti,
+            fileUrl: fileBukti
           });
         }
       }
 
-      return createJsonResponse({ status: "success", data: pendingList });
+      return createJsonResponse({ status: "SUCCESS", data: pendingList });
     }
 
     // ==========================================
@@ -66,53 +70,61 @@ function doPost(e) {
       // Cek apakah link PDF sudah ada di Kolom J / index 10
       var currentPdf = sheet.getRange(targetRow, 10).getValue();
       if (!currentPdf || currentPdf.toString().trim() === "") {
-        // Link template E-Ticket default atau folder tiket
+        // Link default Google Drive E-Ticket jika belum terisi manual
         sheet.getRange(targetRow, 10).setValue("https://drive.google.com");
       }
 
       return createJsonResponse({
-        status: "success",
+        status: "SUCCESS",
         message: "Tiket pada baris " + targetRow + " berhasil disetujui (APPROVED)."
       });
     }
 
     // ==========================================
-    // ACTION 3: PUBLIK - CEK STATUS & UNDUH
+    // ACTION 3: PUBLIK - CEK STATUS & UNDUH (VERIFIKASI GANDA WA + NAMA)
     // ==========================================
     if (action === "check_ticket") {
       var waQuery = (payload.whatsapp || "").toString().trim().replace(/['\s-]/g, "");
+      var nameQuery = (payload.nama || "").toString().trim().toLowerCase();
       var allData = sheet.getDataRange().getValues();
 
       if (allData.length <= 1) {
         return createJsonResponse({ status: "NOT_FOUND", found: false, message: "Belum ada data tiket." });
       }
 
-      // Cari data terbaru dari bawah ke atas
+      // Cari data dari baris terbaru ke lama
       for (var r = allData.length - 1; r >= 1; r--) {
         var rowWa = (allData[r][3] || "").toString().trim().replace(/['\s-]/g, "");
+        var rowName = (allData[r][2] || "").toString().trim().toLowerCase();
+
         var cleanRowWa = rowWa.replace(/^0/, "62");
         var cleanQueryWa = waQuery.replace(/^0/, "62");
 
-        if (cleanRowWa === cleanQueryWa || rowWa === waQuery) {
+        var waMatch = (cleanRowWa === cleanQueryWa || rowWa === waQuery);
+        var nameMatch = !nameQuery || rowName.includes(nameQuery) || nameQuery.includes(rowName);
+
+        if (waMatch && nameMatch) {
           var paymentStatus = (allData[r][8] || "PENDING").toString().toUpperCase().trim();
           var linkPdf = (allData[r][9] || "").toString().trim();
+          var ticketCode = allData[r][1] || ("#BB26-" + waQuery.slice(-4));
 
           return createJsonResponse({
-            status: paymentStatus, // "PENDING" atau "APPROVED"
-            paymentStatus: paymentStatus,
+            status: "FOUND",
+            statusBayar: paymentStatus,
             found: true,
-            ticketCode: allData[r][1] || ("#BB26-" + waQuery.slice(-4)),
+            kodeTiket: ticketCode,
+            ticketCode: ticketCode,
             nama: allData[r][2],
             varian: allData[r][4],
             jumlah: allData[r][5],
             total: allData[r][6],
-            linkPdf: linkPdf,
-            pdfUrl: linkPdf
+            linkPdf: linkPdf || "https://drive.google.com",
+            pdfUrl: linkPdf || "https://drive.google.com"
           });
         }
       }
 
-      return createJsonResponse({ status: "NOT_FOUND", found: false, message: "Nomor WhatsApp belum terdaftar." });
+      return createJsonResponse({ status: "NOT_FOUND", found: false, message: "Nomor WhatsApp dan Nama tidak cocok." });
     }
 
     // ==========================================
@@ -176,11 +188,11 @@ function doPost(e) {
       payload.total,
       fileUrl,
       "PENDING",
-      "" // Link PDF awal kosong sampai di-ACC panitia
+      ""
     ]);
 
     return createJsonResponse({
-      status: "success",
+      status: "SUCCESS",
       message: "Data pemesanan dan bukti pembayaran berhasil disimpan!",
       ticketCode: ticketCode
     });
@@ -194,7 +206,7 @@ function doPost(e) {
 }
 
 /**
- * Handle GET Request (Status Test)
+ * Handle GET Request
  */
 function doGet(e) {
   return createJsonResponse({
