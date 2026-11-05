@@ -47,7 +47,7 @@ Sistem Single Page Application (SPA) responsif, modern, dan estetik untuk pamera
 
 ## 🌐 Endpoint Backend Google Apps Script
 ```javascript
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXvOR1OG8aFXSg7yoQ1TcyAZNRqGOiq2PeB-l9_X3arDJ6P0kbhaog3gNhIlMF6edC/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRMLG227dO9VkqJh__-Prb6HGw_t1JMY14FLLeQHO6kMwq5jlClzXlkMTfMYOh31zw/exec";
 ```
 
 ---
