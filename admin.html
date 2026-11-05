@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Panel Verifikasi Tiket | Bingkai Bisu 2026</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Google Fonts: Plus Jakarta Sans, Syne, Space Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            night: '#0F0F14',
+            'night-card': '#16161E',
+            'night-input': '#1D1D27',
+            'night-border': '#2A2A38',
+            pastel: {
+              purple: '#B8A9E3',
+              'purple-hover': '#A695D8',
+              'purple-light': '#D6CDF3',
+              yellow: '#F7D070',
+              'yellow-hover': '#EAC15B',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Syne"', 'sans-serif'],
+            mono: ['"Space Mono"', 'monospace'],
+          },
+          boxShadow: {
+            'glow-purple': '0 0 35px -5px rgba(184, 169, 227, 0.25)',
+            'glow-yellow': '0 0 30px -5px rgba(247, 208, 112, 0.25)',
+            'glow-green': '0 0 30px -5px rgba(52, 211, 153, 0.3)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      background-color: #0F0F14;
+      color: #FFFFFF;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(184, 169, 227, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(247, 208, 112, 0.05) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0F0F14; }
+    ::-webkit-scrollbar-thumb { background: #2A2A38; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #B8A9E3; }
+  </style>
+</head>
+<body class="selection:bg-pastel-purple selection:text-night flex flex-col justify-between min-h-screen">
+
+  <!-- Top Accent Bar -->
+  <div class="h-1 w-full bg-gradient-to-r from-pastel-purple via-pastel-yellow to-pastel-purple"></div>
+
+  <!-- ==================== PIN AUTHENTICATION MODAL ==================== -->
+  <div 
+    id="pinAuthModal" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night/95 backdrop-blur-md"
+  >
+    <div class="w-full max-w-sm bg-night-card border border-night-border rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
+      <!-- Glow ambient -->
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-pastel-purple/20 rounded-full blur-2xl"></div>
+
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-pastel-purple/10 border border-pastel-purple/30 text-pastel-purple flex items-center justify-center mb-4">
+        <i data-lucide="shield-check" class="w-8 h-8"></i>
+      </div>
+
+      <h2 class="font-display font-bold text-2xl text-white mb-1">Akses Panitia</h2>
+      <p class="text-xs text-white/60 mb-6">Masukkan PIN keamanan panitia untuk membuka dashboard verifikasi.</p>
+
+      <form id="pinForm" class="space-y-4">
+        <div>
+          <input 
+            type="password" 
+            id="inputPin" 
+            maxlength="10" 
+            placeholder="Masukkan PIN" 
+            autocomplete="current-password"
+            class="w-full text-center text-xl tracking-[0.3em] font-mono py-3.5 px-4 rounded-xl bg-night-input border border-night-border text-white focus:outline-none focus:border-pastel-purple focus:ring-1 focus:ring-pastel-purple transition duration-200"
+          />
+          <p id="pinErrorMsg" class="text-xs text-red-400 mt-2 hidden flex items-center justify-center gap-1">
+            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> PIN Salah! Silakan coba lagi.
+          </p>
+        </div>
+
+        <button 
+          type="submit" 
+          class="w-full py-3.5 px-6 rounded-xl font-display font-bold text-sm uppercase tracking-wider text-night bg-pastel-purple hover:bg-pastel-purple-hover active:scale-[0.99] transition-all duration-200 shadow-glow-purple cursor-pointer flex items-center justify-center gap-2"
+        >
+          <i data-lucide="unlock" class="w-4 h-4"></i>
+          <span>Buka Dashboard</span>
+        </button>
+
+        <a 
+          href="index.html" 
+          class="block text-xs text-white/40 hover:text-white pt-2 transition-colors"
+        >
+          ← Kembali ke Halaman Pemesanan
+        </a>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ==================== MAIN ADMIN DASHBOARD ==================== -->
+  <div id="mainDashboard" class="hidden flex-1 flex flex-col">
+    
+    <!-- Navbar Admin -->
+    <nav class="border-b border-night-border/80 bg-night-card/70 backdrop-blur-md sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        
+        <div class="flex items-center gap-3">
+          <img 
+            src="asset/LOGO_BINGKAI_BISU.png" 
+            alt="Logo Bingkai Bisu" 
+            class="h-10 w-auto object-contain"
+          />
+          <div class="border-l border-white/10 pl-3">
+            <h1 class="font-display font-bold text-base sm:text-lg text-white leading-none">
+              Panel Verifikasi Tiket
+            </h1>
+            <span class="text-[11px] text-pastel-yellow font-medium">Bingkai Bisu - Fixlens Festival 2026</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- Tombol Segarkan Data -->
+          <button 
+            type="button" 
+            id="btnRefreshData" 
+            class="py-2.5 px-4 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-white hover:border-pastel-purple transition-all duration-200 flex items-center gap-2 cursor-pointer"
+          >
+            <i data-lucide="refresh-cw" id="iconRefresh" class="w-3.5 h-3.5"></i>
+            <span>Segarkan Data</span>
+          </button>
+
+          <!-- Tautan Halaman Publik -->
+          <a 
+            href="index.html" 
+            target="_blank" 
+            class="py-2.5 px-4 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-white/70 hover:text-white transition-all duration-200 flex items-center gap-1.5"
+          >
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            <span>Web Publik</span>
+          </a>
+
+          <!-- Tombol Logout -->
+          <button 
+            type="button" 
+            id="btnLogout" 
+            class="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all duration-200 cursor-pointer"
+            title="Kunci / Keluar"
+          >
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 flex-1 space-y-6">
+
+      <!-- Summary Stats Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        
+        <div class="p-5 rounded-2xl bg-night-card border border-night-border flex items-center justify-between">
+          <div>
+            <span class="text-xs text-white/50 block font-medium">Antrean Verifikasi (Pending)</span>
+            <span id="statPendingCount" class="font-display font-extrabold text-2xl sm:text-3xl text-pastel-yellow">0</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-pastel-yellow/10 text-pastel-yellow flex items-center justify-center">
+            <i data-lucide="clock" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-night-card border border-night-border flex items-center justify-between">
+          <div>
+            <span class="text-xs text-white/50 block font-medium">Tiket Terverifikasi (ACC)</span>
+            <span id="statAccCount" class="font-display font-extrabold text-2xl sm:text-3xl text-emerald-400">-</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-night-card border border-night-border flex items-center justify-between">
+          <div>
+            <span class="text-xs text-white/50 block font-medium">Lokasi Pameran</span>
+            <span class="font-display font-bold text-base text-white">Hetero Space Banyumas</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-pastel-purple/10 text-pastel-purple flex items-center justify-center">
+            <i data-lucide="map-pin" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Table Card Container -->
+      <div class="bg-night-card rounded-2xl border border-night-border shadow-2xl overflow-hidden">
+        
+        <div class="p-5 sm:p-6 border-b border-night-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="font-display font-bold text-lg text-white">Antrean Pembayaran Menunggu Konfirmasi</h2>
+            <p class="text-xs text-white/50 mt-0.5">Periksa struk transfer, lalu klik tombol ACC untuk menerbitkan E-Ticket resmi.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-pastel-yellow animate-pulse"></span>
+            <span class="text-xs font-mono text-pastel-yellow font-semibold">Mode Live Database</span>
+          </div>
+        </div>
+
+        <!-- Table Responsive Wrapper -->
+        <div class="overflow-x-auto min-h-[280px] relative">
+          
+          <!-- Loading State Overlay -->
+          <div id="tableLoading" class="absolute inset-0 bg-night/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-3">
+            <svg class="animate-spin h-8 w-8 text-pastel-purple" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <span class="text-xs text-white/70 font-mono tracking-wider">Memuat antrean pending...</span>
+          </div>
+
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b border-night-border bg-[#14141E] text-white/50 uppercase font-mono tracking-wider text-[11px]">
+                <th class="py-3.5 px-4 w-12 text-center">No</th>
+                <th class="py-3.5 px-4">Tanggal / Waktu</th>
+                <th class="py-3.5 px-4">Nama Pemesan</th>
+                <th class="py-3.5 px-4">WhatsApp</th>
+                <th class="py-3.5 px-4">Varian & Qty</th>
+                <th class="py-3.5 px-4">Total Bayar</th>
+                <th class="py-3.5 px-4 text-center">Bukti Transfer</th>
+                <th class="py-3.5 px-4 text-center">Aksi Verifikasi</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-night-border/70 text-white/80">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+
+          <!-- Empty State -->
+          <div id="tableEmpty" class="hidden p-12 text-center space-y-3">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+              <i data-lucide="check-circle" class="w-7 h-7"></i>
+            </div>
+            <h3 class="font-display font-bold text-base text-white">Semua Pembayaran Telah Terverifikasi!</h3>
+            <p class="text-xs text-white/50 max-w-sm mx-auto">
+              Saat ini tidak ada antrean pending. Klik tombol <strong>Segarkan Data</strong> untuk mengecek pesanan baru yang masuk.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Footer Admin -->
+    <footer class="border-t border-night-border/70 py-4 px-4 text-center text-xs text-white/40">
+      Panel Admin Resmi Bingkai Bisu 2026 • Dilindungi dengan enkripsi PIN
+    </footer>
+
+  </div>
+
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXvOR1OG8aFXSg7yoQ1TcyAZNRqGOiq2PeB-l9_X3arDJ6P0kbhaog3gNhIlMF6edC/exec";
+    const DEFAULT_PIN = "2026";
+
+    // Inisialisasi Lucide Icons
+    lucide.createIcons();
+
+    // DOM Elements Auth
+    const pinAuthModal = document.getElementById("pinAuthModal");
+    const mainDashboard = document.getElementById("mainDashboard");
+    const pinForm = document.getElementById("pinForm");
+    const inputPin = document.getElementById("inputPin");
+    const pinErrorMsg = document.getElementById("pinErrorMsg");
+    const btnLogout = document.getElementById("btnLogout");
+
+    // DOM Elements Data
+    const tableBody = document.getElementById("tableBody");
+    const tableLoading = document.getElementById("tableLoading");
+    const tableEmpty = document.getElementById("tableEmpty");
+    const statPendingCount = document.getElementById("statPendingCount");
+    const btnRefreshData = document.getElementById("btnRefreshData");
+    const iconRefresh = document.getElementById("iconRefresh");
+
+    // Format Rupiah
+    function formatRupiah(amount) {
+      if (!amount) return "Rp 0";
+      const num = parseInt(amount, 10);
+      if (isNaN(num)) return amount;
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0
+      }).format(num).replace(/\s+/g, " ");
+    }
+
+    // ================== AUTENTIKASI PIN ==================
+    function checkSessionAuth() {
+      const isAuth = sessionStorage.getItem("admin_authenticated") === "true";
+      if (isAuth) {
+        pinAuthModal.classList.add("hidden");
+        mainDashboard.classList.remove("hidden");
+        loadPendingOrders();
+      } else {
+        pinAuthModal.classList.remove("hidden");
+        mainDashboard.classList.add("hidden");
+        inputPin.focus();
+      }
+    }
+
+    pinForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const enteredPin = inputPin.value.trim();
+      if (enteredPin === DEFAULT_PIN) {
+        sessionStorage.setItem("admin_authenticated", "true");
+        pinErrorMsg.classList.add("hidden");
+        inputPin.value = "";
+        checkSessionAuth();
+      } else {
+        pinErrorMsg.classList.remove("hidden");
+        inputPin.classList.add("border-red-500");
+        inputPin.focus();
+        inputPin.select();
+      }
+    });
+
+    btnLogout.addEventListener("click", () => {
+      if (confirm("Kunci kembali dashboard panitia?")) {
+        sessionStorage.removeItem("admin_authenticated");
+        checkSessionAuth();
+      }
+    });
+
+    // ================== LOAD PENDING ORDERS ==================
+    async function loadPendingOrders() {
+      tableLoading.classList.remove("hidden");
+      tableEmpty.classList.add("hidden");
+      iconRefresh.classList.add("animate-spin");
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            action: "admin_get_pending"
+          })
+        });
+
+        const resData = await response.json();
+        const items = Array.isArray(resData) ? resData : (resData.data || resData.items || []);
+
+        renderTableRows(items);
+        statPendingCount.textContent = items.length;
+
+      } catch (err) {
+        console.error("Gagal memuat data pending:", err);
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="8" class="py-8 text-center text-red-400">
+              Gagal menghubungi server database. Periksa koneksi atau URL Apps Script.
+            </td>
+          </tr>
+        `;
+      } finally {
+        tableLoading.classList.add("hidden");
+        iconRefresh.classList.remove("animate-spin");
+        lucide.createIcons();
+      }
+    }
+
+    // ================== RENDER TABEL ==================
+    function renderTableRows(items) {
+      tableBody.innerHTML = "";
+
+      if (!items || items.length === 0) {
+        tableEmpty.classList.remove("hidden");
+        return;
+      }
+
+      tableEmpty.classList.add("hidden");
+
+      items.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-white/[0.02] transition-colors";
+
+        const cleanWa = (item.whatsapp || "").toString().replace(/['\s-]/g, "");
+        const waLink = `https://wa.me/${cleanWa.replace(/^0/, "62")}?text=Halo%20${encodeURIComponent(item.nama || "")},%20konfirmasi%20tiket%20Bingkai%20Bisu%202026`;
+
+        tr.innerHTML = `
+          <td class="py-4 px-4 text-center font-mono text-white/50">${index + 1}</td>
+          <td class="py-4 px-4 whitespace-nowrap font-mono text-[11px] text-white/60">
+            ${item.timestamp || "-"}
+          </td>
+          <td class="py-4 px-4 font-semibold text-white">
+            ${item.nama || "-"}
+          </td>
+          <td class="py-4 px-4 whitespace-nowrap">
+            <a 
+              href="${waLink}" 
+              target="_blank" 
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 font-mono transition-colors"
+              title="Chat WhatsApp"
+            >
+              <i data-lucide="phone" class="w-3 h-3"></i>
+              <span>${cleanWa}</span>
+            </a>
+          </td>
+          <td class="py-4 px-4">
+            <span class="block font-medium text-white">${item.varian || "2 Day Pass"}</span>
+            <span class="text-[11px] text-pastel-yellow font-semibold">${item.jumlah || 1} Tiket</span>
+          </td>
+          <td class="py-4 px-4 font-display font-bold text-white whitespace-nowrap">
+            ${formatRupiah(item.total)}
+          </td>
+          <td class="py-4 px-4 text-center whitespace-nowrap">
+            ${item.fileUrl && item.fileUrl !== "-" ? `
+              <a 
+                href="${item.fileUrl}" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pastel-purple/10 text-pastel-purple hover:bg-pastel-purple/20 transition-colors font-medium text-xs"
+              >
+                <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                <span>Lihat Struk ↗</span>
+              </a>
+            ` : `<span class="text-white/30 text-xs">-</span>`}
+          </td>
+          <td class="py-4 px-4 text-center whitespace-nowrap">
+            <button 
+              type="button" 
+              class="btn-acc inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer disabled:opacity-50"
+              data-row="${item.rowIndex}"
+              data-name="${item.nama || 'Peserta'}"
+            >
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              <span>✔ ACC & Terbitkan</span>
+            </button>
+          </td>
+        `;
+
+        tableBody.appendChild(tr);
+      });
+
+      // Bind tombol ACC
+      document.querySelectorAll(".btn-acc").forEach(btn => {
+        btn.addEventListener("click", handleAccTicket);
+      });
+    }
+
+    // ================== HANDLE ACC / VERIFIKASI ==================
+    async function handleAccTicket(e) {
+      const btn = e.currentTarget;
+      const rowIndex = btn.dataset.row;
+      const attendeeName = btn.dataset.name;
+
+      if (!confirm(`Konfirmasi pembayaran atas nama "${attendeeName}" dan terbitkan E-Ticket?`)) {
+        return;
+      }
+
+      btn.disabled = true;
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = `
+        <svg class="animate-spin h-3.5 w-3.5 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <span>Menerbitkan...</span>
+      `;
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            action: "admin_acc",
+            rowIndex: parseInt(rowIndex, 10)
+          })
+        });
+
+        const res = await response.json();
+
+        if (res && (res.status === "error" || res.error)) {
+          throw new Error(res.message || "Gagal verifikasi di server.");
+        }
+
+        alert(`Sukses! Pembayaran ${attendeeName} telah di-ACC. E-Ticket telah diterbitkan dan dapat diunduh pemesan.`);
+        loadPendingOrders();
+
+      } catch (err) {
+        console.error("Gagal ACC tiket:", err);
+        alert("Gagal melakukan ACC: " + err.message);
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        lucide.createIcons();
+      }
+    }
+
+    // Segarkan Data Manual
+    btnRefreshData.addEventListener("click", loadPendingOrders);
+
+    // Initial check
+    checkSessionAuth();
+  </script>
+</body>
+</html>

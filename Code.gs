@@ -1,0 +1,210 @@
+/**
+ * Google Apps Script Backend: "BINGKAI BISU - Fixlens Festival 2026"
+ * 
+ * Melayani:
+ * 1. Form Pemesanan Publik (Simpan ke Sheets & Upload Bukti Transfer ke Drive)
+ * 2. Cek Status & Unduh E-Ticket (action: "check_ticket")
+ * 3. Dashboard Admin - Ambil Antrean Pending (action: "admin_get_pending")
+ * 4. Dashboard Admin - ACC Tiket (action: "admin_acc")
+ */
+
+var SHEET_NAME = "Pesanan Tiket";
+var DRIVE_FOLDER_BUKTI = "Bukti Transfer Bingkai Bisu 2026";
+
+/**
+ * Handle POST Request (Format JSON via text/plain agar bebas hambatan CORS)
+ */
+function doPost(e) {
+  try {
+    var rawData = e.postData.contents;
+    var payload = JSON.parse(rawData);
+    var action = payload.action;
+
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(SHEET_NAME) || ss.getActiveSheet();
+
+    // ==========================================
+    // ACTION 1: ADMIN - AMBIL ANTREAN PENDING
+    // ==========================================
+    if (action === "admin_get_pending") {
+      var data = sheet.getDataRange().getValues();
+      var pendingList = [];
+
+      // Format kolom: [0]Timestamp, [1]KodeTiket, [2]Nama, [3]WhatsApp, [4]Varian, [5]Jumlah, [6]Total, [7]BuktiUrl, [8]Status, [9]LinkPdf
+      for (var i = 1; i < data.length; i++) {
+        var rowStatus = (data[i][8] || "PENDING").toString().toUpperCase().trim();
+        if (rowStatus === "PENDING") {
+          pendingList.push({
+            rowIndex: i + 1, // Baris 1-indexed untuk SpreadsheetApp
+            timestamp: data[i][0] ? data[i][0].toString() : "-",
+            ticketCode: data[i][1] || ("#BB26-" + (i + 100)),
+            nama: data[i][2] || "-",
+            whatsapp: (data[i][3] || "").toString().replace(/['\s-]/g, ""),
+            varian: data[i][4] || "2 Day Pass",
+            jumlah: data[i][5] || 1,
+            total: data[i][6] || 0,
+            fileUrl: data[i][7] || "-"
+          });
+        }
+      }
+
+      return createJsonResponse({ status: "success", data: pendingList });
+    }
+
+    // ==========================================
+    // ACTION 2: ADMIN - ACC & TERBITKAN TIKET
+    // ==========================================
+    if (action === "admin_acc") {
+      var targetRow = parseInt(payload.rowIndex, 10);
+      if (!targetRow || targetRow < 2) {
+        return createJsonResponse({ status: "error", message: "Nomor baris tidak valid." });
+      }
+
+      // Update kolom status pembayaran (Kolom I / index 9) menjadi "APPROVED"
+      sheet.getRange(targetRow, 9).setValue("APPROVED");
+
+      // Cek apakah link PDF sudah ada di Kolom J / index 10
+      var currentPdf = sheet.getRange(targetRow, 10).getValue();
+      if (!currentPdf || currentPdf.toString().trim() === "") {
+        // Link template E-Ticket default atau folder tiket
+        sheet.getRange(targetRow, 10).setValue("https://drive.google.com");
+      }
+
+      return createJsonResponse({
+        status: "success",
+        message: "Tiket pada baris " + targetRow + " berhasil disetujui (APPROVED)."
+      });
+    }
+
+    // ==========================================
+    // ACTION 3: PUBLIK - CEK STATUS & UNDUH
+    // ==========================================
+    if (action === "check_ticket") {
+      var waQuery = (payload.whatsapp || "").toString().trim().replace(/['\s-]/g, "");
+      var allData = sheet.getDataRange().getValues();
+
+      if (allData.length <= 1) {
+        return createJsonResponse({ status: "NOT_FOUND", found: false, message: "Belum ada data tiket." });
+      }
+
+      // Cari data terbaru dari bawah ke atas
+      for (var r = allData.length - 1; r >= 1; r--) {
+        var rowWa = (allData[r][3] || "").toString().trim().replace(/['\s-]/g, "");
+        var cleanRowWa = rowWa.replace(/^0/, "62");
+        var cleanQueryWa = waQuery.replace(/^0/, "62");
+
+        if (cleanRowWa === cleanQueryWa || rowWa === waQuery) {
+          var paymentStatus = (allData[r][8] || "PENDING").toString().toUpperCase().trim();
+          var linkPdf = (allData[r][9] || "").toString().trim();
+
+          return createJsonResponse({
+            status: paymentStatus, // "PENDING" atau "APPROVED"
+            paymentStatus: paymentStatus,
+            found: true,
+            ticketCode: allData[r][1] || ("#BB26-" + waQuery.slice(-4)),
+            nama: allData[r][2],
+            varian: allData[r][4],
+            jumlah: allData[r][5],
+            total: allData[r][6],
+            linkPdf: linkPdf,
+            pdfUrl: linkPdf
+          });
+        }
+      }
+
+      return createJsonResponse({ status: "NOT_FOUND", found: false, message: "Nomor WhatsApp belum terdaftar." });
+    }
+
+    // ==========================================
+    // ACTION 4: PUBLIK - PEMESANAN TIKET BARU
+    // ==========================================
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Timestamp",
+        "Kode Tiket",
+        "Nama Lengkap",
+        "Nomor WhatsApp",
+        "Varian Tiket",
+        "Jumlah Tiket",
+        "Total Pembayaran",
+        "Link Bukti Transfer (Drive)",
+        "Status Pembayaran",
+        "Link PDF E-Ticket"
+      ]);
+
+      var headerRange = sheet.getRange(1, 1, 1, 10);
+      headerRange.setFontWeight("bold");
+      headerRange.setBackground("#B8A9E3");
+      headerRange.setFontColor("#0F0F14");
+    }
+
+    // Buat Kode Tiket Unik (#BB26-XXXX)
+    var ticketCode = "#BB26-" + Math.floor(1000 + Math.random() * 9000);
+
+    // Proses Simpan Bukti Transfer ke Google Drive
+    var fileUrl = "-";
+    if (payload.fileData) {
+      try {
+        var decodedBytes = Utilities.base64Decode(payload.fileData);
+        var mimeType = "image/jpeg";
+        var fileName = payload.namaFile || "bukti.jpg";
+
+        if (fileName.toLowerCase().endsWith(".png")) mimeType = "image/png";
+        if (fileName.toLowerCase().endsWith(".webp")) mimeType = "image/webp";
+
+        var blob = Utilities.newBlob(decodedBytes, mimeType, "Bukti_" + payload.whatsapp + "_" + fileName);
+
+        var folders = DriveApp.getFoldersByName(DRIVE_FOLDER_BUKTI);
+        var targetFolder = folders.hasNext() ? folders.next() : DriveApp.createFolder(DRIVE_FOLDER_BUKTI);
+
+        var uploadedFile = targetFolder.createFile(blob);
+        uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        fileUrl = uploadedFile.getUrl();
+      } catch (fileErr) {
+        fileUrl = "Error upload file: " + fileErr.toString();
+      }
+    }
+
+    // Tambah baris baru ke Sheet (Default: PENDING)
+    sheet.appendRow([
+      new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }),
+      ticketCode,
+      payload.nama,
+      "'" + payload.whatsapp,
+      payload.varian,
+      payload.jumlah,
+      payload.total,
+      fileUrl,
+      "PENDING",
+      "" // Link PDF awal kosong sampai di-ACC panitia
+    ]);
+
+    return createJsonResponse({
+      status: "success",
+      message: "Data pemesanan dan bukti pembayaran berhasil disimpan!",
+      ticketCode: ticketCode
+    });
+
+  } catch (error) {
+    return createJsonResponse({
+      status: "error",
+      message: error.toString()
+    });
+  }
+}
+
+/**
+ * Handle GET Request (Status Test)
+ */
+function doGet(e) {
+  return createJsonResponse({
+    status: "alive",
+    message: "Backend Sistem Tiket Bingkai Bisu 2026 aktif."
+  });
+}
+
+function createJsonResponse(data) {
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}

@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bingkai Bisu - Fixlens Festival 2026 | Tiket Pameran Foto</title>
+  <meta name="description" content="Pemesanan dan Cek Tiket Pameran Foto Jurnalistik 'Bingkai Bisu' - Fixlens Festival 2026 di Hetero Space Banyumas." />
+  
+  <!-- Open Graph Meta -->
+  <meta property="og:title" content="Bingkai Bisu - Fixlens Festival 2026" />
+  <meta property="og:description" content="Pemesanan & Cek Tiket 2 Day Pass Pameran Foto Jurnalistik di Hetero Space Banyumas." />
+  <meta property="og:type" content="website" />
+
+  <!-- Google Fonts: Syne & Plus Jakarta Sans & Space Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            night: '#0F0F14',
+            'night-card': '#16161E',
+            'night-input': '#1D1D27',
+            'night-border': '#2A2A38',
+            pastel: {
+              purple: '#B8A9E3',
+              'purple-hover': '#A695D8',
+              'purple-light': '#D6CDF3',
+              yellow: '#F7D070',
+              'yellow-hover': '#EAC15B',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Syne"', 'sans-serif'],
+            mono: ['"Space Mono"', 'monospace'],
+          },
+          boxShadow: {
+            'glow-purple': '0 0 35px -5px rgba(184, 169, 227, 0.25)',
+            'glow-yellow': '0 0 30px -5px rgba(247, 208, 112, 0.25)',
+            'glow-green': '0 0 30px -5px rgba(52, 211, 153, 0.3)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      background-color: #0F0F14;
+      color: #FFFFFF;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 8%, rgba(184, 169, 227, 0.08) 0%, transparent 42%),
+        radial-gradient(circle at 85% 55%, rgba(247, 208, 112, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 50% 92%, rgba(184, 169, 227, 0.05) 0%, transparent 45%);
+      background-attachment: fixed;
+    }
+
+    .bg-grain {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.025'/%3E%3C/svg%3E");
+    }
+
+    .ticket-stub-left {
+      position: relative;
+    }
+    .ticket-stub-left::after {
+      content: '';
+      position: absolute;
+      right: -10px;
+      top: -10px;
+      width: 20px;
+      height: 20px;
+      background: #0F0F14;
+      border-radius: 50%;
+      z-index: 20;
+    }
+    .ticket-stub-left::before {
+      content: '';
+      position: absolute;
+      right: -10px;
+      bottom: -10px;
+      width: 20px;
+      height: 20px;
+      background: #0F0F14;
+      border-radius: 50%;
+      z-index: 20;
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0F0F14; }
+    ::-webkit-scrollbar-thumb { background: #2A2A38; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #B8A9E3; }
+  </style>
+</head>
+<body class="min-h-screen bg-grain flex flex-col justify-between selection:bg-pastel-purple selection:text-night relative">
+
+  <!-- Top Accent Bar -->
+  <div class="h-1 w-full bg-gradient-to-r from-pastel-purple via-pastel-yellow to-pastel-purple"></div>
+
+  <!-- Header & Logos -->
+  <header class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-4 text-center">
+    <!-- Brand Logos Grid -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 mb-6">
+      <!-- Penyelenggara Sub-Logo -->
+      <img 
+        src="asset/LOGO_FIXFEST_TEKS_BAWAH_PUTIH.png" 
+        alt="Fixlens Festival 2026" 
+        class="h-16 sm:h-20 w-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-300"
+      />
+      <!-- Divider on desktop -->
+      <div class="hidden sm:block w-px h-12 bg-white/20"></div>
+      <!-- Hero Event Logo -->
+      <img 
+        src="asset/LOGO_BINGKAI_BISU.png" 
+        alt="Bingkai Bisu - Pameran Foto" 
+        class="h-20 sm:h-24 w-auto object-contain drop-shadow-lg hover:scale-105 transition-transform duration-300"
+      />
+    </div>
+
+    <!-- Event Tag & Subtitle -->
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-pastel-purple/30 bg-pastel-purple/10 text-pastel-purple text-xs tracking-wider uppercase font-semibold mb-3">
+      <span class="inline-block w-2 h-2 rounded-full bg-pastel-purple animate-ping"></span>
+      <span>Pameran Foto Jurnalistik</span>
+      <span class="text-white/40">•</span>
+      <span class="text-white/80">29 - 30 November 2026</span>
+    </div>
+    
+    <p class="text-sm sm:text-base text-white/60 max-w-xl mx-auto">
+      Hetero Space, Banyumas, Jawa Tengah • 2 Day Pass All Access
+    </p>
+
+    <!-- ==================== MAIN NAVIGATION TABS ==================== -->
+    <div class="mt-8 max-w-md mx-auto p-1.5 rounded-2xl bg-night-card border border-night-border flex items-center shadow-lg">
+      <button 
+        type="button" 
+        id="tabBtnOrder" 
+        class="flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 bg-pastel-purple text-night shadow-md"
+      >
+        <i data-lucide="ticket" class="w-4 h-4"></i>
+        <span>Pesan Tiket</span>
+      </button>
+
+      <button 
+        type="button" 
+        id="tabBtnCheck" 
+        class="flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-white/70 hover:text-white"
+      >
+        <i data-lucide="search-check" class="w-4 h-4"></i>
+        <span>Cek Status & Unduh</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="w-full max-w-4xl mx-auto px-4 sm:px-6 py-4 flex-1">
+
+    <!-- ================================================================ -->
+    <!-- TAB 1: FORM PEMESANAN MULTI-STEP                                 -->
+    <!-- ================================================================ -->
+    <div id="sectionOrder" class="space-y-8">
+      
+      <!-- ================= LIVE TICKET PREVIEW CARD ================= -->
+      <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-night-card via-[#1A1A26] to-night-card border border-night-border p-5 sm:p-7 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-pastel-yellow">
+            <i data-lucide="sparkles" class="w-4 h-4"></i> Live Ticket Mockup Preview
+          </div>
+          <span class="text-[11px] font-mono text-white/40">OFFICIAL EXHIBITION PASS</span>
+        </div>
+
+        <!-- Horizontal Ticket Mockup Container -->
+        <div class="relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-night-border/90 bg-[#14141E] shadow-xl">
+          <!-- Left Main Body -->
+          <div class="ticket-stub-left flex-1 p-5 sm:p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-dashed border-night-border relative">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="text-[11px] tracking-widest font-mono text-pastel-purple font-semibold uppercase">FIXLENS FESTIVAL 2026</span>
+                <span id="previewVariantBadge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-pastel-purple/20 text-pastel-purple border border-pastel-purple/30">
+                  2 DAY PASS - REGULAR
+                </span>
+              </div>
+              
+              <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-tight uppercase leading-none mb-1">
+                BINGKAI <span class="text-pastel-purple">BISU</span>
+              </h2>
+              <p class="text-xs text-white/60 mb-4">Pameran Foto Jurnalistik • Hetero Space, Banyumas</p>
+
+              <!-- Dynamic Attendee Info -->
+              <div class="grid grid-cols-2 gap-3 text-xs bg-night/60 p-3 rounded-xl border border-white/5">
+                <div>
+                  <span class="block text-[10px] uppercase font-mono text-white/40">Pemegang Tiket</span>
+                  <span id="previewName" class="font-semibold text-white truncate block">Nama Anda</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] uppercase font-mono text-white/40">Jadwal Akses</span>
+                  <span class="font-semibold text-white block">29 - 30 Nov 2026</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Free Coffee Treat Badge -->
+            <div id="previewTreatBadge" class="hidden mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-pastel-yellow/15 border border-pastel-yellow/30 text-pastel-yellow text-xs font-semibold">
+              <i data-lucide="coffee" class="w-4 h-4"></i>
+              <span>Include: Free 1 Cup Kopi Susu Gula Aren</span>
+            </div>
+          </div>
+
+          <!-- Right Ticket Stub / QR Mockup Section -->
+          <div class="w-full md:w-56 p-5 sm:p-6 bg-[#181824] flex flex-col items-center justify-center text-center shrink-0">
+            <span class="text-[10px] uppercase font-mono text-white/50 mb-2">Scan on Entry</span>
+            
+            <!-- Yellow QR Code Box -->
+            <div class="w-28 h-28 bg-pastel-yellow rounded-xl p-2.5 shadow-md flex items-center justify-center relative group">
+              <svg class="w-full h-full text-night" viewBox="0 0 100 100" fill="currentColor">
+                <rect x="5" y="5" width="25" height="25" rx="3" fill="#111116"/>
+                <rect x="10" y="10" width="15" height="15" fill="#F7D070"/>
+                <rect x="13" y="13" width="9" height="9" fill="#111116"/>
+
+                <rect x="70" y="5" width="25" height="25" rx="3" fill="#111116"/>
+                <rect x="75" y="10" width="15" height="15" fill="#F7D070"/>
+                <rect x="78" y="13" width="9" height="9" fill="#111116"/>
+
+                <rect x="5" y="70" width="25" height="25" rx="3" fill="#111116"/>
+                <rect x="10" y="75" width="15" height="15" fill="#F7D070"/>
+                <rect x="13" y="78" width="9" height="9" fill="#111116"/>
+
+                <rect x="36" y="12" width="6" height="14" rx="1"/>
+                <rect x="48" y="8" width="14" height="6" rx="1"/>
+                <rect x="42" y="38" width="18" height="18" rx="2"/>
+                <rect x="12" y="44" width="14" height="6" rx="1"/>
+                <rect x="68" y="44" width="20" height="6" rx="1"/>
+                <rect x="74" y="60" width="14" height="14" rx="2"/>
+                <rect x="40" y="68" width="16" height="8" rx="1"/>
+                <rect x="58" y="78" width="10" height="12" rx="1"/>
+              </svg>
+            </div>
+
+            <span class="mt-2 text-[10px] font-mono tracking-widest text-pastel-yellow font-bold">#BB26-PASS</span>
+            <span class="text-[9px] text-white/40">Verified by Fixlens</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step Indicator Bar -->
+      <div class="flex items-center justify-center gap-3">
+        <div class="flex items-center gap-2">
+          <div id="step1Indicator" class="w-7 h-7 rounded-full bg-pastel-purple text-night font-bold text-xs flex items-center justify-center shadow-glow-purple">
+            1
+          </div>
+          <span class="text-xs sm:text-sm font-semibold text-white">Varian & Data Diri</span>
+        </div>
+        <div class="w-10 sm:w-16 h-0.5 bg-night-border" id="stepConnector"></div>
+        <div class="flex items-center gap-2">
+          <div id="step2Indicator" class="w-7 h-7 rounded-full bg-night-input border border-night-border text-white/40 font-bold text-xs flex items-center justify-center">
+            2
+          </div>
+          <span class="text-xs sm:text-sm font-semibold text-white/40" id="step2Label">Pembayaran & Bukti</span>
+        </div>
+      </div>
+
+      <!-- ================= STEP 1 CONTAINER ================= -->
+      <div id="step1Container" class="bg-night-card rounded-2xl border border-night-border p-6 sm:p-9 shadow-2xl space-y-6">
+        <div>
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white">Langkah 1: Pilih Tiket & Identitas</h3>
+          <p class="text-xs sm:text-sm text-white/60 mt-1">Pilih varian tiket yang Anda inginkan lalu lengkapi data pemesan.</p>
+        </div>
+
+        <!-- 1. Pilihan Varian Tiket (Radio Cards) -->
+        <div class="space-y-3">
+          <label class="block text-xs uppercase tracking-wider text-white/50 font-semibold">Pilih Varian Tiket <span class="text-pastel-yellow">*</span></label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Varian 1: Regular -->
+            <label class="variant-card relative p-4 sm:p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 flex flex-col justify-between border-pastel-purple bg-pastel-purple/5" id="cardVariant1">
+              <input type="radio" name="ticketVariant" value="regular" checked class="sr-only" />
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-mono font-bold tracking-wider text-pastel-purple uppercase">Akses Standar</span>
+                  <div class="w-5 h-5 rounded-full border-2 border-pastel-purple flex items-center justify-center" id="radioDot1">
+                    <div class="w-2.5 h-2.5 rounded-full bg-pastel-purple"></div>
+                  </div>
+                </div>
+                <h4 class="font-display font-bold text-lg text-white">2 Day Pass - Regular</h4>
+                <p class="text-xs text-white/60 mt-1">Akses penuh 2 hari pameran foto, photobook showcase, & artist talk.</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-night-border flex items-baseline justify-between">
+                <span class="text-xs text-white/50">Harga Satuan:</span>
+                <span class="font-display font-extrabold text-xl text-white">Rp 50.000</span>
+              </div>
+            </label>
+
+            <!-- Varian 2: Special Treat -->
+            <label class="variant-card relative p-4 sm:p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 flex flex-col justify-between border-night-border bg-night-input/50 hover:border-pastel-yellow/60" id="cardVariant2">
+              <input type="radio" name="ticketVariant" value="treat" class="sr-only" />
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pastel-yellow/20 text-pastel-yellow text-[10px] font-bold border border-pastel-yellow/30">
+                    <i data-lucide="coffee" class="w-3 h-3"></i> SPECIAL TREAT
+                  </span>
+                  <div class="w-5 h-5 rounded-full border-2 border-white/20 flex items-center justify-center" id="radioDot2">
+                    <div class="w-2.5 h-2.5 rounded-full bg-pastel-yellow hidden"></div>
+                  </div>
+                </div>
+                <h4 class="font-display font-bold text-lg text-white">2 Day Pass + Special Treat</h4>
+                <p class="text-xs text-white/60 mt-1">Akses penuh 2 hari + <strong class="text-pastel-yellow">Free 1 Cup Kopi Susu Gula Aren</strong> saat pameran.</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-night-border flex items-baseline justify-between">
+                <span class="text-xs text-white/50">Harga Satuan:</span>
+                <span class="font-display font-extrabold text-xl text-pastel-yellow">Rp 60.000</span>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- 2. Jumlah Tiket -->
+        <div class="p-4 rounded-xl bg-night-input border border-night-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-white">Jumlah Tiket <span class="text-pastel-yellow">*</span></label>
+            <span class="text-xs text-white/50">Tentukan jumlah tiket yang ingin dipesan</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <button type="button" id="btnDec" class="w-9 h-9 rounded-lg bg-night-card border border-night-border text-white/80 hover:text-white flex items-center justify-center transition-colors">
+              <i data-lucide="minus" class="w-4 h-4"></i>
+            </button>
+            <input 
+              type="number" 
+              id="ticketQty" 
+              value="1" 
+              min="1" 
+              max="20" 
+              class="w-14 text-center bg-transparent text-white font-bold text-lg focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+            <button type="button" id="btnInc" class="w-9 h-9 rounded-lg bg-night-card border border-night-border text-white/80 hover:text-white flex items-center justify-center transition-colors">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Form Input Data Diri -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <!-- Nama Lengkap -->
+          <div class="space-y-1.5">
+            <label for="inputName" class="block text-sm font-semibold text-white">
+              Nama Lengkap <span class="text-pastel-yellow">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+                <i data-lucide="user" class="w-4 h-4"></i>
+              </div>
+              <input 
+                type="text" 
+                id="inputName" 
+                placeholder="Contoh: Muhammad Raditya" 
+                required 
+                class="w-full pl-10 pr-4 py-3 rounded-xl bg-night-input border border-night-border text-white text-sm focus:outline-none focus:border-pastel-purple focus:ring-1 focus:ring-pastel-purple transition duration-200"
+              />
+            </div>
+            <p id="errName" class="text-xs text-red-400 hidden flex items-center gap-1 mt-1">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Nama lengkap wajib diisi.
+            </p>
+          </div>
+
+          <!-- Nomor WhatsApp -->
+          <div class="space-y-1.5">
+            <label for="inputWa" class="block text-sm font-semibold text-white">
+              Nomor WhatsApp <span class="text-pastel-yellow">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+                <i data-lucide="phone" class="w-4 h-4"></i>
+              </div>
+              <input 
+                type="tel" 
+                id="inputWa" 
+                placeholder="08123456789" 
+                required 
+                class="w-full pl-10 pr-4 py-3 rounded-xl bg-night-input border border-night-border text-white text-sm focus:outline-none focus:border-pastel-purple focus:ring-1 focus:ring-pastel-purple transition duration-200"
+              />
+            </div>
+            <p id="errWa" class="text-xs text-red-400 hidden flex items-center gap-1 mt-1">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Masukkan nomor WhatsApp aktif (min. 10 digit).
+            </p>
+          </div>
+        </div>
+
+        <!-- Tombol Lanjut ke Step 2 -->
+        <div class="pt-4">
+          <button 
+            type="button" 
+            id="btnGoToStep2" 
+            class="w-full py-4 px-6 rounded-xl font-display font-bold text-base tracking-wide uppercase text-night bg-gradient-to-r from-pastel-purple via-pastel-purple-light to-pastel-yellow hover:brightness-105 active:scale-[0.99] transition-all duration-300 shadow-glow-purple flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>Lanjut ke Pembayaran</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= STEP 2 CONTAINER ================= -->
+      <div id="step2Container" class="hidden bg-night-card rounded-2xl border border-night-border p-6 sm:p-9 shadow-2xl space-y-7">
+        <div>
+          <h3 class="font-display font-bold text-xl sm:text-2xl text-white">Langkah 2: Rincian Tagihan & Konfirmasi Pembayaran</h3>
+          <p class="text-xs sm:text-sm text-white/60 mt-1">Periksa rincian pesanan, transfer via QRIS, dan unggah bukti transfer.</p>
+        </div>
+
+        <!-- 1. Ringkasan Pesanan Card -->
+        <div class="rounded-xl bg-night-input p-5 border border-night-border/90 space-y-3">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <span class="text-xs uppercase tracking-wider text-white/50 font-medium">Ringkasan Tagihan</span>
+            <span class="text-xs font-mono text-pastel-purple font-semibold">FIXLENS PASS</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div>
+              <span class="text-xs text-white/40 block">Nama Pemesan:</span>
+              <span id="summaryNameDisplay" class="font-semibold text-white">-</span>
+            </div>
+            <div>
+              <span class="text-xs text-white/40 block">Nomor WhatsApp:</span>
+              <span id="summaryWaDisplay" class="font-semibold text-white font-mono">-</span>
+            </div>
+            <div>
+              <span class="text-xs text-white/40 block">Varian Terpilih:</span>
+              <span id="summaryVariantDisplay" class="font-semibold text-pastel-purple">-</span>
+            </div>
+            <div>
+              <span class="text-xs text-white/40 block">Jumlah Tiket:</span>
+              <span id="summaryQtyDisplay" class="font-semibold text-white">-</span>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-white/10 flex items-center justify-between">
+            <span class="text-sm font-semibold text-white">Total yang Harus Dibayar:</span>
+            <span id="summaryTotalDisplay" class="font-display font-extrabold text-2xl text-pastel-yellow">Rp 0</span>
+          </div>
+        </div>
+
+        <!-- 2. QRIS Pembayaran Container -->
+        <div class="rounded-2xl border border-night-border bg-[#14141E] p-6 text-center flex flex-col items-center">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pastel-purple/15 text-pastel-purple text-xs font-semibold uppercase mb-4">
+            <i data-lucide="qr-code" class="w-3.5 h-3.5"></i> Scan QRIS Resmi Pameran
+          </div>
+
+          <!-- Gambar QRIS Lokal dari asset/qris.jpeg -->
+          <div class="relative max-w-xs w-full bg-white p-3 rounded-2xl shadow-xl overflow-hidden border-2 border-pastel-purple/40">
+            <img 
+              src="asset/qris.jpeg" 
+              alt="QRIS Pembayaran Bingkai Bisu" 
+              class="w-full h-auto object-contain rounded-xl"
+            />
+          </div>
+
+          <p class="text-xs text-white/70 max-w-md mt-4 leading-relaxed">
+            Scan QRIS di atas via <strong class="text-white">GoPay, OVO, Dana, ShopeePay, BCA, Mandiri</strong>, atau Mobile Banking lainnya, lalu simpan tangkapan layar (screenshot) bukti transfer.
+          </p>
+        </div>
+
+        <!-- 3. Upload Bukti Pembayaran -->
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-white flex items-center justify-between">
+            <span>Upload Bukti Pembayaran <span class="text-pastel-yellow">*</span></span>
+            <span class="text-xs text-white/40">Format: JPG, PNG, WEBP (Maks. 5MB)</span>
+          </label>
+
+          <input 
+            type="file" 
+            id="fileProofInput" 
+            accept="image/png, image/jpeg, image/jpg, image/webp" 
+            class="hidden" 
+          />
+
+          <!-- Dropzone Container -->
+          <div 
+            id="proofDropzone" 
+            class="group relative border-2 border-dashed border-night-border hover:border-pastel-purple/70 bg-night-input/50 hover:bg-night-input rounded-2xl p-6 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center min-h-[160px]"
+          >
+            <!-- Dropzone Prompt -->
+            <div id="dropzonePrompt" class="space-y-2 pointer-events-none">
+              <div class="w-12 h-12 mx-auto rounded-full bg-pastel-purple/10 text-pastel-purple flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+              </div>
+              <p class="text-sm font-medium text-white">
+                Tarik & letakkan foto bukti transfer di sini, atau <span class="text-pastel-purple underline font-semibold">pilih file</span>
+              </p>
+              <p class="text-xs text-white/40">Pastikan nama pengirim dan nominal terlihat jelas</p>
+            </div>
+
+            <!-- Dropzone Preview (Hidden by default) -->
+            <div id="dropzonePreview" class="hidden w-full flex flex-col sm:flex-row items-center gap-4 text-left">
+              <div class="w-24 h-24 rounded-xl overflow-hidden border border-night-border shrink-0 bg-night">
+                <img id="previewProofImg" src="" alt="Thumbnail Bukti" class="w-full h-full object-cover" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5 text-pastel-purple text-xs font-semibold uppercase mb-1">
+                  <i data-lucide="check-circle-2" class="w-4 h-4"></i> Bukti Siap Diunggah
+                </div>
+                <p id="proofFileName" class="text-sm font-semibold text-white truncate"></p>
+                <p id="proofFileSize" class="text-xs text-white/50"></p>
+                <button type="button" id="btnChangeFile" class="mt-2 text-xs text-red-400 hover:text-red-300 flex items-center gap-1">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Ganti File
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p id="errProof" class="text-xs text-red-400 hidden flex items-center gap-1 mt-1">
+            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Bukti transfer wajib dilampirkan.
+          </p>
+        </div>
+
+        <!-- Tombol Aksi Step 2 -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 pt-4">
+          <button 
+            type="button" 
+            id="btnBackToStep1" 
+            class="w-full sm:w-auto py-3.5 px-6 rounded-xl border border-night-border bg-night-input hover:bg-night-border text-white text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+          >
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            <span>Ubah Data</span>
+          </button>
+
+          <button 
+            type="button" 
+            id="btnSubmitPayment" 
+            class="flex-1 w-full py-4 px-6 rounded-xl font-display font-bold text-base tracking-wide uppercase text-night bg-gradient-to-r from-pastel-purple via-pastel-purple-light to-pastel-yellow hover:brightness-105 active:scale-[0.99] transition-all duration-300 shadow-glow-purple flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <span id="btnSubmitText" class="flex items-center gap-2">
+              <i data-lucide="send" class="w-5 h-5"></i>
+              Kirim Bukti Pembayaran
+            </span>
+            <span id="btnSubmitSpinner" class="hidden flex items-center gap-3">
+              <svg class="animate-spin h-5 w-5 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              <span>Sedang mengunggah...</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ================================================================ -->
+    <!-- TAB 2: CEK STATUS & UNDUH TIKET                                  -->
+    <!-- ================================================================ -->
+    <div id="sectionCheck" class="hidden space-y-6">
+      
+      <div class="bg-night-card rounded-2xl border border-night-border p-6 sm:p-9 shadow-2xl space-y-6">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pastel-yellow/15 text-pastel-yellow text-xs font-semibold uppercase mb-2">
+            <i data-lucide="search" class="w-3.5 h-3.5"></i> Cek Tiket Instan
+          </div>
+          <h3 class="font-display font-bold text-2xl text-white">Cek Status & Unduh E-Ticket</h3>
+          <p class="text-xs sm:text-sm text-white/60 mt-1">
+            Masukkan nomor WhatsApp yang Anda gunakan saat pemesanan untuk mengunduh E-Ticket (PDF).
+          </p>
+        </div>
+
+        <!-- Input WhatsApp Pencarian -->
+        <div class="space-y-2">
+          <label for="checkWaInput" class="block text-sm font-semibold text-white">
+            Nomor WhatsApp Pemesan
+          </label>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/40">
+                <i data-lucide="phone" class="w-4 h-4"></i>
+              </div>
+              <input 
+                type="tel" 
+                id="checkWaInput" 
+                placeholder="Contoh: 08123456789" 
+                class="w-full pl-10 pr-4 py-3.5 rounded-xl bg-night-input border border-night-border text-white text-sm focus:outline-none focus:border-pastel-purple focus:ring-1 focus:ring-pastel-purple transition duration-200"
+              />
+            </div>
+            <button 
+              type="button" 
+              id="btnSearchTicket" 
+              class="py-3.5 px-7 rounded-xl font-display font-bold text-sm uppercase tracking-wider text-night bg-pastel-yellow hover:bg-pastel-yellow-hover active:scale-[0.99] transition-all duration-200 shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer shrink-0 disabled:opacity-60"
+            >
+              <span id="btnSearchText" class="flex items-center gap-2">
+                <i data-lucide="search" class="w-4 h-4"></i>
+                Cek Tiket Saya
+              </span>
+              <span id="btnSearchSpinner" class="hidden flex items-center gap-2">
+                <svg class="animate-spin h-4 w-4 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>Mengecek...</span>
+              </span>
+            </button>
+          </div>
+          <p id="errCheckWa" class="text-xs text-red-400 hidden flex items-center gap-1 mt-1">
+            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Masukkan nomor WhatsApp yang valid (min. 10 digit).
+          </p>
+        </div>
+
+        <!-- ================= DYNAMIC RESULT CARD CONTAINER ================= -->
+        <div id="checkResultContainer" class="hidden pt-4 border-t border-night-border">
+
+          <!-- STATE 1: PENDING -->
+          <div id="resultPending" class="hidden rounded-2xl bg-amber-500/10 border border-amber-500/30 p-5 sm:p-6 text-amber-200 space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                <i data-lucide="clock" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <span class="text-xs uppercase tracking-wider font-semibold text-amber-400">Status Pembayaran: Pending</span>
+                <h4 class="font-display font-bold text-lg text-white">Menunggu Verifikasi Panitia</h4>
+              </div>
+            </div>
+            <p class="text-xs sm:text-sm text-white/80 leading-relaxed pl-13">
+              Pembayaran Anda sedang dalam proses verifikasi panitia. Mohon tunggu beberapa saat dan cek kembali halaman ini secara berkala.
+            </p>
+          </div>
+
+          <!-- STATE 2: NOT FOUND -->
+          <div id="resultNotFound" class="hidden rounded-2xl bg-red-500/10 border border-red-500/30 p-5 sm:p-6 text-red-200 space-y-2">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="font-display font-bold text-base text-white">Nomor WhatsApp Tidak Ditemukan</h4>
+                <p class="text-xs text-white/70">
+                  Nomor WhatsApp belum terdaftar. Pastikan nomor yang dimasukkan sama dengan saat memesan tiket.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- STATE 3: APPROVED (ESTHETIC TICKET & DOWNLOAD CTA) -->
+          <div id="resultApproved" class="hidden space-y-5">
+            <div class="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-4 text-emerald-300 flex items-center justify-between">
+              <div class="flex items-center gap-2 text-xs font-semibold">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+                <span>Status: Pembayaran Lunas / Terverifikasi</span>
+              </div>
+              <span class="text-[11px] font-mono text-emerald-400 uppercase font-bold">READY TO DOWNLOAD</span>
+            </div>
+
+            <!-- Verified Ticket Card -->
+            <div class="relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-emerald-500/30 bg-[#14141E] shadow-2xl">
+              <div class="ticket-stub-left flex-1 p-5 sm:p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-dashed border-night-border">
+                <div>
+                  <div class="flex items-center justify-between gap-2 mb-2">
+                    <span class="text-[10px] tracking-widest font-mono text-pastel-purple font-semibold uppercase">OFFICIAL E-TICKET</span>
+                    <span id="approvedTicketCode" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-white/10 text-pastel-yellow">
+                      #BB26-XXXXX
+                    </span>
+                  </div>
+
+                  <h3 class="font-display font-extrabold text-2xl text-white tracking-tight uppercase leading-none mb-1">
+                    BINGKAI <span class="text-pastel-purple">BISU</span>
+                  </h3>
+                  <p class="text-xs text-white/60 mb-4">Fixlens Festival 2026 • Hetero Space Banyumas</p>
+
+                  <div class="grid grid-cols-2 gap-3 text-xs bg-night/70 p-3 rounded-xl border border-white/5">
+                    <div>
+                      <span class="block text-[10px] uppercase font-mono text-white/40">Nama Pemesan</span>
+                      <span id="approvedName" class="font-semibold text-white truncate block">-</span>
+                    </div>
+                    <div>
+                      <span class="block text-[10px] uppercase font-mono text-white/40">Varian Tiket</span>
+                      <span id="approvedVariant" class="font-semibold text-pastel-purple block">-</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between text-xs text-white/60">
+                  <span>Akses: 29 - 30 November 2026</span>
+                  <span id="approvedQty" class="font-semibold text-white">- Tiket</span>
+                </div>
+              </div>
+
+              <!-- Stub CTA Section -->
+              <div class="w-full md:w-64 p-5 sm:p-6 bg-[#181824] flex flex-col items-center justify-center text-center shrink-0">
+                <span class="text-[11px] font-mono text-white/50 mb-3">E-Ticket File (PDF)</span>
+
+                <a 
+                  id="btnDownloadPdf" 
+                  href="#" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="w-full py-3.5 px-5 rounded-xl font-display font-bold text-sm uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 text-center"
+                >
+                  <i data-lucide="download" class="w-4 h-4"></i>
+                  <span>Unduh E-Ticket (PDF)</span>
+                </a>
+                
+                <span class="text-[10px] text-white/40 mt-2.5">Buka file via Google Drive</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- ==================== STEP 3: MODAL NOTIFIKASI SUKSES ==================== -->
+  <div 
+    id="successModal" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+  >
+    <div 
+      id="modalContainer" 
+      class="w-full max-w-md bg-night-card border border-night-border rounded-3xl p-6 sm:p-8 text-center shadow-2xl transform scale-95 transition-transform duration-300 relative overflow-hidden"
+    >
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-pastel-purple/20 rounded-full blur-2xl"></div>
+      <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-pastel-yellow/20 rounded-full blur-2xl"></div>
+
+      <!-- Centang Sukses -->
+      <div class="w-20 h-20 mx-auto rounded-full bg-pastel-purple/10 border border-pastel-purple/30 flex items-center justify-center text-pastel-purple shadow-glow-purple mb-5">
+        <i data-lucide="check" class="w-10 h-10 stroke-[2.5]"></i>
+      </div>
+
+      <h3 id="modalTitle" class="text-2xl font-display font-bold text-white mb-2">
+        Pesanan Berhasil Dikirim!
+      </h3>
+
+      <p class="text-white/80 text-sm leading-relaxed mb-6">
+        Data dan bukti pembayaran Anda sedang diverifikasi panitia. Link unduh <strong class="text-pastel-purple">E-Ticket (PDF)</strong> berisikan QR Code unik akan dikirimkan langsung ke nomor WhatsApp Anda, atau dapat dicek langsung melalui tab <strong>Cek Status & Unduh</strong>.
+      </p>
+
+      <!-- Transaction Summary Mini -->
+      <div class="bg-night-input/80 rounded-xl p-3.5 border border-night-border text-left text-xs text-white/70 space-y-1.5 mb-6">
+        <div class="flex justify-between">
+          <span>Pemesan:</span>
+          <span id="modalSummaryName" class="font-semibold text-white truncate max-w-[170px]">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Nomor WhatsApp:</span>
+          <span id="modalSummaryWa" class="font-semibold text-white">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Varian & Jumlah:</span>
+          <span id="modalSummaryQty" class="font-semibold text-pastel-yellow">-</span>
+        </div>
+        <div class="flex justify-between border-t border-white/10 pt-1.5">
+          <span>Total Bayar:</span>
+          <span id="modalSummaryTotal" class="font-bold text-pastel-yellow text-sm">-</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-2.5">
+        <button 
+          type="button" 
+          id="btnModalCheckNow" 
+          class="w-full py-3.5 px-6 rounded-xl font-display font-semibold text-sm uppercase tracking-wider text-night bg-pastel-yellow hover:bg-pastel-yellow-hover active:scale-[0.99] transition-all duration-200 cursor-pointer shadow-md flex items-center justify-center gap-2"
+        >
+          <i data-lucide="search" class="w-4 h-4"></i>
+          <span>Cek Status Tiket Saya</span>
+        </button>
+
+        <button 
+          type="button" 
+          id="btnCloseModal" 
+          class="w-full py-3 px-6 rounded-xl font-display font-semibold text-xs uppercase tracking-wider text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200 cursor-pointer"
+        >
+          Tutup & Kembali
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating WhatsApp Assistance Button -->
+  <aside class="fixed bottom-6 right-6 z-40" aria-label="Bantuan Panitia">
+    <a 
+      href="https://wa.me/6281285589413?text=Halo%20panitia%20Bingkai%20Bisu,%20saya%20butuh%20bantuan" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      class="inline-flex items-center gap-2.5 px-4 py-3 rounded-full bg-emerald-500 hover:bg-emerald-400 text-night font-semibold text-xs sm:text-sm shadow-glow-green transition-all duration-300 hover:scale-105"
+    >
+      <i data-lucide="message-circle" class="w-5 h-5 text-night"></i>
+      <span>Butuh Bantuan Panitia?</span>
+    </a>
+  </aside>
+
+  <!-- Footer -->
+  <footer class="w-full border-t border-night-border/70 py-8 px-4 text-center text-xs text-white/50 mt-12">
+    <div class="max-w-4xl mx-auto space-y-3">
+      <p class="font-display font-semibold text-white/80 tracking-wider">BINGKAI BISU • FIXLENS FESTIVAL 2026</p>
+      <p>Hetero Space, Banyumas, Jawa Tengah • 29 - 30 November 2026</p>
+      
+      <div class="flex items-center justify-center gap-4 text-[11px] pt-1">
+        <a 
+          href="https://wa.me/6281285589413?text=Halo%20panitia%20Bingkai%20Bisu,%20saya%20butuh%20bantuan" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="text-pastel-purple hover:underline inline-flex items-center gap-1"
+        >
+          <i data-lucide="phone" class="w-3.5 h-3.5"></i> Hubungi CS WhatsApp
+        </a>
+        <span class="text-white/20">•</span>
+        <a href="admin.html" class="text-white/40 hover:text-white/80 transition-colors">
+          Portal Admin
+        </a>
+      </div>
+
+      <p class="text-[11px] text-white/40 pt-1">© 2026 Fixlens Community. Hak cipta dilindungi undang-undang.</p>
+    </div>
+  </footer>
+
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    /**
+     * 1. Konfigurasi Endpoint Google Apps Script
+     */
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXvOR1OG8aFXSg7yoQ1TcyAZNRqGOiq2PeB-l9_X3arDJ6P0kbhaog3gNhIlMF6edC/exec";
+
+    // Inisialisasi Lucide Icons
+    lucide.createIcons();
+
+    // ================== TAB NAVIGATION ==================
+    const tabBtnOrder = document.getElementById("tabBtnOrder");
+    const tabBtnCheck = document.getElementById("tabBtnCheck");
+    const sectionOrder = document.getElementById("sectionOrder");
+    const sectionCheck = document.getElementById("sectionCheck");
+
+    function switchTab(target) {
+      if (target === "order") {
+        tabBtnOrder.className = "flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 bg-pastel-purple text-night shadow-md";
+        tabBtnCheck.className = "flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-white/70 hover:text-white";
+        sectionOrder.classList.remove("hidden");
+        sectionCheck.classList.add("hidden");
+      } else {
+        tabBtnCheck.className = "flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 bg-pastel-yellow text-night shadow-md";
+        tabBtnOrder.className = "flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-white/70 hover:text-white";
+        sectionCheck.classList.remove("hidden");
+        sectionOrder.classList.add("hidden");
+      }
+      lucide.createIcons();
+    }
+
+    tabBtnOrder.addEventListener("click", () => switchTab("order"));
+    tabBtnCheck.addEventListener("click", () => switchTab("check"));
+
+    // ================== PRICE & VARIANT STATE ==================
+    const VARIANTS = {
+      regular: { name: "2 Day Pass - Regular", price: 50000, hasTreat: false },
+      treat: { name: "2 Day Pass + Special Treat", price: 60000, hasTreat: true }
+    };
+
+    let selectedVariantKey = "regular";
+    let selectedQuantity = 1;
+    let selectedProofFile = null;
+    let selectedProofBase64TanpaHeader = null;
+
+    // Helper Rupiah
+    function formatRupiah(amount) {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(amount).replace(/\s+/g, " ");
+    }
+
+    // Helper format bytes
+    function formatBytes(bytes) {
+      if (bytes === 0) return "0 Bytes";
+      const k = 1024;
+      const sizes = ["Bytes", "KB", "MB"];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    }
+
+    // ================== LIVE PREVIEW & CALCULATION ==================
+    const previewVariantBadge = document.getElementById("previewVariantBadge");
+    const previewName = document.getElementById("previewName");
+    const previewTreatBadge = document.getElementById("previewTreatBadge");
+
+    const inputName = document.getElementById("inputName");
+    const inputWa = document.getElementById("inputWa");
+    const ticketQtyInput = document.getElementById("ticketQty");
+    const btnDec = document.getElementById("btnDec");
+    const btnInc = document.getElementById("btnInc");
+
+    const cardVariant1 = document.getElementById("cardVariant1");
+    const cardVariant2 = document.getElementById("cardVariant2");
+    const radioDot1 = document.getElementById("radioDot1").firstElementChild;
+    const radioDot2 = document.getElementById("radioDot2").firstElementChild;
+
+    function updateVariantSelection(variantKey) {
+      selectedVariantKey = variantKey;
+      if (variantKey === "regular") {
+        cardVariant1.classList.add("border-pastel-purple", "bg-pastel-purple/5");
+        cardVariant1.classList.remove("border-night-border", "bg-night-input/50");
+        radioDot1.classList.remove("hidden");
+
+        cardVariant2.classList.remove("border-pastel-yellow", "bg-pastel-yellow/5");
+        cardVariant2.classList.add("border-night-border", "bg-night-input/50");
+        radioDot2.classList.add("hidden");
+
+        previewVariantBadge.textContent = "2 DAY PASS - REGULAR";
+        previewVariantBadge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-pastel-purple/20 text-pastel-purple border border-pastel-purple/30";
+        previewTreatBadge.classList.add("hidden");
+      } else {
+        cardVariant2.classList.add("border-pastel-yellow", "bg-pastel-yellow/5");
+        cardVariant2.classList.remove("border-night-border", "bg-night-input/50");
+        radioDot2.classList.remove("hidden");
+
+        cardVariant1.classList.remove("border-pastel-purple", "bg-pastel-purple/5");
+        cardVariant1.classList.add("border-night-border", "bg-night-input/50");
+        radioDot1.classList.add("hidden");
+
+        previewVariantBadge.textContent = "2 DAY PASS + SPECIAL TREAT";
+        previewVariantBadge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-pastel-yellow/20 text-pastel-yellow border border-pastel-yellow/30";
+        previewTreatBadge.classList.remove("hidden");
+      }
+      lucide.createIcons();
+    }
+
+    cardVariant1.addEventListener("click", () => updateVariantSelection("regular"));
+    cardVariant2.addEventListener("click", () => updateVariantSelection("treat"));
+
+    inputName.addEventListener("input", (e) => {
+      const val = e.target.value.trim();
+      previewName.textContent = val || "Nama Anda";
+      document.getElementById("errName").classList.add("hidden");
+      inputName.classList.remove("border-red-500");
+    });
+
+    inputWa.addEventListener("input", () => {
+      document.getElementById("errWa").classList.add("hidden");
+      inputWa.classList.remove("border-red-500");
+    });
+
+    btnDec.addEventListener("click", () => {
+      let q = parseInt(ticketQtyInput.value, 10) || 1;
+      if (q > 1) {
+        ticketQtyInput.value = q - 1;
+        selectedQuantity = q - 1;
+      }
+    });
+
+    btnInc.addEventListener("click", () => {
+      let q = parseInt(ticketQtyInput.value, 10) || 1;
+      if (q < 20) {
+        ticketQtyInput.value = q + 1;
+        selectedQuantity = q + 1;
+      }
+    });
+
+    ticketQtyInput.addEventListener("input", (e) => {
+      let q = parseInt(e.target.value, 10);
+      if (isNaN(q) || q < 1) q = 1;
+      if (q > 20) q = 20;
+      ticketQtyInput.value = q;
+      selectedQuantity = q;
+    });
+
+    // ================== STEP TRANSITIONS ==================
+    const step1Container = document.getElementById("step1Container");
+    const step2Container = document.getElementById("step2Container");
+    const step1Indicator = document.getElementById("step1Indicator");
+    const step2Indicator = document.getElementById("step2Indicator");
+    const step2Label = document.getElementById("step2Label");
+
+    const btnGoToStep2 = document.getElementById("btnGoToStep2");
+    const btnBackToStep1 = document.getElementById("btnBackToStep1");
+
+    // Summary Elements in Step 2
+    const summaryNameDisplay = document.getElementById("summaryNameDisplay");
+    const summaryWaDisplay = document.getElementById("summaryWaDisplay");
+    const summaryVariantDisplay = document.getElementById("summaryVariantDisplay");
+    const summaryQtyDisplay = document.getElementById("summaryQtyDisplay");
+    const summaryTotalDisplay = document.getElementById("summaryTotalDisplay");
+
+    function validateStep1() {
+      let valid = true;
+      const name = inputName.value.trim();
+      const wa = inputWa.value.trim();
+      const phoneRegex = /^[0-9+]{10,16}$/;
+
+      if (!name) {
+        document.getElementById("errName").classList.remove("hidden");
+        inputName.classList.add("border-red-500");
+        valid = false;
+      } else {
+        document.getElementById("errName").classList.add("hidden");
+        inputName.classList.remove("border-red-500");
+      }
+
+      if (!wa || !phoneRegex.test(wa.replace(/\s|-/g, ""))) {
+        document.getElementById("errWa").classList.remove("hidden");
+        inputWa.classList.add("border-red-500");
+        valid = false;
+      } else {
+        document.getElementById("errWa").classList.add("hidden");
+        inputWa.classList.remove("border-red-500");
+      }
+
+      return valid;
+    }
+
+    btnGoToStep2.addEventListener("click", () => {
+      if (!validateStep1()) return;
+
+      const currentVariant = VARIANTS[selectedVariantKey];
+      const totalAmount = currentVariant.price * selectedQuantity;
+
+      summaryNameDisplay.textContent = inputName.value.trim();
+      summaryWaDisplay.textContent = inputWa.value.trim();
+      summaryVariantDisplay.textContent = currentVariant.name;
+      summaryQtyDisplay.textContent = `${selectedQuantity} Tiket (@ ${formatRupiah(currentVariant.price)})`;
+      summaryTotalDisplay.textContent = formatRupiah(totalAmount);
+
+      step1Container.classList.add("hidden");
+      step2Container.classList.remove("hidden");
+
+      step2Indicator.className = "w-7 h-7 rounded-full bg-pastel-purple text-night font-bold text-xs flex items-center justify-center shadow-glow-purple";
+      step2Label.classList.remove("text-white/40");
+      step2Label.classList.add("text-white");
+
+      window.scrollTo({ top: step2Container.offsetTop - 80, behavior: "smooth" });
+      lucide.createIcons();
+    });
+
+    btnBackToStep1.addEventListener("click", () => {
+      step2Container.classList.add("hidden");
+      step1Container.classList.remove("hidden");
+
+      step2Indicator.className = "w-7 h-7 rounded-full bg-night-input border border-night-border text-white/40 font-bold text-xs flex items-center justify-center";
+      step2Label.classList.remove("text-white");
+      step2Label.classList.add("text-white/40");
+
+      window.scrollTo({ top: step1Container.offsetTop - 80, behavior: "smooth" });
+    });
+
+    // ================== FILE UPLOAD & BASE64 LOGIC ==================
+    const fileProofInput = document.getElementById("fileProofInput");
+    const proofDropzone = document.getElementById("proofDropzone");
+    const dropzonePrompt = document.getElementById("dropzonePrompt");
+    const dropzonePreview = document.getElementById("dropzonePreview");
+    const previewProofImg = document.getElementById("previewProofImg");
+    const proofFileName = document.getElementById("proofFileName");
+    const proofFileSize = document.getElementById("proofFileSize");
+    const btnChangeFile = document.getElementById("btnChangeFile");
+    const errProof = document.getElementById("errProof");
+
+    function handleProofFile(file) {
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        alert("Harap pilih file berupa gambar (JPG, PNG, atau WEBP).");
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Ukuran file maksimal adalah 5MB.");
+        return;
+      }
+
+      selectedProofFile = file;
+      errProof.classList.add("hidden");
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const fullBase64 = e.target.result;
+        // Ambil Base64 murni tanpa prefix data:image/...;base64,
+        selectedProofBase64TanpaHeader = fullBase64.split(",")[1] || fullBase64;
+
+        previewProofImg.src = fullBase64;
+        proofFileName.textContent = file.name;
+        proofFileSize.textContent = formatBytes(file.size);
+
+        dropzonePrompt.classList.add("hidden");
+        dropzonePreview.classList.remove("hidden");
+        lucide.createIcons();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    proofDropzone.addEventListener("click", (e) => {
+      if (e.target.closest("#btnChangeFile")) return;
+      fileProofInput.click();
+    });
+
+    fileProofInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files[0]) {
+        handleProofFile(e.target.files[0]);
+      }
+    });
+
+    btnChangeFile.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectedProofFile = null;
+      selectedProofBase64TanpaHeader = null;
+      fileProofInput.value = "";
+      dropzonePreview.classList.add("hidden");
+      dropzonePrompt.classList.remove("hidden");
+    });
+
+    ["dragenter", "dragover"].forEach(evt => {
+      proofDropzone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        proofDropzone.classList.add("border-pastel-purple", "bg-night-input");
+      });
+    });
+
+    ["dragleave", "drop"].forEach(evt => {
+      proofDropzone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        proofDropzone.classList.remove("border-pastel-purple", "bg-night-input");
+      });
+    });
+
+    proofDropzone.addEventListener("drop", (e) => {
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleProofFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    // ================== SUBMIT PEMESANAN (FETCH POST SCRIPT_URL) ==================
+    const btnSubmitPayment = document.getElementById("btnSubmitPayment");
+    const btnSubmitText = document.getElementById("btnSubmitText");
+    const btnSubmitSpinner = document.getElementById("btnSubmitSpinner");
+
+    const successModal = document.getElementById("successModal");
+    const modalContainer = document.getElementById("modalContainer");
+    const btnCloseModal = document.getElementById("btnCloseModal");
+    const btnModalCheckNow = document.getElementById("btnModalCheckNow");
+
+    const modalSummaryName = document.getElementById("modalSummaryName");
+    const modalSummaryWa = document.getElementById("modalSummaryWa");
+    const modalSummaryQty = document.getElementById("modalSummaryQty");
+    const modalSummaryTotal = document.getElementById("modalSummaryTotal");
+
+    function setSubmittingState(isSubmitting) {
+      if (isSubmitting) {
+        btnSubmitPayment.disabled = true;
+        btnSubmitText.classList.add("hidden");
+        btnSubmitSpinner.classList.remove("hidden");
+      } else {
+        btnSubmitPayment.disabled = false;
+        btnSubmitText.classList.remove("hidden");
+        btnSubmitSpinner.classList.add("hidden");
+      }
+    }
+
+    btnSubmitPayment.addEventListener("click", async () => {
+      if (!selectedProofBase64TanpaHeader || !selectedProofFile) {
+        errProof.classList.remove("hidden");
+        proofDropzone.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      setSubmittingState(true);
+
+      const currentVariant = VARIANTS[selectedVariantKey];
+      const totalAmount = currentVariant.price * selectedQuantity;
+      const namaValue = inputName.value.trim();
+      const waValue = inputWa.value.trim();
+
+      // Struktur Payload sesuai spesifikasi
+      const payload = {
+        nama: namaValue,
+        whatsapp: waValue,
+        varian: currentVariant.name,
+        jumlah: selectedQuantity,
+        total: totalAmount,
+        namaFile: selectedProofFile.name,
+        fileData: selectedProofBase64TanpaHeader
+      };
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result && (result.status === "error" || result.error)) {
+          throw new Error(result.message || "Gagal menyimpan data ke sistem.");
+        }
+
+        // Tampilkan Modal Sukses
+        modalSummaryName.textContent = namaValue;
+        modalSummaryWa.textContent = waValue;
+        modalSummaryQty.textContent = `${selectedQuantity}x (${currentVariant.name})`;
+        modalSummaryTotal.textContent = formatRupiah(totalAmount);
+
+        successModal.classList.remove("opacity-0", "pointer-events-none");
+        modalContainer.classList.remove("scale-95");
+        modalContainer.classList.add("scale-100");
+        lucide.createIcons();
+
+      } catch (err) {
+        console.error("Gagal mengirim pesanan:", err);
+        alert("Terjadi kendala saat mengirim data: " + (err.message || "Koneksi terganggu. Silakan coba beberapa saat lagi."));
+      } finally {
+        setSubmittingState(false);
+      }
+    });
+
+    function resetOrderForm() {
+      inputName.value = "";
+      inputWa.value = "";
+      ticketQtyInput.value = 1;
+      selectedQuantity = 1;
+      updateVariantSelection("regular");
+      previewName.textContent = "Nama Anda";
+
+      selectedProofFile = null;
+      selectedProofBase64TanpaHeader = null;
+      fileProofInput.value = "";
+      dropzonePreview.classList.add("hidden");
+      dropzonePrompt.classList.remove("hidden");
+
+      step2Container.classList.add("hidden");
+      step1Container.classList.remove("hidden");
+      step2Indicator.className = "w-7 h-7 rounded-full bg-night-input border border-night-border text-white/40 font-bold text-xs flex items-center justify-center";
+      step2Label.classList.remove("text-white");
+      step2Label.classList.add("text-white/40");
+    }
+
+    btnCloseModal.addEventListener("click", () => {
+      modalContainer.classList.remove("scale-100");
+      modalContainer.classList.add("scale-95");
+      successModal.classList.add("opacity-0", "pointer-events-none");
+      resetOrderForm();
+    });
+
+    btnModalCheckNow.addEventListener("click", () => {
+      const wa = inputWa.value.trim();
+      modalContainer.classList.remove("scale-100");
+      modalContainer.classList.add("scale-95");
+      successModal.classList.add("opacity-0", "pointer-events-none");
+
+      resetOrderForm();
+      switchTab("check");
+      if (wa) {
+        document.getElementById("checkWaInput").value = wa;
+        checkTicketStatus(wa);
+      }
+    });
+
+
+    // ================== TAB 2: CEK STATUS & UNDUH TIKET ==================
+    const checkWaInput = document.getElementById("checkWaInput");
+    const btnSearchTicket = document.getElementById("btnSearchTicket");
+    const btnSearchText = document.getElementById("btnSearchText");
+    const btnSearchSpinner = document.getElementById("btnSearchSpinner");
+    const errCheckWa = document.getElementById("errCheckWa");
+
+    const checkResultContainer = document.getElementById("checkResultContainer");
+    const resultPending = document.getElementById("resultPending");
+    const resultNotFound = document.getElementById("resultNotFound");
+    const resultApproved = document.getElementById("resultApproved");
+
+    const approvedTicketCode = document.getElementById("approvedTicketCode");
+    const approvedName = document.getElementById("approvedName");
+    const approvedVariant = document.getElementById("approvedVariant");
+    const approvedQty = document.getElementById("approvedQty");
+    const btnDownloadPdf = document.getElementById("btnDownloadPdf");
+
+    function setSearchLoading(isLoading) {
+      if (isLoading) {
+        btnSearchTicket.disabled = true;
+        btnSearchText.classList.add("hidden");
+        btnSearchSpinner.classList.remove("hidden");
+      } else {
+        btnSearchTicket.disabled = false;
+        btnSearchText.classList.remove("hidden");
+        btnSearchSpinner.classList.add("hidden");
+      }
+    }
+
+    function hideAllResults() {
+      checkResultContainer.classList.remove("hidden");
+      resultPending.classList.add("hidden");
+      resultNotFound.classList.add("hidden");
+      resultApproved.classList.add("hidden");
+    }
+
+    async function checkTicketStatus(waNumber) {
+      const cleanWa = waNumber.trim().replace(/\s|-/g, "");
+      const phoneRegex = /^[0-9+]{10,16}$/;
+
+      if (!cleanWa || !phoneRegex.test(cleanWa)) {
+        errCheckWa.classList.remove("hidden");
+        return;
+      }
+      errCheckWa.classList.add("hidden");
+      setSearchLoading(true);
+      hideAllResults();
+
+      try {
+        // Kirim request POST action "check_ticket" ke SCRIPT_URL
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            action: "check_ticket",
+            whatsapp: cleanWa
+          })
+        });
+
+        const data = await response.json();
+
+        const statusUpper = (data.status || "").toUpperCase();
+
+        if (statusUpper === "NOT_FOUND" || data.found === false) {
+          resultNotFound.classList.remove("hidden");
+          alert("Nomor WhatsApp belum terdaftar. Pastikan nomor yang dimasukkan sama dengan saat memesan.");
+        } else if (statusUpper === "PENDING" || data.paymentStatus === "PENDING") {
+          resultPending.classList.remove("hidden");
+        } else if (statusUpper === "APPROVED" || data.paymentStatus === "APPROVED") {
+          approvedTicketCode.textContent = data.ticketCode || ("#BB26-" + cleanWa.slice(-4));
+          approvedName.textContent = data.nama || "Peserta Bingkai Bisu";
+          approvedVariant.textContent = data.varian || "2 Day Pass";
+          approvedQty.textContent = `${data.jumlah || 1} Tiket`;
+          btnDownloadPdf.href = data.linkPdf || data.pdfUrl || "#";
+          resultApproved.classList.remove("hidden");
+        } else {
+          resultPending.classList.remove("hidden");
+        }
+
+      } catch (error) {
+        console.error("Gagal mengecek status tiket:", error);
+        alert("Gagal menghubungi server database tiket. Pastikan koneksi internet Anda aktif.");
+      } finally {
+        setSearchLoading(false);
+        lucide.createIcons();
+      }
+    }
+
+    btnSearchTicket.addEventListener("click", () => {
+      checkTicketStatus(checkWaInput.value);
+    });
+
+    checkWaInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        checkTicketStatus(checkWaInput.value);
+      }
+    });
+  </script>
+</body>
+</html>
