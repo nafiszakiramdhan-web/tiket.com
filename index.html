@@ -1108,8 +1108,9 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const fullBase64 = e.target.result;
-        // Ambil Base64 murni tanpa prefix data:image/...;base64,
-        selectedProofBase64TanpaHeader = fullBase64.split(",")[1] || fullBase64;
+        // Membuang header data:*/*;base64, secara aman
+        const commaIndex = fullBase64.indexOf(",");
+        selectedProofBase64TanpaHeader = commaIndex !== -1 ? fullBase64.substring(commaIndex + 1) : fullBase64;
 
         previewProofImg.src = fullBase64;
         proofFileName.textContent = file.name;
@@ -1118,6 +1119,10 @@
         dropzonePrompt.classList.add("hidden");
         dropzonePreview.classList.remove("hidden");
         lucide.createIcons();
+      };
+      reader.onerror = function(err) {
+        console.error("Gagal membaca berkas gambar:", err);
+        alert("Gagal membaca berkas gambar. Silakan coba pilih berkas lain.");
       };
       reader.readAsDataURL(file);
     }
@@ -1240,6 +1245,8 @@
       try {
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
+          mode: "cors",
+          redirect: "follow",
           headers: {
             "Content-Type": "text/plain;charset=utf-8"
           },
@@ -1371,6 +1378,8 @@
         // Kirim request POST action "check_ticket" dengan verifikasi ganda (whatsapp + nama)
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
+          mode: "cors",
+          redirect: "follow",
           headers: {
             "Content-Type": "text/plain;charset=utf-8"
           },

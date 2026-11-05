@@ -443,6 +443,8 @@
       try {
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
+          mode: "cors",
+          redirect: "follow",
           headers: {
             "Content-Type": "text/plain;charset=utf-8"
           },
@@ -644,6 +646,8 @@
       try {
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
+          mode: "cors",
+          redirect: "follow",
           headers: {
             "Content-Type": "text/plain;charset=utf-8"
           },
