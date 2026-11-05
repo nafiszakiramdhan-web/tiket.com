@@ -6,6 +6,8 @@
  * 2. Cek Status & Unduh E-Ticket (action: "check_ticket", verifikasi ganda WA + Nama)
  * 3. Dashboard Admin - Ambil Antrean Pending (action: "admin_get_pending")
  * 4. Dashboard Admin - ACC & Terbitkan Tiket (action: "admin_acc")
+ * 5. Gate Scanner Offline - Unduh Database (action: "download_offline_db")
+ * 6. Gate Scanner Offline - Sinkronkan Hasil Scan (action: "sync_offline_checkins")
  */
 
 var SHEET_NAME = "Pesanan Tiket";
@@ -70,7 +72,6 @@ function doPost(e) {
       // Cek apakah link PDF sudah ada di Kolom J / index 10
       var currentPdf = sheet.getRange(targetRow, 10).getValue();
       if (!currentPdf || currentPdf.toString().trim() === "") {
-        // Link default Google Drive E-Ticket jika belum terisi manual
         sheet.getRange(targetRow, 10).setValue("https://drive.google.com");
       }
 
@@ -128,6 +129,70 @@ function doPost(e) {
     }
 
     // ==========================================
+    // ACTION 5: GATE SCANNER - UNDUH DATABASE OFFLINE
+    // ==========================================
+    if (action === "download_offline_db") {
+      var allRows = sheet.getDataRange().getValues();
+      var offlineList = [];
+
+      for (var k = 1; k < allRows.length; k++) {
+        var payStat = (allRows[k][8] || "PENDING").toString().toUpperCase().trim();
+        // Hanya tiket yang APPROVED atau jika diinginkan semua tiket
+        if (payStat === "APPROVED") {
+          offlineList.push({
+            kodeTiket: (allRows[k][1] || "").toString().trim().toUpperCase(),
+            nama: allRows[k][2] || "-",
+            whatsapp: (allRows[k][3] || "").toString().replace(/['\s-]/g, ""),
+            varian: allRows[k][4] || "2 Day Pass",
+            jumlah: allRows[k][5] || 1,
+            statusBayar: payStat,
+            statusCheckin: (allRows[k][10] || "BELUM MASUK").toString().toUpperCase().trim(), // Kolom K
+            waktuScan: (allRows[k][11] || "").toString().trim() // Kolom L
+          });
+        }
+      }
+
+      return createJsonResponse({
+        status: "SUCCESS",
+        count: offlineList.length,
+        tickets: offlineList
+      });
+    }
+
+    // ==========================================
+    // ACTION 6: GATE SCANNER - SINKRONKAN HASIL SCAN
+    // ==========================================
+    if (action === "sync_offline_checkins") {
+      var checkinList = payload.checkins || [];
+      var allRows = sheet.getDataRange().getValues();
+      var updatedCount = 0;
+
+      // Buat header check-in jika kolom K dan L belum ada
+      if (allRows.length > 0 && allRows[0].length < 12) {
+        sheet.getRange(1, 11).setValue("Status Check-In");
+        sheet.getRange(1, 12).setValue("Waktu Scan");
+      }
+
+      checkinList.forEach(function(item) {
+        var targetCode = (item.kodeTiket || "").toString().trim().toUpperCase();
+        for (var rowIdx = 1; rowIdx < allRows.length; rowIdx++) {
+          var currentCode = (allRows[rowIdx][1] || "").toString().trim().toUpperCase();
+          if (currentCode === targetCode || currentCode.replace("#", "") === targetCode.replace("#", "")) {
+            sheet.getRange(rowIdx + 1, 11).setValue("SUDAH MASUK");
+            sheet.getRange(rowIdx + 1, 12).setValue(item.waktuScan || new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }));
+            updatedCount++;
+            break;
+          }
+        }
+      });
+
+      return createJsonResponse({
+        status: "SUCCESS",
+        message: "Berhasil menyinkronkan " + updatedCount + " data check-in tiket ke Cloud."
+      });
+    }
+
+    // ==========================================
     // ACTION 4: PUBLIK - PEMESANAN TIKET BARU
     // ==========================================
     if (sheet.getLastRow() === 0) {
@@ -141,10 +206,12 @@ function doPost(e) {
         "Total Pembayaran",
         "Link Bukti Transfer (Drive)",
         "Status Pembayaran",
-        "Link PDF E-Ticket"
+        "Link PDF E-Ticket",
+        "Status Check-In",
+        "Waktu Scan"
       ]);
 
-      var headerRange = sheet.getRange(1, 1, 1, 10);
+      var headerRange = sheet.getRange(1, 1, 1, 12);
       headerRange.setFontWeight("bold");
       headerRange.setBackground("#B8A9E3");
       headerRange.setFontColor("#0F0F14");
@@ -188,6 +255,8 @@ function doPost(e) {
       payload.total,
       fileUrl,
       "PENDING",
+      "",
+      "BELUM MASUK",
       ""
     ]);
 

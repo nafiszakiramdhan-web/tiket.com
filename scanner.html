@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Gate Scanner Offline - Bingkai Bisu 2026</title>
+  
+  <!-- PWA Manifest & Meta -->
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#0F0F14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="GateScanner" />
+  <link rel="apple-touch-icon" href="asset/LOGO_BINGKAI_BISU.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            night: '#0F0F14',
+            'night-card': '#16161E',
+            'night-input': '#1D1D27',
+            'night-border': '#2A2A38',
+            pastel: {
+              purple: '#B8A9E3',
+              'purple-hover': '#A695D8',
+              'purple-light': '#D6CDF3',
+              yellow: '#F7D070',
+              'yellow-hover': '#EAC15B',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Syne"', 'sans-serif'],
+            mono: ['"Space Mono"', 'monospace'],
+          },
+          boxShadow: {
+            'glow-purple': '0 0 35px -5px rgba(184, 169, 227, 0.25)',
+            'glow-yellow': '0 0 30px -5px rgba(247, 208, 112, 0.25)',
+            'glow-green': '0 0 30px -5px rgba(52, 211, 153, 0.3)',
+            'glow-red': '0 0 30px -5px rgba(239, 68, 68, 0.3)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- HTML5 QR Code Library (Offline Cached via sw.js) -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    body {
+      background-color: #0F0F14;
+      color: #FFFFFF;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    #reader video {
+      border-radius: 1rem;
+      object-fit: cover !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    #reader {
+      border: none !important;
+      background: transparent !important;
+    }
+    #reader__scan_region {
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+    /* Scanner box scanning laser effect */
+    .laser-line {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #F7D070, transparent);
+      box-shadow: 0 0 15px #F7D070;
+      animation: scanLaser 2s linear infinite alternate;
+      z-index: 10;
+      pointer-events: none;
+    }
+    @keyframes scanLaser {
+      0% { top: 15%; opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { top: 85%; opacity: 0.3; }
+    }
+  </style>
+</head>
+<body class="flex flex-col justify-between selection:bg-pastel-purple selection:text-night">
+
+  <!-- Top Accent Bar -->
+  <div class="h-1 w-full bg-gradient-to-r from-pastel-purple via-pastel-yellow to-pastel-purple"></div>
+
+  <!-- Main Container -->
+  <div class="max-w-md mx-auto w-full px-4 py-4 flex-1 flex flex-col justify-between space-y-4">
+
+    <!-- Header Section -->
+    <header class="text-center pt-2">
+      <div class="flex items-center justify-between mb-2">
+        <a href="index.html" class="p-2 rounded-xl bg-night-card border border-night-border text-white/60 hover:text-white transition-colors" title="Kembali">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        </a>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pastel-purple/10 border border-pastel-purple/20 text-pastel-purple text-[11px] font-semibold tracking-wider uppercase">
+          <i data-lucide="scan-line" class="w-3.5 h-3.5"></i>
+          <span>Fixlens Festival 2026</span>
+        </div>
+        <button type="button" id="btnToggleAudio" class="p-2 rounded-xl bg-night-card border border-night-border text-pastel-yellow hover:text-white transition-colors" title="Suara Beep">
+          <i data-lucide="volume-2" id="iconAudio" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <h1 class="font-display font-extrabold text-xl sm:text-2xl text-white uppercase tracking-tight">
+        GATE SCANNER <span class="text-pastel-purple">OFFLINE</span>
+      </h1>
+      <p class="text-[11px] text-white/50">Pemindai Tiket Masuk • Hetero Space Banyumas</p>
+    </header>
+
+    <!-- Baris Status & Indikator -->
+    <section class="grid grid-cols-3 gap-2 text-center text-xs">
+      <!-- Status Internet -->
+      <div class="p-2.5 rounded-xl bg-night-card border border-night-border flex flex-col items-center justify-center">
+        <span class="text-[9px] uppercase tracking-wider text-white/40 font-mono mb-1">Koneksi</span>
+        <span id="badgeNetwork" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px]">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="textNetwork">ONLINE</span>
+        </span>
+      </div>
+
+      <!-- Database HP -->
+      <div class="p-2.5 rounded-xl bg-night-card border border-night-border flex flex-col items-center justify-center">
+        <span class="text-[9px] uppercase tracking-wider text-white/40 font-mono mb-1">Database HP</span>
+        <span id="statDbCount" class="font-display font-bold text-sm text-pastel-purple">0 Tiket</span>
+      </div>
+
+      <!-- Check-in Count -->
+      <div class="p-2.5 rounded-xl bg-night-card border border-night-border flex flex-col items-center justify-center">
+        <span class="text-[9px] uppercase tracking-wider text-white/40 font-mono mb-1">Sudah Masuk</span>
+        <span id="statCheckinCount" class="font-display font-bold text-sm text-pastel-yellow">0 Orang</span>
+      </div>
+    </section>
+
+    <!-- Kotak Kamera Scanner -->
+    <section class="relative bg-night-card border border-night-border rounded-3xl p-3 shadow-2xl overflow-hidden flex flex-col items-center">
+      <!-- Camera Viewport Box -->
+      <div class="relative w-full aspect-square max-w-[320px] rounded-2xl overflow-hidden bg-black flex items-center justify-center border border-white/10">
+        
+        <!-- Video Target from html5-qrcode -->
+        <div id="reader" class="w-full h-full"></div>
+
+        <!-- Scanning Guides & Laser -->
+        <div id="scanGuides" class="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between">
+          <div class="flex justify-between">
+            <div class="w-8 h-8 border-t-2 border-l-2 border-pastel-yellow rounded-tl-lg"></div>
+            <div class="w-8 h-8 border-t-2 border-r-2 border-pastel-yellow rounded-tr-lg"></div>
+          </div>
+          <div class="laser-line"></div>
+          <div class="flex justify-between">
+            <div class="w-8 h-8 border-b-2 border-l-2 border-pastel-yellow rounded-bl-lg"></div>
+            <div class="w-8 h-8 border-b-2 border-r-2 border-pastel-yellow rounded-br-lg"></div>
+          </div>
+        </div>
+
+        <!-- Placeholder when camera stopped -->
+        <div id="cameraPlaceholder" class="hidden absolute inset-0 bg-night-input flex flex-col items-center justify-center text-center p-6 space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-white/5 text-white/40 flex items-center justify-center">
+            <i data-lucide="camera-off" class="w-6 h-6"></i>
+          </div>
+          <p class="text-xs text-white/60">Kamera tidak aktif</p>
+          <button type="button" id="btnStartCamera" class="py-2 px-4 rounded-xl bg-pastel-purple text-night font-bold text-xs uppercase tracking-wider shadow-md">
+            Aktifkan Kamera
+          </button>
+        </div>
+      </div>
+
+      <!-- Camera Controls -->
+      <div class="flex items-center justify-between w-full max-w-[320px] mt-3 px-1 text-xs text-white/60">
+        <button type="button" id="btnToggleCamera" class="inline-flex items-center gap-1 hover:text-white transition-colors">
+          <i data-lucide="video" class="w-3.5 h-3.5"></i>
+          <span id="btnToggleCameraText">Jeda Kamera</span>
+        </button>
+        <button type="button" id="btnSwitchCamera" class="inline-flex items-center gap-1 hover:text-white transition-colors">
+          <i data-lucide="flip-horizontal" class="w-3.5 h-3.5"></i>
+          <span>Ganti Kamera</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Area Notifikasi Hasil Validasi -->
+    <section id="validationContainer" class="space-y-2">
+      
+      <!-- DEFAULT / IDLE STATE -->
+      <div id="notifIdle" class="rounded-2xl bg-night-card border border-night-border p-4 text-center text-xs text-white/50 space-y-1">
+        <i data-lucide="scan" class="w-5 h-5 mx-auto text-white/30 mb-1"></i>
+        <p class="font-semibold text-white/70">Arahkan Kamera ke QR Code E-Ticket</p>
+        <p class="text-[11px] text-white/40">Sistem memverifikasi tiket secara lokal langsung di memori HP.</p>
+      </div>
+
+      <!-- NOTIFIKASI HIJAU: CHECK-IN BERHASIL -->
+      <div id="notifSuccess" class="hidden rounded-2xl bg-emerald-500/15 border-2 border-emerald-400 p-4 text-emerald-300 shadow-glow-green space-y-2 animate-bounce-subtle">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500 text-night flex items-center justify-center shrink-0">
+            <i data-lucide="check" class="w-6 h-6 stroke-[3]"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 font-bold block">VALID • ALL ACCESS</span>
+            <h3 class="font-display font-extrabold text-base text-white leading-tight">CHECK-IN BERHASIL</h3>
+          </div>
+        </div>
+        <div class="bg-black/30 rounded-xl p-2.5 text-xs text-white/90 space-y-1 border border-emerald-400/20">
+          <div class="flex justify-between">
+            <span class="text-white/50">Nama:</span>
+            <span id="successName" class="font-bold text-white truncate max-w-[200px]">-</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-white/50">Varian:</span>
+            <span id="successVariant" class="font-bold text-pastel-yellow">-</span>
+          </div>
+          <div class="flex justify-between font-mono text-[11px]">
+            <span class="text-white/50">Kode:</span>
+            <span id="successCode" class="text-emerald-300 font-bold">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFIKASI KUNING/ORANGE: TIKET SUDAH DIGUNAKAN -->
+      <div id="notifWarning" class="hidden rounded-2xl bg-amber-500/15 border-2 border-amber-400 p-4 text-amber-300 shadow-glow-yellow space-y-2">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-night flex items-center justify-center shrink-0">
+            <i data-lucide="alert-triangle" class="w-6 h-6 stroke-[3]"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <span class="text-[10px] uppercase font-mono tracking-widest text-amber-400 font-bold block">PERINGATAN MASUK</span>
+            <h3 class="font-display font-extrabold text-base text-white leading-tight">TIKET SUDAH DIGUNAKAN</h3>
+          </div>
+        </div>
+        <div class="bg-black/30 rounded-xl p-2.5 text-xs text-white/90 space-y-1 border border-amber-400/20">
+          <div class="flex justify-between">
+            <span class="text-white/50">Nama:</span>
+            <span id="warningName" class="font-bold text-white truncate max-w-[200px]">-</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-white/50">Scan Pertama:</span>
+            <span id="warningTime" class="font-mono text-amber-300 font-semibold">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFIKASI MERAH: KODE TIKET TIDAK VALID -->
+      <div id="notifError" class="hidden rounded-2xl bg-red-500/15 border-2 border-red-500 p-4 text-red-300 shadow-glow-red space-y-2">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center shrink-0">
+            <i data-lucide="x-circle" class="w-6 h-6"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <span class="text-[10px] uppercase font-mono tracking-widest text-red-400 font-bold block">DITOLAK</span>
+            <h3 class="font-display font-extrabold text-base text-white leading-tight">KODE TIKET TIDAK VALID</h3>
+          </div>
+        </div>
+        <p class="text-xs text-white/80 leading-relaxed bg-black/30 p-2.5 rounded-xl border border-red-500/20">
+          Kode tiket tidak ditemukan di database offline. Pastikan database offline sudah diunduh atau periksa tiket asli.
+        </p>
+      </div>
+
+    </section>
+
+    <!-- Fallback Manual Input -->
+    <div class="bg-night-card border border-night-border rounded-2xl p-3">
+      <form id="formManualScan" class="flex gap-2">
+        <input 
+          type="text" 
+          id="inputManualCode" 
+          placeholder="Input manual: #BB26-XXXX" 
+          class="flex-1 py-2 px-3 rounded-xl bg-night-input border border-night-border text-white text-xs font-mono uppercase focus:outline-none focus:border-pastel-purple"
+        />
+        <button type="submit" class="py-2 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors">
+          Periksa
+        </button>
+      </form>
+    </div>
+
+    <!-- Panel Tombol Sinkronisasi Database -->
+    <footer class="space-y-2.5 pt-1">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <!-- Tombol 1: Unduh Database -->
+        <button 
+          type="button" 
+          id="btnDownloadDb" 
+          class="w-full py-3 px-4 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-pastel-purple hover:bg-pastel-purple-hover active:scale-[0.98] transition-all duration-200 shadow-glow-purple flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+        >
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span id="btnDownloadDbText">📥 Unduh Database Tiket</span>
+        </button>
+
+        <!-- Tombol 2: Sinkronkan ke Cloud -->
+        <button 
+          type="button" 
+          id="btnSyncCloud" 
+          class="w-full py-3 px-4 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-pastel-yellow hover:bg-pastel-yellow-hover active:scale-[0.98] transition-all duration-200 shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+        >
+          <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+          <span id="btnSyncCloudText">☁️ Sinkronkan ke Cloud</span>
+        </button>
+      </div>
+
+      <div class="text-center text-[10px] text-white/40">
+        PWA Scanner Offline • Simpan ke Layar Utama (Add to Home Screen)
+      </div>
+    </footer>
+
+  </div>
+
+
+  <!-- ==================== LOGIKA JAVASCRIPT ==================== -->
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRMLG227dO9VkqJh__-Prb6HGw_t1JMY14FLLeQHO6kMwq5jlClzXlkMTfMYOh31zw/exec";
+    const DB_KEY = "bingkai_bisu_offline_db";
+
+    lucide.createIcons();
+
+    // ================== SERVICE WORKER REGISTRATION ==================
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+          .then((reg) => console.log("[PWA] Service Worker aktif di scope:", reg.scope))
+          .catch((err) => console.warn("[PWA] Pendaftaran Service Worker gagal:", err));
+      });
+    }
+
+    // ================== AUDIO BEEP SYNTHESIZER (100% OFFLINE) ==================
+    let audioContext = null;
+    let isAudioEnabled = true;
+
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    }
+
+    document.getElementById("btnToggleAudio").addEventListener("click", () => {
+      initAudio();
+      isAudioEnabled = !isAudioEnabled;
+      const icon = document.getElementById("iconAudio");
+      if (isAudioEnabled) {
+        icon.setAttribute("data-lucide", "volume-2");
+        document.getElementById("btnToggleAudio").classList.replace("text-white/40", "text-pastel-yellow");
+      } else {
+        icon.setAttribute("data-lucide", "volume-x");
+        document.getElementById("btnToggleAudio").classList.replace("text-pastel-yellow", "text-white/40");
+      }
+      lucide.createIcons();
+    });
+
+    function playTone(freq, type, duration) {
+      if (!isAudioEnabled) return;
+      try {
+        initAudio();
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+      } catch (e) {
+        console.warn("Audio play warning:", e);
+      }
+    }
+
+    function soundSuccess() {
+      playTone(880, "sine", 0.15);
+      setTimeout(() => playTone(1320, "sine", 0.25), 120);
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    }
+
+    function soundWarning() {
+      playTone(520, "square", 0.18);
+      setTimeout(() => playTone(520, "square", 0.18), 220);
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    }
+
+    function soundError() {
+      playTone(220, "sawtooth", 0.35);
+      if (navigator.vibrate) navigator.vibrate(350);
+    }
+
+    // ================== NETWORK STATUS LISTENER ==================
+    const badgeNetwork = document.getElementById("badgeNetwork");
+    const textNetwork = document.getElementById("textNetwork");
+
+    function updateNetworkStatus() {
+      if (navigator.onLine) {
+        badgeNetwork.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px]";
+        badgeNetwork.querySelector("span").className = "w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse";
+        textNetwork.textContent = "ONLINE";
+      } else {
+        badgeNetwork.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 font-bold text-[10px]";
+        badgeNetwork.querySelector("span").className = "w-1.5 h-1.5 rounded-full bg-red-400";
+        textNetwork.textContent = "OFFLINE";
+      }
+    }
+
+    window.addEventListener("online", updateNetworkStatus);
+    window.addEventListener("offline", updateNetworkStatus);
+    updateNetworkStatus();
+
+    // ================== LOCAL STORAGE DATABASE HELPER ==================
+    function getOfflineDb() {
+      try {
+        const raw = localStorage.getItem(DB_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveOfflineDb(data) {
+      localStorage.setItem(DB_KEY, JSON.stringify(data));
+      updateCounters();
+    }
+
+    function updateCounters() {
+      const db = getOfflineDb();
+      document.getElementById("statDbCount").textContent = `${db.length} Tiket`;
+      const checkedIn = db.filter(item => item.statusCheckin === "SUDAH MASUK").length;
+      document.getElementById("statCheckinCount").textContent = `${checkedIn} Orang`;
+    }
+
+    updateCounters();
+
+    // ================== NOTIFICATION DISPLAY ==================
+    const notifIdle = document.getElementById("notifIdle");
+    const notifSuccess = document.getElementById("notifSuccess");
+    const notifWarning = document.getElementById("notifWarning");
+    const notifError = document.getElementById("notifError");
+
+    const successName = document.getElementById("successName");
+    const successVariant = document.getElementById("successVariant");
+    const successCode = document.getElementById("successCode");
+
+    const warningName = document.getElementById("warningName");
+    const warningTime = document.getElementById("warningTime");
+
+    let notifTimeout = null;
+
+    function resetNotifications() {
+      notifIdle.classList.remove("hidden");
+      notifSuccess.classList.add("hidden");
+      notifWarning.classList.add("hidden");
+      notifError.classList.add("hidden");
+    }
+
+    function showNotification(type, data) {
+      clearTimeout(notifTimeout);
+      notifIdle.classList.add("hidden");
+      notifSuccess.classList.add("hidden");
+      notifWarning.classList.add("hidden");
+      notifError.classList.add("hidden");
+
+      if (type === "success") {
+        successName.textContent = data.nama || "Peserta";
+        successVariant.textContent = (data.varian || "2 Day Pass") + ` (${data.jumlah || 1} Tiket)`;
+        successCode.textContent = data.kodeTiket || "-";
+        notifSuccess.classList.remove("hidden");
+        soundSuccess();
+      } else if (type === "warning") {
+        warningName.textContent = data.nama || "Peserta";
+        warningTime.textContent = data.waktuScan || "Sebelumnya";
+        notifWarning.classList.remove("hidden");
+        soundWarning();
+      } else if (type === "error") {
+        notifError.classList.remove("hidden");
+        soundError();
+      }
+
+      lucide.createIcons();
+
+      // Reset ke idle setelah 7 detik
+      notifTimeout = setTimeout(() => {
+        resetNotifications();
+      }, 7000);
+    }
+
+    // ================== SCAN VALIDATION LOGIC ==================
+    let isProcessingScan = false;
+
+    function cleanScanCode(rawText) {
+      if (!rawText) return "";
+      let code = rawText.trim();
+      // Handle jika QR berisi URL yang memuat kode (e.g. ...#BB26-1234 atau ?code=BB26-1234)
+      const match = code.match(/BB26-[A-Za-z0-9]+/i);
+      if (match) {
+        return "#" + match[0].toUpperCase();
+      }
+      return code.toUpperCase();
+    }
+
+    function validateTicketCode(scannedRaw) {
+      if (isProcessingScan) return;
+      isProcessingScan = true;
+
+      const code = cleanScanCode(scannedRaw);
+      console.log("[Scanner] Memeriksa kode:", code);
+
+      const db = getOfflineDb();
+
+      // Cari tiket berdasarkan kodeTiket (case-insensitive)
+      const targetIndex = db.findIndex(item => {
+        const itemCode = (item.kodeTiket || item.ticketCode || "").toString().trim().toUpperCase();
+        return itemCode === code || itemCode.replace("#", "") === code.replace("#", "");
+      });
+
+      // 1. Tidak ditemukan
+      if (targetIndex === -1) {
+        showNotification("error");
+        setTimeout(() => { isProcessingScan = false; }, 2000);
+        return;
+      }
+
+      const ticket = db[targetIndex];
+
+      // 2. Ditemukan dan SUDAH MASUK
+      if (ticket.statusCheckin === "SUDAH MASUK") {
+        showNotification("warning", ticket);
+        setTimeout(() => { isProcessingScan = false; }, 2000);
+        return;
+      }
+
+      // 3. Ditemukan dan BELUM MASUK -> Lakukan Check-In
+      const nowWib = new Date().toLocaleString("id-ID", {
+        timeZone: "Asia/Jakarta",
+        hour12: false
+      }) + " WIB";
+
+      ticket.statusCheckin = "SUDAH MASUK";
+      ticket.waktuScan = nowWib;
+      db[targetIndex] = ticket;
+
+      saveOfflineDb(db);
+      showNotification("success", ticket);
+
+      setTimeout(() => { isProcessingScan = false; }, 2000);
+    }
+
+    // Form Manual Scan
+    document.getElementById("formManualScan").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("inputManualCode");
+      if (input.value.trim()) {
+        validateTicketCode(input.value.trim());
+        input.value = "";
+      }
+    });
+
+    // ================== HTML5-QRCODE CAMERA INTEGRATION ==================
+    let html5QrCode = null;
+    let isCameraRunning = false;
+    let currentFacingMode = "environment"; // Kamera belakang bawaan
+
+    async function startCameraScanner() {
+      try {
+        if (!html5QrCode) {
+          html5QrCode = new Html5Qrcode("reader");
+        }
+
+        const config = {
+          fps: 15,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0
+        };
+
+        await html5QrCode.start(
+          { facingMode: currentFacingMode },
+          config,
+          (decodedText) => {
+            validateTicketCode(decodedText);
+          },
+          (errorMessage) => {
+            // Ignore frame parse errors
+          }
+        );
+
+        isCameraRunning = true;
+        document.getElementById("cameraPlaceholder").classList.add("hidden");
+        document.getElementById("scanGuides").classList.remove("hidden");
+        document.getElementById("btnToggleCameraText").textContent = "Jeda Kamera";
+      } catch (err) {
+        console.warn("Gagal membuka kamera:", err);
+        document.getElementById("cameraPlaceholder").classList.remove("hidden");
+        document.getElementById("scanGuides").classList.add("hidden");
+        isCameraRunning = false;
+      }
+    }
+
+    async function stopCameraScanner() {
+      if (html5QrCode && isCameraRunning) {
+        await html5QrCode.stop();
+        isCameraRunning = false;
+        document.getElementById("cameraPlaceholder").classList.remove("hidden");
+        document.getElementById("scanGuides").classList.add("hidden");
+        document.getElementById("btnToggleCameraText").textContent = "Mulai Kamera";
+      }
+    }
+
+    document.getElementById("btnToggleCamera").addEventListener("click", () => {
+      if (isCameraRunning) {
+        stopCameraScanner();
+      } else {
+        startCameraScanner();
+      }
+    });
+
+    document.getElementById("btnStartCamera").addEventListener("click", startCameraScanner);
+
+    document.getElementById("btnSwitchCamera").addEventListener("click", async () => {
+      currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+      if (isCameraRunning) {
+        await stopCameraScanner();
+        startCameraScanner();
+      }
+    });
+
+    // Mulai kamera otomatis saat halaman dibuka
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(startCameraScanner, 400);
+    });
+
+    // ================== SINKRONISASI DATABASE ==================
+    const btnDownloadDb = document.getElementById("btnDownloadDb");
+    const btnDownloadDbText = document.getElementById("btnDownloadDbText");
+    const btnSyncCloud = document.getElementById("btnSyncCloud");
+    const btnSyncCloudText = document.getElementById("btnSyncCloudText");
+
+    // 1. Unduh Database Tiket dari Cloud ke HP
+    btnDownloadDb.addEventListener("click", async () => {
+      if (!navigator.onLine) {
+        alert("Perangkat Anda sedang OFFLINE. Sambungkan ke WiFi/seluler untuk mengunduh database terbaru.");
+        return;
+      }
+
+      btnDownloadDb.disabled = true;
+      btnDownloadDbText.textContent = "Mengunduh...";
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "cors",
+          redirect: "follow",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            action: "download_offline_db"
+          })
+        });
+
+        const res = await response.json();
+
+        if (res && res.status === "SUCCESS") {
+          const cloudTickets = res.tickets || res.data || [];
+          const currentLocalDb = getOfflineDb();
+
+          // Pertahankan status 'SUDAH MASUK' lokal jika ada tiket yang sudah discan di HP
+          const mergedDb = cloudTickets.map(cloudItem => {
+            const localMatch = currentLocalDb.find(l => 
+              (l.kodeTiket || "").toUpperCase() === (cloudItem.kodeTiket || "").toUpperCase()
+            );
+            if (localMatch && localMatch.statusCheckin === "SUDAH MASUK") {
+              return {
+                ...cloudItem,
+                statusCheckin: "SUDAH MASUK",
+                waktuScan: localMatch.waktuScan
+              };
+            }
+            return {
+              ...cloudItem,
+              statusCheckin: cloudItem.statusCheckin || "BELUM MASUK",
+              waktuScan: cloudItem.waktuScan || ""
+            };
+          });
+
+          saveOfflineDb(mergedDb);
+          alert(`Sukses! ${mergedDb.length} data tiket berhasil diunduh ke HP dan siap dipakai offline.`);
+        } else {
+          throw new Error(res.message || "Respon server tidak valid");
+        }
+      } catch (err) {
+        console.error("Gagal mengunduh database:", err);
+        alert("Gagal mengunduh database: " + err.message);
+      } finally {
+        btnDownloadDb.disabled = false;
+        btnDownloadDbText.textContent = "📥 Unduh Database Tiket";
+        updateCounters();
+      }
+    });
+
+    // 2. Sinkronkan Hasil Scan Offline ke Cloud
+    btnSyncCloud.addEventListener("click", async () => {
+      if (!navigator.onLine) {
+        alert("Perangkat sedang OFFLINE. Harap hubungkan internet untuk menyinkronkan data scan ke Cloud.");
+        return;
+      }
+
+      const db = getOfflineDb();
+      const checkinList = db.filter(item => item.statusCheckin === "SUDAH MASUK");
+
+      if (checkinList.length === 0) {
+        alert("Belum ada data tiket yang di-check-in di perangkat ini.");
+        return;
+      }
+
+      if (!confirm(`Sinkronkan ${checkinList.length} data tiket yang sudah masuk ke Google Sheets?`)) {
+        return;
+      }
+
+      btnSyncCloud.disabled = true;
+      btnSyncCloudText.textContent = "Menyinkronkan...";
+
+      try {
+        const payloadCheckins = checkinList.map(item => ({
+          kodeTiket: item.kodeTiket || item.ticketCode,
+          waktuScan: item.waktuScan || new Date().toISOString()
+        }));
+
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "cors",
+          redirect: "follow",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            action: "sync_offline_checkins",
+            checkins: payloadCheckins
+          })
+        });
+
+        const res = await response.json();
+
+        if (res && res.status === "SUCCESS") {
+          alert(`Berhasil! ${checkinList.length} data scan telah disinkronkan ke Cloud Google Sheets.`);
+        } else {
+          throw new Error(res.message || "Gagal sinkronisasi");
+        }
+      } catch (err) {
+        console.error("Gagal sync ke cloud:", err);
+        alert("Gagal sinkronisasi: " + err.message);
+      } finally {
+        btnSyncCloud.disabled = false;
+        btnSyncCloudText.textContent = "☁️ Sinkronkan ke Cloud";
+        updateCounters();
+      }
+    });
+  </script>
+</body>
+</html>
