@@ -273,14 +273,38 @@
       <!-- Table Card Container -->
       <div class="bg-night-card rounded-2xl border border-night-border shadow-2xl overflow-hidden">
         
-        <div class="p-5 sm:p-6 border-b border-night-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <!-- Header with Tabs: Antrean Pending & Riwayat ACC -->
+        <div class="p-5 sm:p-6 border-b border-night-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-display font-bold text-lg text-white">Antrean Pesanan Tiket (Status: PENDING)</h2>
-            <p class="text-xs text-white/50 mt-0.5">Periksa bukti struk transfer, lalu klik tombol ACC untuk menerbitkan E-Ticket resmi.</p>
+            <div class="flex items-center gap-2">
+              <button 
+                type="button" 
+                id="tabBtnPending" 
+                class="px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-pastel-purple text-night shadow-glow-purple flex items-center gap-2 cursor-pointer"
+              >
+                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                <span>Antrean Pending</span>
+                <span id="badgePendingCount" class="px-1.5 py-0.5 rounded-md bg-night/20 text-night text-[10px] font-mono font-black">0</span>
+              </button>
+
+              <button 
+                type="button" 
+                id="tabBtnApproved" 
+                class="px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-night-input text-white/60 hover:text-white border border-night-border hover:bg-white/5 flex items-center gap-2 cursor-pointer"
+              >
+                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                <span>Riwayat ACC (APPROVED)</span>
+                <span id="badgeApprovedCount" class="px-1.5 py-0.5 rounded-md bg-white/10 text-emerald-400 text-[10px] font-mono font-bold">0</span>
+              </button>
+            </div>
+            <p id="tableSectionDesc" class="text-xs text-white/50 mt-2">
+              Periksa bukti struk transfer, lalu klik tombol ACC untuk menerbitkan E-Ticket resmi.
+            </p>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-pastel-yellow animate-pulse"></span>
-            <span class="text-xs font-mono text-pastel-yellow font-semibold">Live Pending Queue</span>
+
+          <div class="flex items-center gap-2 self-start sm:self-auto">
+            <span id="tabLiveDot" class="w-2.5 h-2.5 rounded-full bg-pastel-yellow animate-pulse"></span>
+            <span id="tabLiveIndicator" class="text-xs font-mono text-pastel-yellow font-semibold">Live Pending Queue</span>
           </div>
         </div>
 
@@ -293,19 +317,19 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
-            <span class="text-xs text-white/70 font-mono tracking-wider">Memuat antrean pending...</span>
+            <span id="tableLoadingText" class="text-xs text-white/70 font-mono tracking-wider">Memuat antrean...</span>
           </div>
 
           <table class="w-full text-left border-collapse text-xs">
             <thead>
               <tr class="border-b border-night-border bg-[#14141E] text-white/50 uppercase font-mono tracking-wider text-[11px]">
                 <th class="py-3.5 px-4 w-12 text-center">No</th>
-                <th class="py-3.5 px-4">Waktu Pesan</th>
+                <th class="py-3.5 px-4">Waktu</th>
                 <th class="py-3.5 px-4">Nama Pemesan</th>
                 <th class="py-3.5 px-4">WhatsApp</th>
                 <th class="py-3.5 px-4">Varian & Jumlah</th>
                 <th class="py-3.5 px-4">Total Bayar</th>
-                <th class="py-3.5 px-4 text-center">Bukti Bayar</th>
+                <th class="py-3.5 px-4 text-center">Bukti / PDF</th>
                 <th class="py-3.5 px-4 text-center">Tindakan</th>
               </tr>
             </thead>
@@ -316,11 +340,11 @@
 
           <!-- Empty State -->
           <div id="tableEmpty" class="hidden p-12 text-center space-y-3">
-            <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <div id="emptyIcon" class="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
               <i data-lucide="check-circle" class="w-7 h-7"></i>
             </div>
-            <h3 class="font-display font-bold text-base text-white">Semua Pembayaran Telah Terverifikasi!</h3>
-            <p class="text-xs text-white/50 max-w-sm mx-auto">
+            <h3 id="emptyTitle" class="font-display font-bold text-base text-white">Semua Pembayaran Telah Terverifikasi!</h3>
+            <p id="emptyDesc" class="text-xs text-white/50 max-w-sm mx-auto">
               Saat ini tidak ada antrean pending. Klik tombol <strong>Segarkan Data</strong> untuk mengecek pesanan baru.
             </p>
           </div>
@@ -731,6 +755,7 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRMLG227dO9VkqJh__-Prb6HGw_t1JMY14FLLeQHO6kMwq5jlClzXlkMTfMYOh31zw/exec";
     const DEFAULT_PIN = "2026";
+    const ADMIN_PIN = DEFAULT_PIN;
 
     // Inisialisasi Lucide Icons
     lucide.createIcons();
@@ -743,10 +768,21 @@
     const pinErrorMsg = document.getElementById("pinErrorMsg");
     const btnLogout = document.getElementById("btnLogout");
 
-    // DOM Elements Data Table
+    // DOM Elements Data Table & Tabs
+    const tabBtnPending = document.getElementById("tabBtnPending");
+    const tabBtnApproved = document.getElementById("tabBtnApproved");
+    const badgePendingCount = document.getElementById("badgePendingCount");
+    const badgeApprovedCount = document.getElementById("badgeApprovedCount");
+    const tableSectionDesc = document.getElementById("tableSectionDesc");
+    const tabLiveIndicator = document.getElementById("tabLiveIndicator");
+    const tabLiveDot = document.getElementById("tabLiveDot");
+
     const tableBody = document.getElementById("tableBody");
     const tableLoading = document.getElementById("tableLoading");
     const tableEmpty = document.getElementById("tableEmpty");
+    const emptyIcon = document.getElementById("emptyIcon");
+    const emptyTitle = document.getElementById("emptyTitle");
+    const emptyDesc = document.getElementById("emptyDesc");
     const statPendingCount = document.getElementById("statPendingCount");
     const btnRefreshData = document.getElementById("btnRefreshData");
     const iconRefresh = document.getElementById("iconRefresh");
@@ -762,6 +798,9 @@
     const btnModalAcc = document.getElementById("btnModalAcc");
 
     let currentModalItem = null;
+    let currentTab = "pending"; // 'pending' | 'approved'
+    let pendingOrdersList = [];
+    let approvedOrdersList = [];
 
     // Helper Format Rupiah
     function formatRupiah(amount) {
@@ -775,13 +814,92 @@
       }).format(num).replace(/\s+/g, " ");
     }
 
+    // ================== LOGIKA BERBAGI FILE PDF LANGSUNG (WEB SHARE API) ==================
+    async function bagikanPdfKeWhatsApp(nama, noWa, linkPdf, buttonElement) {
+      const originalHtml = buttonElement ? buttonElement.innerHTML : "";
+      if (buttonElement) {
+        buttonElement.disabled = true;
+        buttonElement.innerHTML = `
+          <svg class="animate-spin h-3.5 w-3.5 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <span>Menyiapkan file PDF...</span>
+        `;
+      }
+
+      const cleanWa = (noWa || "").toString().replace(/[^0-9]/g, '').replace(/^0/, '62');
+      const safeLinkPdf = linkPdf || "https://drive.google.com";
+
+      try {
+        const pinToUse = sessionStorage.getItem("admin_pin") || ADMIN_PIN;
+
+        // Ambil file PDF melalui backend Apps Script untuk menghindari CORS Google Drive
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "cors",
+          redirect: "follow",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            action: "get_pdf_base64",
+            pdfUrl: safeLinkPdf,
+            pin: pinToUse
+          })
+        });
+
+        const res = await response.json();
+
+        if (res && res.base64) {
+          const byteCharacters = atob(res.base64);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const file = new File([byteArray], `E-Ticket_BingkaiBisu_${(nama || "Pengunjung").replace(/\s+/g, '_')}.pdf`, { type: "application/pdf" });
+
+          // Panggil Web Share API (Fitur Bawaan HP)
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'E-Ticket Bingkai Bisu 2026',
+              text: `Halo ${nama}! 👋\nBerikut adalah E-Ticket resmi kamu untuk pameran foto Bingkai Bisu - Fixlens Festival 2026.\nSilakan tunjukkan QR Code pada tiket ini di pintu masuk Hetero Space Banyumas.`
+            });
+          } else {
+            // Fallback jika dibuka dari browser Laptop/PC yang tidak mendukung Share File
+            const pesan = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu dapat diunduh di tautan berikut: ${safeLinkPdf}`;
+            window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesan)}`, '_blank');
+          }
+        } else {
+          // Fallback jika respon tidak memuat base64
+          const pesan = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu dapat diunduh di tautan berikut: ${safeLinkPdf}`;
+          window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesan)}`, '_blank');
+        }
+      } catch (err) {
+        console.warn("Gagal mengambil file PDF via server, menggunakan fallback WhatsApp link:", err);
+        const pesan = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu dapat diunduh di tautan berikut: ${safeLinkPdf}`;
+        window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesan)}`, '_blank');
+      } finally {
+        if (buttonElement) {
+          buttonElement.disabled = false;
+          buttonElement.innerHTML = `
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+            <span>📤 Kirim File PDF ke WA</span>
+          `;
+          lucide.createIcons();
+        }
+      }
+    }
+
     // ================== AUTENTIKASI PIN ==================
     function checkSessionAuth() {
       const isAuth = sessionStorage.getItem("admin_authenticated") === "true";
       if (isAuth) {
         pinAuthModal.classList.add("hidden");
         mainDashboard.classList.remove("hidden");
-        loadPendingOrders();
+        loadOrdersData();
       } else {
         pinAuthModal.classList.remove("hidden");
         mainDashboard.classList.add("hidden");
@@ -794,6 +912,7 @@
       const enteredPin = inputPin.value.trim();
       if (enteredPin === DEFAULT_PIN) {
         sessionStorage.setItem("admin_authenticated", "true");
+        sessionStorage.setItem("admin_pin", enteredPin);
         pinErrorMsg.classList.add("hidden");
         inputPin.value = "";
         checkSessionAuth();
@@ -812,33 +931,48 @@
       }
     });
 
-    // ================== LOAD PENDING ORDERS ==================
-    async function loadPendingOrders() {
+    // ================== LOAD PENDING & APPROVED ORDERS ==================
+    async function loadOrdersData() {
       tableLoading.classList.remove("hidden");
       tableEmpty.classList.add("hidden");
       iconRefresh.classList.add("animate-spin");
 
       try {
-        const response = await fetch(SCRIPT_URL, {
+        const pendingPromise = fetch(SCRIPT_URL, {
           method: "POST",
           mode: "cors",
           redirect: "follow",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
-          body: JSON.stringify({
-            action: "admin_get_pending"
-          })
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "admin_get_pending" })
+        }).then(r => r.json()).catch(err => {
+          console.warn("Pending fetch error:", err);
+          return { data: [] };
         });
 
-        const resData = await response.json();
-        const items = Array.isArray(resData) ? resData : (resData.data || resData.items || []);
+        const approvedPromise = fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "cors",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "download_offline_db" })
+        }).then(r => r.json()).catch(err => {
+          console.warn("Approved fetch error:", err);
+          return { data: [] };
+        });
 
-        renderTableRows(items);
-        statPendingCount.textContent = items.length;
+        const [resPending, resApproved] = await Promise.all([pendingPromise, approvedPromise]);
+
+        pendingOrdersList = Array.isArray(resPending) ? resPending : (resPending.data || resPending.items || []);
+        approvedOrdersList = Array.isArray(resApproved) ? resApproved : (resApproved.data || resApproved.tickets || []);
+
+        badgePendingCount.textContent = pendingOrdersList.length;
+        badgeApprovedCount.textContent = approvedOrdersList.length;
+        statPendingCount.textContent = pendingOrdersList.length;
+
+        renderCurrentTabTable();
 
       } catch (err) {
-        console.error("Gagal memuat data pending:", err);
+        console.error("Gagal memuat data:", err);
         tableBody.innerHTML = `
           <tr>
             <td colspan="8" class="py-8 text-center text-red-400">
@@ -853,12 +987,46 @@
       }
     }
 
-    // ================== RENDER TABEL ANTREAN ==================
-    function renderTableRows(items) {
+    // ================== TAB SWITCHING ==================
+    function switchTab(targetTab) {
+      currentTab = targetTab;
+
+      if (currentTab === "pending") {
+        tabBtnPending.className = "px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-pastel-purple text-night shadow-glow-purple flex items-center gap-2 cursor-pointer";
+        tabBtnApproved.className = "px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-night-input text-white/60 hover:text-white border border-night-border hover:bg-white/5 flex items-center gap-2 cursor-pointer";
+        tableSectionDesc.textContent = "Periksa bukti struk transfer, lalu klik tombol ACC untuk menerbitkan E-Ticket resmi.";
+        tabLiveIndicator.textContent = "Live Pending Queue";
+        tabLiveDot.className = "w-2.5 h-2.5 rounded-full bg-pastel-yellow animate-pulse";
+      } else {
+        tabBtnPending.className = "px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-night-input text-white/60 hover:text-white border border-night-border hover:bg-white/5 flex items-center gap-2 cursor-pointer";
+        tabBtnApproved.className = "px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-emerald-500 text-night shadow-glow-green flex items-center gap-2 cursor-pointer";
+        tableSectionDesc.textContent = "Daftar pesanan yang telah disetujui (APPROVED). Kirim atau bagikan file PDF E-Ticket resmi ke WhatsApp tamu.";
+        tabLiveIndicator.textContent = `Riwayat ACC (${approvedOrdersList.length})`;
+        tabLiveDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+      }
+
+      renderCurrentTabTable();
+    }
+
+    tabBtnPending.addEventListener("click", () => switchTab("pending"));
+    tabBtnApproved.addEventListener("click", () => switchTab("approved"));
+
+    // ================== RENDER TABEL ANTREAN & RIWAYAT ACC ==================
+    function renderCurrentTabTable() {
       tableBody.innerHTML = "";
+
+      const items = currentTab === "pending" ? pendingOrdersList : approvedOrdersList;
 
       if (!items || items.length === 0) {
         tableEmpty.classList.remove("hidden");
+        if (currentTab === "pending") {
+          emptyTitle.textContent = "Semua Pembayaran Telah Terverifikasi!";
+          emptyDesc.textContent = "Saat ini tidak ada antrean pending. Klik tombol Segarkan Data untuk mengecek pesanan baru.";
+        } else {
+          emptyTitle.textContent = "Belum Ada Riwayat Tiket Di-ACC";
+          emptyDesc.textContent = "Pesanan yang telah disetujui (APPROVED) akan otomatis tercatat di sini dan siap dibagikan ke WhatsApp.";
+        }
+        lucide.createIcons();
         return;
       }
 
@@ -871,7 +1039,9 @@
         const cleanWa = (item.whatsapp || "").toString().replace(/['\s-]/g, "");
         const waLink = `https://wa.me/${cleanWa.replace(/^0/, "62")}?text=Halo%20${encodeURIComponent(item.nama || "")},%20konfirmasi%20tiket%20Bingkai%20Bisu%202026`;
         const buktiUrl = item.linkBukti || item.fileUrl || "-";
-        const waktuPesan = item.waktu || item.timestamp || "-";
+        const linkPdf = item.linkPdf || item.pdfUrl || "https://drive.google.com";
+        const waktuPesan = item.waktu || item.timestamp || item.waktuScan || "-";
+        const isApproved = currentTab === "approved" || item.isAccDone === true || item.statusBayar === "APPROVED";
 
         tr.innerHTML = `
           <td class="py-4 px-4 text-center font-mono text-white/50">${index + 1}</td>
@@ -879,7 +1049,8 @@
             ${waktuPesan}
           </td>
           <td class="py-4 px-4 font-semibold text-white">
-            ${item.nama || "-"}
+            <div>${item.nama || "-"}</div>
+            ${item.kodeTiket ? `<span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-400/20">${item.kodeTiket}</span>` : ''}
           </td>
           <td class="py-4 px-4 whitespace-nowrap">
             <a 
@@ -893,14 +1064,24 @@
             </a>
           </td>
           <td class="py-4 px-4">
-            <span class="block font-medium text-white">${item.varian || "2 Day Pass"}</span>
+            <span class="block font-medium text-white">${item.varian || "Tiket Reguler"}</span>
             <span class="text-[11px] text-pastel-yellow font-semibold">${item.jumlah || 1} Tiket</span>
           </td>
           <td class="py-4 px-4 font-display font-bold text-white whitespace-nowrap">
             ${formatRupiah(item.total)}
           </td>
           <td class="py-4 px-4 text-center whitespace-nowrap">
-            ${buktiUrl && buktiUrl !== "-" ? `
+            ${isApproved ? `
+              <a 
+                href="${linkPdf}" 
+                target="_blank" 
+                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 transition-colors font-medium text-xs font-mono"
+                title="Buka File PDF E-Ticket"
+              >
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                <span>📄 PDF Tiket</span>
+              </a>
+            ` : (buktiUrl && buktiUrl !== "-" ? `
               <button 
                 type="button" 
                 class="btn-preview-receipt inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pastel-purple/15 text-pastel-purple hover:bg-pastel-purple/25 transition-colors font-medium text-xs cursor-pointer"
@@ -909,18 +1090,34 @@
                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
                 <span>🔍 Lihat Struk</span>
               </button>
-            ` : `<span class="text-white/30 text-xs">-</span>`}
+            ` : `<span class="text-white/30 text-xs">-</span>`)}
           </td>
           <td class="py-4 px-4 text-center whitespace-nowrap">
-            <button 
-              type="button" 
-              class="btn-acc inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer disabled:opacity-50"
-              data-row="${item.rowIndex}"
-              data-name="${item.nama || 'Peserta'}"
-            >
-              <i data-lucide="check" class="w-3.5 h-3.5"></i>
-              <span>✔ ACC & Terbitkan Tiket</span>
-            </button>
+            ${isApproved ? `
+              <button 
+                type="button" 
+                class="btn-send-wa inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer"
+                data-name="${item.nama || 'Peserta'}"
+                data-wa="${item.whatsapp || ''}"
+                data-pdf="${linkPdf}"
+              >
+                <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+                <span>📤 Kirim File PDF ke WA</span>
+              </button>
+            ` : `
+              <button 
+                type="button" 
+                class="btn-acc inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer disabled:opacity-50"
+                data-row="${item.rowIndex}"
+                data-index="${index}"
+                data-name="${item.nama || 'Peserta'}"
+                data-wa="${item.whatsapp || ''}"
+                data-pdf="${linkPdf}"
+              >
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                <span>✔ ACC & Terbitkan Tiket</span>
+              </button>
+            `}
           </td>
         `;
 
@@ -940,17 +1137,32 @@
         btn.addEventListener("click", (e) => {
           const rowIndex = e.currentTarget.dataset.row;
           const attendeeName = e.currentTarget.dataset.name;
-          executeAccTicket(rowIndex, attendeeName, e.currentTarget);
+          const idx = parseInt(e.currentTarget.dataset.index, 10);
+          const item = items[idx];
+          executeAccTicket(rowIndex, attendeeName, e.currentTarget, item);
         });
       });
+
+      // Bind Tombol "📤 Kirim File PDF ke WA"
+      document.querySelectorAll(".btn-send-wa").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const name = e.currentTarget.dataset.name;
+          const wa = e.currentTarget.dataset.wa;
+          const pdf = e.currentTarget.dataset.pdf;
+          bagikanPdfKeWhatsApp(name, wa, pdf, e.currentTarget);
+        });
+      });
+
+      lucide.createIcons();
     }
 
     // ================== MODAL PREVIEW STRUK ==================
     function openReceiptModal(item) {
       currentModalItem = item;
       const buktiUrl = item.linkBukti || item.fileUrl || "";
+      const isApproved = item.isAccDone === true || item.statusBayar === "APPROVED";
 
-      receiptModalAttendee.textContent = `Pemesan: ${item.nama || "-"} • ${item.varian || "2 Day Pass"} (${formatRupiah(item.total)})`;
+      receiptModalAttendee.textContent = `Pemesan: ${item.nama || "-"} • ${item.varian || "Tiket"} (${formatRupiah(item.total)})`;
       btnReceiptOpenNewTab.href = buktiUrl;
 
       // Handle Drive image preview
@@ -959,7 +1171,6 @@
       receiptImgFallback.classList.add("hidden");
 
       if (buktiUrl && buktiUrl !== "-") {
-        // Coba tampilkan direct preview
         let directImgUrl = buktiUrl;
         if (buktiUrl.includes("drive.google.com/file/d/")) {
           const match = buktiUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
@@ -976,6 +1187,26 @@
       } else {
         receiptModalImg.classList.add("hidden");
         receiptImgFallback.classList.remove("hidden");
+      }
+
+      if (isApproved) {
+        btnModalAcc.className = "flex-1 w-full py-3.5 px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer";
+        btnModalAcc.innerHTML = `
+          <i data-lucide="share-2" class="w-4 h-4"></i>
+          <span>📤 Kirim File PDF ke WA</span>
+        `;
+        btnModalAcc.onclick = () => {
+          bagikanPdfKeWhatsApp(item.nama || "Peserta", item.whatsapp || "", item.linkPdf || "https://drive.google.com", btnModalAcc);
+        };
+      } else {
+        btnModalAcc.className = "flex-1 w-full py-3.5 px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer";
+        btnModalAcc.innerHTML = `
+          <i data-lucide="check" class="w-4 h-4"></i>
+          <span>✔ Setujui Pembayaran Ini</span>
+        `;
+        btnModalAcc.onclick = () => {
+          executeAccTicket(item.rowIndex, item.nama || "Peserta", btnModalAcc, item);
+        };
       }
 
       receiptModal.classList.remove("opacity-0", "pointer-events-none");
@@ -996,15 +1227,8 @@
       if (e.target === receiptModal) closeReceiptModal();
     });
 
-    // ACC Langsung dari dalam Modal
-    btnModalAcc.addEventListener("click", () => {
-      if (currentModalItem) {
-        executeAccTicket(currentModalItem.rowIndex, currentModalItem.nama || "Peserta", btnModalAcc);
-      }
-    });
-
     // ================== EKSEKUSI ACC TIKET ==================
-    async function executeAccTicket(rowIndex, attendeeName, buttonElement) {
+    async function executeAccTicket(rowIndex, attendeeName, buttonElement, itemData) {
       if (!confirm(`Konfirmasi pembayaran atas nama "${attendeeName}" dan terbitkan E-Ticket (PDF)?`)) {
         return;
       }
@@ -1041,9 +1265,55 @@
           throw new Error(res.message || "Gagal verifikasi di server.");
         }
 
-        alert(`Sukses! Pembayaran "${attendeeName}" telah di-ACC dan E-Ticket (PDF) telah diterbitkan.`);
-        closeReceiptModal();
-        loadPendingOrders();
+        const linkPdf = (res && res.linkPdf) || (itemData && itemData.linkPdf) || (itemData && itemData.pdfUrl) || "https://drive.google.com";
+        const noWa = (itemData && itemData.whatsapp) || "";
+
+        // Tandai item sudah di-ACC agar tombol langsung berganti menjadi Kirim File PDF ke WA
+        if (itemData) {
+          itemData.isAccDone = true;
+          itemData.linkPdf = linkPdf;
+          itemData.statusBayar = "APPROVED";
+          approvedOrdersList.unshift({
+            ...itemData,
+            statusBayar: "APPROVED",
+            linkPdf: linkPdf
+          });
+          badgeApprovedCount.textContent = approvedOrdersList.length;
+        }
+
+        // Tampilkan tombol hijau [ 📤 Kirim File PDF ke WA ] sesaat setelah ACC
+        if (buttonElement) {
+          buttonElement.disabled = false;
+          buttonElement.className = "btn-send-wa inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer";
+          buttonElement.innerHTML = `
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+            <span>📤 Kirim File PDF ke WA</span>
+          `;
+          buttonElement.onclick = (e) => {
+            e.stopPropagation();
+            bagikanPdfKeWhatsApp(attendeeName, noWa, linkPdf, buttonElement);
+          };
+          lucide.createIcons();
+        }
+
+        // Jika tombol ACC di modal pratinjau diklik, ubah juga tombol modal menjadi Kirim File PDF ke WA
+        if (buttonElement === btnModalAcc || (btnModalAcc && currentModalItem && currentModalItem.rowIndex == rowIndex)) {
+          btnModalAcc.disabled = false;
+          btnModalAcc.className = "flex-1 w-full py-3.5 px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer";
+          btnModalAcc.innerHTML = `
+            <i data-lucide="share-2" class="w-4 h-4"></i>
+            <span>📤 Kirim File PDF ke WA</span>
+          `;
+          btnModalAcc.onclick = () => {
+            bagikanPdfKeWhatsApp(attendeeName, noWa, linkPdf, btnModalAcc);
+          };
+          lucide.createIcons();
+        }
+
+        // Tawarkan untuk langsung membagikan PDF ke WhatsApp
+        if (confirm(`Sukses! Pembayaran "${attendeeName}" telah di-ACC dan E-Ticket resmi diterbitkan.\n\nKirimkan file PDF E-Ticket sekarang ke WhatsApp ${attendeeName}?`)) {
+          bagikanPdfKeWhatsApp(attendeeName, noWa, linkPdf, buttonElement);
+        }
 
       } catch (err) {
         console.error("Gagal ACC tiket:", err);
@@ -1057,7 +1327,7 @@
     }
 
     // Tombol Segarkan Data
-    btnRefreshData.addEventListener("click", loadPendingOrders);
+    btnRefreshData.addEventListener("click", loadOrdersData);
 
     // ===============================================================
     // ==================== GATE SCANNER MODAL LOGIC =================

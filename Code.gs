@@ -77,8 +77,51 @@ function doPost(e) {
 
       return createJsonResponse({
         status: "SUCCESS",
-        message: "Tiket pada baris " + targetRow + " berhasil disetujui (APPROVED)."
+        message: "Tiket pada baris " + targetRow + " berhasil disetujui (APPROVED).",
+        linkPdf: currentPdf || "https://drive.google.com"
       });
+    }
+
+    // ==========================================
+    // ACTION: AMBIL FILE PDF AS BASE64 (Web Share API)
+    // ==========================================
+    if (action === "get_pdf_base64") {
+      var pdfUrl = (payload.pdfUrl || "").toString().trim();
+
+      if (!pdfUrl) {
+        return createJsonResponse({ status: "ERROR", message: "Parameter pdfUrl wajib disertakan." });
+      }
+
+      try {
+        var fileBlob = null;
+        var driveMatch = pdfUrl.match(/[-\w]{25,}/);
+
+        if (driveMatch && driveMatch[0]) {
+          try {
+            var driveFile = DriveApp.getFileById(driveMatch[0]);
+            fileBlob = driveFile.getBlob();
+          } catch (dErr) {
+            // fallback to UrlFetchApp
+          }
+        }
+
+        if (!fileBlob) {
+          var response = UrlFetchApp.fetch(pdfUrl, { muteHttpExceptions: true });
+          fileBlob = response.getBlob();
+        }
+
+        var base64Data = Utilities.base64Encode(fileBlob.getBytes());
+        return createJsonResponse({
+          status: "SUCCESS",
+          base64: base64Data,
+          contentType: fileBlob.getContentType() || "application/pdf"
+        });
+      } catch (err) {
+        return createJsonResponse({
+          status: "ERROR",
+          message: "Gagal mengambil file PDF: " + err.toString()
+        });
+      }
     }
 
     // ==========================================
