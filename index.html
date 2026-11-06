@@ -1182,7 +1182,11 @@
 
         if (res && res.quotaBundling) {
           const q = res.quotaBundling;
-          if (q.isSoldOut || q.remaining <= 0) {
+          const maxSlot = q.max || q.total || 95;
+          const sisa = typeof q.sisa !== "undefined" ? q.sisa : (typeof q.remaining !== "undefined" ? q.remaining : (maxSlot - (q.terjual || q.booked || 0)));
+          const isSoldOut = q.isSoldOut === true || sisa <= 0;
+
+          if (isSoldOut) {
             // Nonaktifkan opsi Bundling 10k dan beri label "SOLD OUT / HABIS"
             cardBundling.classList.add("opacity-50", "cursor-not-allowed", "pointer-events-none");
             if (inputBundling) inputBundling.disabled = true;
@@ -1193,7 +1197,7 @@
               updateVariantSelection("tiket_2hari");
             }
           } else {
-            if (quotaElem) quotaElem.innerHTML = `Sisa kuota: <span class="text-amber-300 font-bold">${q.remaining}</span> dari 95 slot`;
+            if (quotaElem) quotaElem.innerHTML = `Sisa kuota: <span class="text-amber-300 font-bold">${sisa}</span> dari ${maxSlot} slot`;
           }
         }
       } catch (err) {

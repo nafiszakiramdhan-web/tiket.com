@@ -1194,7 +1194,7 @@
       if (data && data.merch && typeof data.merch === "object") {
         return data.merch;
       }
-      const v = (data.varian || "").toLowerCase();
+      const v = ((data && data.varian) || (data && data.pass) || "").toLowerCase();
       if (v.includes("ganci") || (v.includes("bundling") && v.includes("stiker"))) {
         return { ada: true, item: "1x Stiker + 1x Gantungan Kunci Fixlens" };
       } else if (v.includes("stiker")) {
@@ -1286,6 +1286,9 @@
 
       resetAdminNotifications();
 
+      const idleP = adminNotifIdle.querySelector("p");
+      if (idleP) idleP.textContent = "Arahkan kamera ke QR Code tiket penonton atau gunakan form input manual di sebelah kiri.";
+
       const input = document.getElementById("inputAdminManualCode");
       if (input) input.value = "";
 
@@ -1311,14 +1314,14 @@
     function cleanScanCodeAdmin(rawText) {
       if (!rawText) return "";
       let code = rawText.trim();
-      const match = code.match(/BB26-[A-Za-z0-9]+/i);
+      const match = code.match(/BB(?:26)?-[A-Za-z0-9]+/i);
       if (match) {
-        return "#" + match[0].toUpperCase();
+        return match[0].toUpperCase();
       }
       return code.toUpperCase();
     }
 
-    function validateAdminTicketCode(scannedRaw) {
+    async function validateAdminTicketCode(scannedRaw) {
       if (isAdminScanningPaused || isAdminProcessingScan) return;
       isAdminProcessingScan = true;
 
@@ -1328,14 +1331,114 @@
       const code = cleanScanCodeAdmin(scannedRaw);
       console.log("[Admin Scanner] Memeriksa kode:", code);
 
+      const idleP = adminNotifIdle.querySelector("p");
+      if (idleP) idleP.textContent = `Memverifikasi tiket ${code}...`;
+
+      // 1. ONLINE CHECK (Utama jika terhubung ke internet)
+      if (navigator.onLine) {
+        try {
+          const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "cors",
+            redirect: "follow",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify({
+              action: "scan_ticket",
+              kodeTiket: code
+            })
+          });
+
+          const res = await response.json();
+          console.log("[Admin Scanner] Respon online:", res);
+
+          const db = getAdminOfflineDb();
+          const cleanTarget = code.replace(/^#/, "");
+          const localIdx = db.findIndex(item => {
+            const itemCode = (item.kodeTiket || item.ticketCode || "").toString().trim().toUpperCase().replace(/^#/, "");
+            return itemCode === cleanTarget;
+          });
+
+          if (res && res.status === "SUCCESS") {
+            const nowWib = new Date().toLocaleString("id-ID", {
+              timeZone: "Asia/Jakarta",
+              hour12: false
+            }) + " WIB";
+
+            const ticketData = {
+              nama: res.nama || (localIdx !== -1 ? db[localIdx].nama : "Peserta"),
+              varian: res.pass || res.varian || (localIdx !== -1 ? db[localIdx].varian : "Tiket Reguler"),
+              jumlah: (localIdx !== -1 ? db[localIdx].jumlah : 1),
+              kodeTiket: code,
+              waktuScan: nowWib,
+              merch: res.merch || (localIdx !== -1 ? db[localIdx].merch : null)
+            };
+
+            if (localIdx !== -1) {
+              db[localIdx].statusCheckin = "SUDAH MASUK";
+              db[localIdx].waktuScan = nowWib;
+              saveAdminOfflineDb(db);
+            }
+
+            showAdminNotification("success", ticketData);
+            return;
+          } else if (res && res.status === "ALREADY_USED") {
+            const scanWaktu = res.waktu ? new Date(res.waktu).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }) + " WIB" : "Sebelumnya";
+            const ticketData = {
+              nama: res.nama || (localIdx !== -1 ? db[localIdx].nama : "Peserta"),
+              varian: res.pass || res.varian || (localIdx !== -1 ? db[localIdx].varian : "Tiket Reguler"),
+              jumlah: (localIdx !== -1 ? db[localIdx].jumlah : 1),
+              kodeTiket: code,
+              waktuScan: scanWaktu,
+              merch: res.merch || (localIdx !== -1 ? db[localIdx].merch : null)
+            };
+
+            if (localIdx !== -1) {
+              db[localIdx].statusCheckin = "SUDAH MASUK";
+              saveAdminOfflineDb(db);
+            }
+
+            showAdminNotification("warning", ticketData);
+            return;
+          } else if (res && res.status === "NOT_FOUND") {
+            if (localIdx !== -1 && db[localIdx].statusBayar === "APPROVED") {
+              const localTicket = db[localIdx];
+              if (localTicket.statusCheckin === "SUDAH MASUK") {
+                showAdminNotification("warning", localTicket);
+                return;
+              } else {
+                const nowWib = new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta", hour12: false }) + " WIB";
+                localTicket.statusCheckin = "SUDAH MASUK";
+                localTicket.waktuScan = nowWib;
+                db[localIdx] = localTicket;
+                saveAdminOfflineDb(db);
+                showAdminNotification("success", localTicket);
+                return;
+              }
+            }
+
+            showAdminNotification("error", {
+              code: code || scannedRaw,
+              message: res.message || "Kode tiket tidak ditemukan di sistem atau pembayaran belum disetujui (APPROVED)."
+            });
+            return;
+          }
+        } catch (netErr) {
+          console.warn("[Admin Scanner] Verifikasi online gagal, beralih ke database offline lokal:", netErr);
+        }
+      }
+
+      // 2. OFFLINE FALLBACK (Saat offline atau koneksi terputus)
       const db = getAdminOfflineDb();
+      const cleanTarget = code.replace(/^#/, "");
 
       const targetIndex = db.findIndex(item => {
-        const itemCode = (item.kodeTiket || item.ticketCode || "").toString().trim().toUpperCase();
-        return itemCode === code || itemCode.replace("#", "") === code.replace("#", "");
+        const itemCode = (item.kodeTiket || item.ticketCode || "").toString().trim().toUpperCase().replace(/^#/, "");
+        return itemCode === cleanTarget;
       });
 
-      // 1. Tidak Ditemukan -> Tiket Tidak Valid
+      // a. Tidak Ditemukan -> Tiket Tidak Valid
       if (targetIndex === -1) {
         showAdminNotification("error", {
           code: code || scannedRaw,
@@ -1346,13 +1449,13 @@
 
       const ticket = db[targetIndex];
 
-      // 2. Ditemukan dan SUDAH MASUK -> Tiket Sudah Pernah Digunakan
+      // b. Ditemukan dan SUDAH MASUK -> Tiket Sudah Pernah Digunakan
       if (ticket.statusCheckin === "SUDAH MASUK") {
         showAdminNotification("warning", ticket);
         return;
       }
 
-      // 3. Ditemukan dan BELUM MASUK -> Lakukan Check-In (Hijau)
+      // c. Ditemukan dan BELUM MASUK -> Lakukan Check-In (Hijau)
       const nowWib = new Date().toLocaleString("id-ID", {
         timeZone: "Asia/Jakarta",
         hour12: false

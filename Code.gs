@@ -162,11 +162,84 @@ function doPost(e) {
       return createJsonResponse({
         status: "SUCCESS",
         quotaBundling: {
+          max: BUNDLING_MAX,
+          terjual: bundlingBooked,
+          sisa: remaining,
           total: BUNDLING_MAX,
           booked: bundlingBooked,
           remaining: remaining,
           isSoldOut: remaining <= 0
         }
+      });
+    }
+
+    // ==========================================
+    // ACTION: GATE SCANNER - VALIDASI SCAN LANGSUNG (scan_ticket)
+    // ==========================================
+    if (action === "scan_ticket") {
+      var rawTicket = (payload.kodeTiket || payload.ticketCode || "").toString().trim().toUpperCase();
+      var cleanCode = rawTicket.replace(/^#/, "");
+      var allRows = sheet.getDataRange().getValues();
+
+      if (allRows.length <= 1) {
+        return createJsonResponse({ status: "NOT_FOUND", message: "KODE TIKET TIDAK VALID: " + rawTicket });
+      }
+
+      // Pastikan kolom K dan L ada
+      if (allRows[0].length < 12) {
+        sheet.getRange(1, 11).setValue("Status Check-In");
+        sheet.getRange(1, 12).setValue("Waktu Scan");
+      }
+
+      for (var s = 1; s < allRows.length; s++) {
+        var rowCode = (allRows[s][1] || "").toString().trim().toUpperCase();
+        var rowCleanCode = rowCode.replace(/^#/, "");
+
+        if (rowCode === rawTicket || rowCleanCode === cleanCode) {
+          var paymentStat = (allRows[s][8] || "PENDING").toString().toUpperCase().trim();
+          if (paymentStat !== "APPROVED") {
+            return createJsonResponse({
+              status: "NOT_FOUND",
+              message: "TIKET BELUM DISETUJUI / PEMBAYARAN BELUM APPROVED: " + rawTicket
+            });
+          }
+
+          var checkinStat = (allRows[s][10] || "BELUM MASUK").toString().toUpperCase().trim();
+          var scanTime = (allRows[s][11] || "").toString().trim();
+          var attendeeName = allRows[s][2] || "-";
+          var variantName = allRows[s][4] || "Tiket Reguler";
+          var ticketMerch = getMerchFromVariant(variantName);
+
+          if (checkinStat === "SUDAH MASUK") {
+            return createJsonResponse({
+              status: "ALREADY_USED",
+              message: "TIKET SUDAH PERNAH DIGUNAKAN!",
+              nama: attendeeName,
+              varian: variantName,
+              pass: variantName,
+              merch: ticketMerch,
+              waktu: scanTime || new Date().toISOString()
+            });
+          }
+
+          var nowIso = new Date().toISOString();
+          sheet.getRange(s + 1, 11).setValue("SUDAH MASUK");
+          sheet.getRange(s + 1, 12).setValue(nowIso);
+
+          return createJsonResponse({
+            status: "SUCCESS",
+            message: "CHECK-IN BERHASIL",
+            nama: attendeeName,
+            varian: variantName,
+            pass: variantName,
+            merch: ticketMerch
+          });
+        }
+      }
+
+      return createJsonResponse({
+        status: "NOT_FOUND",
+        message: "KODE TIKET TIDAK VALID: " + rawTicket
       });
     }
 
