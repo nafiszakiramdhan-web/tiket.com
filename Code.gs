@@ -128,6 +128,48 @@ function doPost(e) {
       return createJsonResponse({ status: "NOT_FOUND", found: false, message: "Nomor WhatsApp dan Nama tidak cocok." });
     }
 
+    // Helper Merchandise sesuai varian tiket
+    function getMerchFromVariant(variantName) {
+      var v = (variantName || "").toString().toLowerCase();
+      if (v.includes("ganci") || (v.includes("bundling") && v.includes("stiker"))) {
+        return { ada: true, item: "1x Stiker + 1x Gantungan Kunci Fixlens" };
+      } else if (v.includes("stiker")) {
+        return { ada: true, item: "1x Stiker Eksklusif" };
+      }
+      return { ada: false, item: "" };
+    }
+
+    // ==========================================
+    // ACTION: CEK KUOTA BUNDLING 10K (MAKS. 95 SLOT)
+    // ==========================================
+    if (action === "get_quota") {
+      var allRows = sheet.getDataRange().getValues();
+      var bundlingBooked = 0;
+      var BUNDLING_MAX = 95;
+
+      for (var b = 1; b < allRows.length; b++) {
+        var vName = (allRows[b][4] || "").toString().toLowerCase();
+        var payStatus = (allRows[b][8] || "PENDING").toString().toUpperCase().trim();
+        if (vName.includes("bundling") || vName.includes("ganci") || vName.includes("10.000") || vName.includes("10k")) {
+          if (payStatus !== "REJECTED" && payStatus !== "BATAL") {
+            var qty = parseInt(allRows[b][5], 10) || 1;
+            bundlingBooked += qty;
+          }
+        }
+      }
+
+      var remaining = Math.max(0, BUNDLING_MAX - bundlingBooked);
+      return createJsonResponse({
+        status: "SUCCESS",
+        quotaBundling: {
+          total: BUNDLING_MAX,
+          booked: bundlingBooked,
+          remaining: remaining,
+          isSoldOut: remaining <= 0
+        }
+      });
+    }
+
     // ==========================================
     // ACTION 5: GATE SCANNER - UNDUH DATABASE OFFLINE
     // ==========================================
@@ -139,13 +181,15 @@ function doPost(e) {
         var payStat = (allRows[k][8] || "PENDING").toString().toUpperCase().trim();
         // Hanya tiket yang APPROVED atau jika diinginkan semua tiket
         if (payStat === "APPROVED") {
+          var varName = allRows[k][4] || "Tiket 2 Hari (Reguler)";
           offlineList.push({
             kodeTiket: (allRows[k][1] || "").toString().trim().toUpperCase(),
             nama: allRows[k][2] || "-",
             whatsapp: (allRows[k][3] || "").toString().replace(/['\s-]/g, ""),
-            varian: allRows[k][4] || "2 Day Pass",
+            varian: varName,
             jumlah: allRows[k][5] || 1,
             statusBayar: payStat,
+            merch: getMerchFromVariant(varName),
             statusCheckin: (allRows[k][10] || "BELUM MASUK").toString().toUpperCase().trim(), // Kolom K
             waktuScan: (allRows[k][11] || "").toString().trim() // Kolom L
           });
@@ -193,78 +237,82 @@ function doPost(e) {
     }
 
     // ==========================================
-    // ACTION 4: PUBLIK - PEMESANAN TIKET BARU
+    // ACTION 4: PUBLIK - PEMESANAN TIKET BARU (submit_order)
     // ==========================================
-    if (sheet.getLastRow() === 0) {
+    if (action === "submit_order" || !action) {
+      if (sheet.getLastRow() === 0) {
+        sheet.appendRow([
+          "Timestamp",
+          "Kode Tiket",
+          "Nama Lengkap",
+          "Nomor WhatsApp",
+          "Varian Tiket",
+          "Jumlah Tiket",
+          "Total Pembayaran",
+          "Link Bukti Transfer (Drive)",
+          "Status Pembayaran",
+          "Link PDF E-Ticket",
+          "Status Check-In",
+          "Waktu Scan"
+        ]);
+
+        var headerRange = sheet.getRange(1, 1, 1, 12);
+        headerRange.setFontWeight("bold");
+        headerRange.setBackground("#B8A9E3");
+        headerRange.setFontColor("#0F0F14");
+      }
+
+      // Buat Kode Tiket Unik (#BB26-XXXX)
+      var ticketCode = "#BB26-" + Math.floor(1000 + Math.random() * 9000);
+
+      // Proses Simpan Bukti Transfer ke Google Drive
+      var fileUrl = "-";
+      if (payload.fileData) {
+        try {
+          var decodedBytes = Utilities.base64Decode(payload.fileData);
+          var mimeType = "image/jpeg";
+          var fileName = payload.namaFile || "bukti.jpg";
+
+          if (fileName.toLowerCase().endsWith(".png")) mimeType = "image/png";
+          if (fileName.toLowerCase().endsWith(".webp")) mimeType = "image/webp";
+
+          var blob = Utilities.newBlob(decodedBytes, mimeType, "Bukti_" + payload.whatsapp + "_" + fileName);
+
+          var folders = DriveApp.getFoldersByName(DRIVE_FOLDER_BUKTI);
+          var targetFolder = folders.hasNext() ? folders.next() : DriveApp.createFolder(DRIVE_FOLDER_BUKTI);
+
+          var uploadedFile = targetFolder.createFile(blob);
+          uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          fileUrl = uploadedFile.getUrl();
+        } catch (fileErr) {
+          fileUrl = "Error upload file: " + fileErr.toString();
+        }
+      }
+
+      // Tambah baris baru ke Sheet (Default: PENDING)
       sheet.appendRow([
-        "Timestamp",
-        "Kode Tiket",
-        "Nama Lengkap",
-        "Nomor WhatsApp",
-        "Varian Tiket",
-        "Jumlah Tiket",
-        "Total Pembayaran",
-        "Link Bukti Transfer (Drive)",
-        "Status Pembayaran",
-        "Link PDF E-Ticket",
-        "Status Check-In",
-        "Waktu Scan"
+        new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }),
+        ticketCode,
+        payload.nama,
+        "'" + payload.whatsapp,
+        payload.varian,
+        payload.jumlah,
+        payload.total,
+        fileUrl,
+        "PENDING",
+        "",
+        "BELUM MASUK",
+        ""
       ]);
 
-      var headerRange = sheet.getRange(1, 1, 1, 12);
-      headerRange.setFontWeight("bold");
-      headerRange.setBackground("#B8A9E3");
-      headerRange.setFontColor("#0F0F14");
+      return createJsonResponse({
+        status: "SUCCESS",
+        message: "Data pemesanan dan bukti pembayaran berhasil disimpan!",
+        ticketCode: ticketCode
+      });
     }
 
-    // Buat Kode Tiket Unik (#BB26-XXXX)
-    var ticketCode = "#BB26-" + Math.floor(1000 + Math.random() * 9000);
-
-    // Proses Simpan Bukti Transfer ke Google Drive
-    var fileUrl = "-";
-    if (payload.fileData) {
-      try {
-        var decodedBytes = Utilities.base64Decode(payload.fileData);
-        var mimeType = "image/jpeg";
-        var fileName = payload.namaFile || "bukti.jpg";
-
-        if (fileName.toLowerCase().endsWith(".png")) mimeType = "image/png";
-        if (fileName.toLowerCase().endsWith(".webp")) mimeType = "image/webp";
-
-        var blob = Utilities.newBlob(decodedBytes, mimeType, "Bukti_" + payload.whatsapp + "_" + fileName);
-
-        var folders = DriveApp.getFoldersByName(DRIVE_FOLDER_BUKTI);
-        var targetFolder = folders.hasNext() ? folders.next() : DriveApp.createFolder(DRIVE_FOLDER_BUKTI);
-
-        var uploadedFile = targetFolder.createFile(blob);
-        uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-        fileUrl = uploadedFile.getUrl();
-      } catch (fileErr) {
-        fileUrl = "Error upload file: " + fileErr.toString();
-      }
-    }
-
-    // Tambah baris baru ke Sheet (Default: PENDING)
-    sheet.appendRow([
-      new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }),
-      ticketCode,
-      payload.nama,
-      "'" + payload.whatsapp,
-      payload.varian,
-      payload.jumlah,
-      payload.total,
-      fileUrl,
-      "PENDING",
-      "",
-      "BELUM MASUK",
-      ""
-    ]);
-
-    return createJsonResponse({
-      status: "SUCCESS",
-      message: "Data pemesanan dan bukti pembayaran berhasil disimpan!",
-      ticketCode: ticketCode
-    });
+    return createJsonResponse({ status: "error", message: "Action tidak dikenal: " + action });
 
   } catch (error) {
     return createJsonResponse({
