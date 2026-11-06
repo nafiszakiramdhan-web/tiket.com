@@ -164,7 +164,7 @@
         <div id="reader" class="w-full h-full"></div>
 
         <!-- Scanning Guides & Laser -->
-        <div id="scanGuides" class="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between">
+        <div id="scanGuides" class="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between transition-opacity duration-200">
           <div class="flex justify-between">
             <div class="w-8 h-8 border-t-2 border-l-2 border-pastel-yellow rounded-tl-lg"></div>
             <div class="w-8 h-8 border-t-2 border-r-2 border-pastel-yellow rounded-tr-lg"></div>
@@ -174,6 +174,12 @@
             <div class="w-8 h-8 border-b-2 border-l-2 border-pastel-yellow rounded-bl-lg"></div>
             <div class="w-8 h-8 border-b-2 border-r-2 border-pastel-yellow rounded-br-lg"></div>
           </div>
+        </div>
+
+        <!-- Badge status ketika kamera dijeda setelah scan -->
+        <div id="scanPausedBadge" class="hidden absolute top-3 px-3 py-1 rounded-full bg-night/85 backdrop-blur-md border border-pastel-yellow/40 text-pastel-yellow font-mono text-[11px] font-bold z-20 flex items-center gap-1.5 shadow-lg">
+          <span class="w-2 h-2 rounded-full bg-pastel-yellow animate-pulse"></span>
+          <span>KAMERA DIJEDA</span>
         </div>
 
         <!-- Placeholder when camera stopped -->
@@ -201,80 +207,146 @@
       </div>
     </section>
 
-    <!-- Area Notifikasi Hasil Validasi -->
-    <section id="validationContainer" class="space-y-2">
+    <!-- Area Notifikasi Hasil Validasi (Persistent Result Card) -->
+    <section id="validationContainer" class="space-y-3">
       
       <!-- DEFAULT / IDLE STATE -->
       <div id="notifIdle" class="rounded-2xl bg-night-card border border-night-border p-4 text-center text-xs text-white/50 space-y-1">
-        <i data-lucide="scan" class="w-5 h-5 mx-auto text-white/30 mb-1"></i>
-        <p class="font-semibold text-white/70">Arahkan Kamera ke QR Code E-Ticket</p>
+        <i data-lucide="scan" class="w-5 h-5 mx-auto text-pastel-purple mb-1"></i>
+        <p class="font-semibold text-white/80">Arahkan Kamera ke QR Code E-Ticket</p>
         <p class="text-[11px] text-white/40">Sistem memverifikasi tiket secara lokal langsung di memori HP.</p>
       </div>
 
-      <!-- NOTIFIKASI HIJAU: CHECK-IN BERHASIL -->
-      <div id="notifSuccess" class="hidden rounded-2xl bg-emerald-500/15 border-2 border-emerald-400 p-4 text-emerald-300 shadow-glow-green space-y-2 animate-bounce-subtle">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500 text-night flex items-center justify-center shrink-0">
-            <i data-lucide="check" class="w-6 h-6 stroke-[3]"></i>
+      <!-- KARTU HIJAU: CHECK-IN BERHASIL -->
+      <div id="notifSuccess" class="hidden rounded-3xl bg-gradient-to-b from-emerald-950/90 to-[#0d1f17] border-2 border-emerald-400 p-5 text-emerald-300 shadow-glow-green space-y-4">
+        <!-- Header Status -->
+        <div class="flex items-center justify-between">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-400 text-night font-display font-black text-xs tracking-wider uppercase shadow-md">
+            <i data-lucide="check-circle-2" class="w-4 h-4 stroke-[3]"></i>
+            <span>CHECK-IN BERHASIL</span>
           </div>
-          <div class="flex-1 min-w-0">
-            <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 font-bold block">VALID • ALL ACCESS</span>
-            <h3 class="font-display font-extrabold text-base text-white leading-tight">CHECK-IN BERHASIL</h3>
+          <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-400/20">
+            VALID • ALL ACCESS
+          </span>
+        </div>
+
+        <!-- Nama Pemegang Tiket (Besar & Tebal) -->
+        <div class="space-y-0.5">
+          <span class="text-[11px] text-emerald-400/70 uppercase font-mono font-semibold tracking-wider">Nama Pemegang Tiket</span>
+          <h2 id="successName" class="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-wide uppercase leading-tight break-words">
+            -
+          </h2>
+        </div>
+
+        <!-- Detail Tiket -->
+        <div class="bg-black/40 rounded-2xl p-3.5 text-xs text-white/90 space-y-2 border border-emerald-400/20 divide-y divide-white/5">
+          <div class="flex justify-between items-center pb-1.5">
+            <span class="text-white/50">Kategori / Varian:</span>
+            <span id="successVariant" class="font-bold text-pastel-yellow text-sm text-right">-</span>
+          </div>
+          <div class="flex justify-between items-center py-1.5 font-mono text-xs">
+            <span class="text-white/50">Kode Tiket:</span>
+            <span id="successCode" class="text-emerald-300 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-400/30">-</span>
+          </div>
+          <div class="flex justify-between items-center pt-1.5 font-mono text-xs">
+            <span class="text-white/50">Waktu Scan:</span>
+            <span id="successTime" class="text-white/80 font-semibold">-</span>
           </div>
         </div>
-        <div class="bg-black/30 rounded-xl p-2.5 text-xs text-white/90 space-y-1 border border-emerald-400/20">
-          <div class="flex justify-between">
-            <span class="text-white/50">Nama:</span>
-            <span id="successName" class="font-bold text-white truncate max-w-[200px]">-</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-white/50">Varian:</span>
-            <span id="successVariant" class="font-bold text-pastel-yellow">-</span>
-          </div>
-          <div class="flex justify-between font-mono text-[11px]">
-            <span class="text-white/50">Kode:</span>
-            <span id="successCode" class="text-emerald-300 font-bold">-</span>
-          </div>
-        </div>
+
+        <!-- Tombol Aksi: Scan Tiket Berikutnya -->
+        <button 
+          type="button" 
+          id="btnNextTicketSuccess" 
+          class="w-full py-3.5 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-night bg-gradient-to-r from-pastel-yellow via-amber-300 to-pastel-yellow hover:brightness-110 active:scale-[0.98] shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
+        >
+          <span>❯ Scan Tiket Berikutnya</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 stroke-[3]"></i>
+        </button>
       </div>
 
-      <!-- NOTIFIKASI KUNING/ORANGE: TIKET SUDAH DIGUNAKAN -->
-      <div id="notifWarning" class="hidden rounded-2xl bg-amber-500/15 border-2 border-amber-400 p-4 text-amber-300 shadow-glow-yellow space-y-2">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-amber-500 text-night flex items-center justify-center shrink-0">
-            <i data-lucide="alert-triangle" class="w-6 h-6 stroke-[3]"></i>
+      <!-- KARTU KUNING: TIKET SUDAH PERNAH DIGUNAKAN -->
+      <div id="notifWarning" class="hidden rounded-3xl bg-gradient-to-b from-amber-950/90 to-[#221609] border-2 border-amber-400 p-5 text-amber-300 shadow-glow-yellow space-y-4">
+        <!-- Header Status -->
+        <div class="flex items-center justify-between">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-400 text-night font-display font-black text-xs tracking-wider uppercase shadow-md">
+            <i data-lucide="alert-triangle" class="w-4 h-4 stroke-[3]"></i>
+            <span>TIKET SUDAH PERNAH DIGUNAKAN</span>
           </div>
-          <div class="flex-1 min-w-0">
-            <span class="text-[10px] uppercase font-mono tracking-widest text-amber-400 font-bold block">PERINGATAN MASUK</span>
-            <h3 class="font-display font-extrabold text-base text-white leading-tight">TIKET SUDAH DIGUNAKAN</h3>
-          </div>
+          <span class="text-[10px] uppercase font-mono tracking-widest text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-400/20">
+            DUPLIKASI SCAN
+          </span>
         </div>
-        <div class="bg-black/30 rounded-xl p-2.5 text-xs text-white/90 space-y-1 border border-amber-400/20">
-          <div class="flex justify-between">
-            <span class="text-white/50">Nama:</span>
-            <span id="warningName" class="font-bold text-white truncate max-w-[200px]">-</span>
+
+        <!-- Nama Pemegang Tiket (Besar & Tebal) -->
+        <div class="space-y-0.5">
+          <span class="text-[11px] text-amber-400/70 uppercase font-mono font-semibold tracking-wider">Nama Pemegang Tiket</span>
+          <h2 id="warningName" class="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-wide uppercase leading-tight break-words">
+            -
+          </h2>
+        </div>
+
+        <!-- Detail Tiket -->
+        <div class="bg-black/40 rounded-2xl p-3.5 text-xs text-white/90 space-y-2 border border-amber-400/20 divide-y divide-white/5">
+          <div class="flex justify-between items-center pb-1.5">
+            <span class="text-white/50">Kategori / Varian:</span>
+            <span id="warningVariant" class="font-bold text-pastel-yellow text-sm text-right">-</span>
           </div>
-          <div class="flex justify-between">
+          <div class="flex justify-between items-center py-1.5 font-mono text-xs">
+            <span class="text-white/50">Kode Tiket:</span>
+            <span id="warningCode" class="text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">-</span>
+          </div>
+          <div class="flex justify-between items-center pt-1.5 font-mono text-xs">
             <span class="text-white/50">Scan Pertama:</span>
-            <span id="warningTime" class="font-mono text-amber-300 font-semibold">-</span>
+            <span id="warningTime" class="text-amber-300 font-bold">-</span>
           </div>
         </div>
+
+        <!-- Tombol Aksi: Scan Tiket Berikutnya -->
+        <button 
+          type="button" 
+          id="btnNextTicketWarning" 
+          class="w-full py-3.5 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-night bg-gradient-to-r from-pastel-yellow via-amber-300 to-pastel-yellow hover:brightness-110 active:scale-[0.98] shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
+        >
+          <span>❯ Scan Tiket Berikutnya</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 stroke-[3]"></i>
+        </button>
       </div>
 
-      <!-- NOTIFIKASI MERAH: KODE TIKET TIDAK VALID -->
-      <div id="notifError" class="hidden rounded-2xl bg-red-500/15 border-2 border-red-500 p-4 text-red-300 shadow-glow-red space-y-2">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center shrink-0">
-            <i data-lucide="x-circle" class="w-6 h-6"></i>
+      <!-- KARTU MERAH: TIKET TIDAK VALID -->
+      <div id="notifError" class="hidden rounded-3xl bg-gradient-to-b from-red-950/90 to-[#220909] border-2 border-red-500 p-5 text-red-300 shadow-glow-red space-y-4">
+        <!-- Header Status -->
+        <div class="flex items-center justify-between">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500 text-white font-display font-black text-xs tracking-wider uppercase shadow-md">
+            <i data-lucide="x-circle" class="w-4 h-4 stroke-[3]"></i>
+            <span>TIKET TIDAK VALID</span>
           </div>
-          <div class="flex-1 min-w-0">
-            <span class="text-[10px] uppercase font-mono tracking-widest text-red-400 font-bold block">DITOLAK</span>
-            <h3 class="font-display font-extrabold text-base text-white leading-tight">KODE TIKET TIDAK VALID</h3>
+          <span class="text-[10px] uppercase font-mono tracking-widest text-red-400 font-bold bg-red-500/10 px-2.5 py-1 rounded-md border border-red-500/20">
+            DITOLAK
+          </span>
+        </div>
+
+        <!-- Kode yang Terbaca -->
+        <div class="space-y-0.5">
+          <span class="text-[11px] text-red-400/70 uppercase font-mono font-semibold tracking-wider">Kode Terdeteksi</span>
+          <div id="errorCode" class="font-mono font-bold text-xl text-red-200 break-all bg-black/40 px-3 py-2 rounded-xl border border-red-500/30">
+            -
           </div>
         </div>
-        <p class="text-xs text-white/80 leading-relaxed bg-black/30 p-2.5 rounded-xl border border-red-500/20">
-          Kode tiket tidak ditemukan di database offline. Pastikan database offline sudah diunduh atau periksa tiket asli.
+
+        <p id="errorMessage" class="text-xs text-white/80 leading-relaxed bg-black/40 p-3 rounded-xl border border-red-500/20">
+          Kode tiket tidak ditemukan di database offline atau belum disetujui (APPROVED). Pastikan database sudah diunduh atau periksa bukti transaksi tamu.
         </p>
+
+        <!-- Tombol Aksi: Coba Scan Ulang -->
+        <button 
+          type="button" 
+          id="btnRetryError" 
+          class="w-full py-3.5 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-white bg-red-600 hover:bg-red-500 active:scale-[0.98] shadow-glow-red flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
+        >
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          <span>Coba Scan Ulang</span>
+        </button>
       </div>
 
     </section>
@@ -458,11 +530,15 @@
     const successName = document.getElementById("successName");
     const successVariant = document.getElementById("successVariant");
     const successCode = document.getElementById("successCode");
+    const successTime = document.getElementById("successTime");
 
     const warningName = document.getElementById("warningName");
+    const warningVariant = document.getElementById("warningVariant");
+    const warningCode = document.getElementById("warningCode");
     const warningTime = document.getElementById("warningTime");
 
-    let notifTimeout = null;
+    const errorCode = document.getElementById("errorCode");
+    const errorMessage = document.getElementById("errorMessage");
 
     function resetNotifications() {
       notifIdle.classList.remove("hidden");
@@ -472,7 +548,6 @@
     }
 
     function showNotification(type, data) {
-      clearTimeout(notifTimeout);
       notifIdle.classList.add("hidden");
       notifSuccess.classList.add("hidden");
       notifWarning.classList.add("hidden");
@@ -480,31 +555,81 @@
 
       if (type === "success") {
         successName.textContent = data.nama || "Peserta";
-        successVariant.textContent = (data.varian || "2 Day Pass") + ` (${data.jumlah || 1} Tiket)`;
+        successVariant.textContent = (data.varian || "2 Day Pass") + ` (${data.jumlah || 1} Orang)`;
         successCode.textContent = data.kodeTiket || "-";
+        successTime.textContent = data.waktuScan || "-";
         notifSuccess.classList.remove("hidden");
         soundSuccess();
       } else if (type === "warning") {
         warningName.textContent = data.nama || "Peserta";
+        warningVariant.textContent = (data.varian || "2 Day Pass") + ` (${data.jumlah || 1} Orang)`;
+        warningCode.textContent = data.kodeTiket || "-";
         warningTime.textContent = data.waktuScan || "Sebelumnya";
         notifWarning.classList.remove("hidden");
         soundWarning();
       } else if (type === "error") {
+        errorCode.textContent = data.code || "-";
+        if (data.message) errorMessage.textContent = data.message;
         notifError.classList.remove("hidden");
         soundError();
       }
 
       lucide.createIcons();
-
-      // Reset ke idle setelah 7 detik
-      notifTimeout = setTimeout(() => {
-        resetNotifications();
-      }, 7000);
+      // Hasil scan bersifat PERSISTENT: tidak ada timer setTimeout yang mereset layar otomatis!
     }
 
-    // ================== SCAN VALIDATION LOGIC ==================
+    // ================== SCANNER PAUSE & RESUME CONTROLS ==================
+    let isScanningPaused = false;
     let isProcessingScan = false;
 
+    function pauseScanner() {
+      isScanningPaused = true;
+      const scanGuides = document.getElementById("scanGuides");
+      const scanPausedBadge = document.getElementById("scanPausedBadge");
+      if (scanGuides) scanGuides.classList.add("opacity-20");
+      if (scanPausedBadge) scanPausedBadge.classList.remove("hidden");
+
+      try {
+        if (html5QrCode && isCameraRunning) {
+          html5QrCode.pause(true); // Jeda pemrosesan frame dan kamera
+        }
+      } catch (e) {
+        console.warn("[Scanner] Jeda kamera peringatan:", e);
+      }
+    }
+
+    function resumeScanner() {
+      isScanningPaused = false;
+      isProcessingScan = false;
+
+      // Sembunyikan kartu hasil verifikasi & kembalikan ke status idle
+      resetNotifications();
+
+      // Bersihkan input manual
+      const inputManual = document.getElementById("inputManualCode");
+      if (inputManual) inputManual.value = "";
+
+      // Kembalikan status visual kamera
+      const scanGuides = document.getElementById("scanGuides");
+      const scanPausedBadge = document.getElementById("scanPausedBadge");
+      if (scanGuides) scanGuides.classList.remove("opacity-20");
+      if (scanPausedBadge) scanPausedBadge.classList.add("hidden");
+
+      try {
+        if (html5QrCode && isCameraRunning) {
+          html5QrCode.resume();
+        }
+      } catch (e) {
+        console.warn("[Scanner] Lanjutkan kamera peringatan:", e);
+      }
+    }
+
+    // Event listener tombol konfirmasi hasil scan
+    document.getElementById("btnNextTicketSuccess").addEventListener("click", resumeScanner);
+    document.getElementById("btnNextTicketWarning").addEventListener("click", resumeScanner);
+    document.getElementById("btnRetryError").addEventListener("click", resumeScanner);
+
+    // ================== SCAN VALIDATION LOGIC ==================
     function cleanScanCode(rawText) {
       if (!rawText) return "";
       let code = rawText.trim();
@@ -517,8 +642,11 @@
     }
 
     function validateTicketCode(scannedRaw) {
-      if (isProcessingScan) return;
+      if (isScanningPaused || isProcessingScan) return;
       isProcessingScan = true;
+
+      // Segera jeda scanner agar tidak membaca frame beruntun (multi-scan)
+      pauseScanner();
 
       const code = cleanScanCode(scannedRaw);
       console.log("[Scanner] Memeriksa kode:", code);
@@ -531,23 +659,24 @@
         return itemCode === code || itemCode.replace("#", "") === code.replace("#", "");
       });
 
-      // 1. Tidak ditemukan
+      // 1. Tidak ditemukan -> Tiket Tidak Valid
       if (targetIndex === -1) {
-        showNotification("error");
-        setTimeout(() => { isProcessingScan = false; }, 2000);
+        showNotification("error", {
+          code: code || scannedRaw,
+          message: "Kode tiket tidak ditemukan di database offline atau pembayaran belum APPROVED. Mohon periksa fisik struk atau tanyakan ke meja panitia."
+        });
         return;
       }
 
       const ticket = db[targetIndex];
 
-      // 2. Ditemukan dan SUDAH MASUK
+      // 2. Ditemukan dan SUDAH MASUK -> Tiket Sudah Pernah Digunakan
       if (ticket.statusCheckin === "SUDAH MASUK") {
         showNotification("warning", ticket);
-        setTimeout(() => { isProcessingScan = false; }, 2000);
         return;
       }
 
-      // 3. Ditemukan dan BELUM MASUK -> Lakukan Check-In
+      // 3. Ditemukan dan BELUM MASUK -> Lakukan Check-In (Hijau)
       const nowWib = new Date().toLocaleString("id-ID", {
         timeZone: "Asia/Jakarta",
         hour12: false
@@ -559,8 +688,6 @@
 
       saveOfflineDb(db);
       showNotification("success", ticket);
-
-      setTimeout(() => { isProcessingScan = false; }, 2000);
     }
 
     // Form Manual Scan
@@ -569,7 +696,6 @@
       const input = document.getElementById("inputManualCode");
       if (input.value.trim()) {
         validateTicketCode(input.value.trim());
-        input.value = "";
       }
     });
 

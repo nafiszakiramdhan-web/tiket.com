@@ -49,6 +49,9 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- HTML5 QR Code Library -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
   <style>
     body {
       background-color: #0F0F14;
@@ -64,6 +67,37 @@
     ::-webkit-scrollbar-track { background: #0F0F14; }
     ::-webkit-scrollbar-thumb { background: #2A2A38; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #B8A9E3; }
+
+    #adminReader video {
+      border-radius: 1rem;
+      object-fit: cover !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    #adminReader {
+      border: none !important;
+      background: transparent !important;
+    }
+    #adminReader__scan_region {
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+    .laser-line {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #F7D070, transparent);
+      box-shadow: 0 0 15px #F7D070;
+      animation: scanLaser 2s linear infinite alternate;
+      z-index: 10;
+      pointer-events: none;
+    }
+    @keyframes scanLaser {
+      0% { top: 15%; opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { top: 85%; opacity: 0.3; }
+    }
   </style>
 </head>
 <body class="selection:bg-pastel-purple selection:text-night flex flex-col justify-between min-h-screen">
@@ -141,34 +175,45 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap justify-end">
           <!-- Tombol Segarkan Data -->
           <button 
             type="button" 
             id="btnRefreshData" 
-            class="py-2.5 px-4 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-white hover:border-pastel-purple transition-all duration-200 flex items-center gap-2 cursor-pointer shadow-sm"
+            class="py-2.5 px-3.5 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-white hover:border-pastel-purple transition-all duration-200 flex items-center gap-1.5 cursor-pointer shadow-sm"
           >
             <i data-lucide="refresh-cw" id="iconRefresh" class="w-3.5 h-3.5"></i>
-            <span>Segarkan Data</span>
+            <span>Segarkan</span>
           </button>
 
-          <!-- Gate Scanner PWA -->
+          <!-- Tombol Gate Scanner Modal Langsung -->
+          <button 
+            type="button" 
+            id="btnOpenAdminScanner" 
+            class="py-2.5 px-4 rounded-xl text-xs font-bold bg-pastel-yellow text-night hover:bg-pastel-yellow-hover active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer shadow-glow-yellow"
+          >
+            <i data-lucide="scan-line" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+            <span>Scan Tiket Gate</span>
+          </button>
+
+          <!-- Gate Scanner Standalone PWA -->
           <a 
             href="scanner.html" 
-            class="py-2.5 px-4 rounded-xl text-xs font-semibold bg-pastel-yellow/15 border border-pastel-yellow/30 text-pastel-yellow hover:bg-pastel-yellow/25 transition-all duration-200 flex items-center gap-1.5"
+            class="py-2.5 px-3.5 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-pastel-yellow hover:border-pastel-yellow/40 transition-all duration-200 flex items-center gap-1.5"
+            title="Buka Aplikasi PWA Scanner Offline di Halaman Penuh"
           >
-            <i data-lucide="scan-line" class="w-3.5 h-3.5"></i>
-            <span>Gate Scanner</span>
+            <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+            <span>PWA Offline</span>
           </a>
 
           <!-- Tautan Halaman Publik -->
           <a 
             href="index.html" 
             target="_blank" 
-            class="py-2.5 px-4 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-white/70 hover:text-white transition-all duration-200 flex items-center gap-1.5"
+            class="py-2.5 px-3 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-white/70 hover:text-white transition-all duration-200 flex items-center gap-1.5"
           >
             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-            <span>Web Publik</span>
+            <span class="hidden sm:inline">Web Publik</span>
           </a>
 
           <!-- Tombol Logout -->
@@ -354,6 +399,304 @@
           <span>✔ Setujui Pembayaran Ini</span>
         </button>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ==================== MODAL GATE SCANNER ADMIN ==================== -->
+  <div 
+    id="adminScannerModal" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-night/95 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div 
+      id="adminScannerModalContainer" 
+      class="w-full max-w-4xl bg-night-card border border-night-border rounded-3xl p-5 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-300 space-y-5 my-auto"
+    >
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-night-border pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-pastel-yellow/10 border border-pastel-yellow/30 text-pastel-yellow flex items-center justify-center shrink-0">
+            <i data-lucide="scan-line" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-display font-extrabold text-base sm:text-lg text-white">Gate Scanner Admin</h3>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px]">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>OFFLINE-READY</span>
+              </span>
+            </div>
+            <p class="text-xs text-white/50">Verifikasi tiket masuk festival secara instan di gate Hetero Space Banyumas.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a 
+            href="scanner.html" 
+            target="_blank" 
+            class="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-night-border bg-night-input hover:bg-night-border text-white text-xs font-semibold transition-colors"
+            title="Buka PWA Full Screen"
+          >
+            <span>PWA Full Screen ↗</span>
+          </a>
+          <button 
+            type="button" 
+            id="btnCloseAdminScanner" 
+            class="p-2 rounded-xl text-white/60 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            title="Tutup Scanner"
+          >
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid Content: Kamera (Kiri) & Hasil Validasi (Kanan) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        <!-- KOLOM KIRI: Kamera & Kontrol -->
+        <div class="space-y-3">
+          <div class="relative w-full aspect-square max-w-[340px] mx-auto rounded-2xl overflow-hidden bg-black flex items-center justify-center border border-white/10 shadow-inner">
+            <!-- Video Reader -->
+            <div id="adminReader" class="w-full h-full"></div>
+
+            <!-- Scanning Guides & Laser -->
+            <div id="adminScanGuides" class="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between transition-opacity duration-200">
+              <div class="flex justify-between">
+                <div class="w-8 h-8 border-t-2 border-l-2 border-pastel-yellow rounded-tl-lg"></div>
+                <div class="w-8 h-8 border-t-2 border-r-2 border-pastel-yellow rounded-tr-lg"></div>
+              </div>
+              <div class="laser-line"></div>
+              <div class="flex justify-between">
+                <div class="w-8 h-8 border-b-2 border-l-2 border-pastel-yellow rounded-bl-lg"></div>
+                <div class="w-8 h-8 border-b-2 border-r-2 border-pastel-yellow rounded-br-lg"></div>
+              </div>
+            </div>
+
+            <!-- Overlay Kamera Dijeda -->
+            <div id="adminScanPausedBadge" class="hidden absolute top-3 px-3 py-1 rounded-full bg-night/85 backdrop-blur-md border border-pastel-yellow/40 text-pastel-yellow font-mono text-[11px] font-bold z-20 flex items-center gap-1.5 shadow-lg">
+              <span class="w-2 h-2 rounded-full bg-pastel-yellow animate-pulse"></span>
+              <span>KAMERA DIJEDA</span>
+            </div>
+
+            <!-- Placeholder saat kamera tidak aktif -->
+            <div id="adminCameraPlaceholder" class="hidden absolute inset-0 bg-night-input flex flex-col items-center justify-center text-center p-6 space-y-3">
+              <div class="w-12 h-12 rounded-2xl bg-white/5 text-white/40 flex items-center justify-center">
+                <i data-lucide="camera-off" class="w-6 h-6"></i>
+              </div>
+              <p class="text-xs text-white/60">Kamera tidak aktif</p>
+              <button type="button" id="btnAdminStartCamera" class="py-2 px-4 rounded-xl bg-pastel-purple text-night font-bold text-xs uppercase tracking-wider shadow-md">
+                Nyalakan Kamera
+              </button>
+            </div>
+          </div>
+
+          <!-- Kontrol Kamera -->
+          <div class="flex items-center justify-between text-xs text-white/60 px-1 max-w-[340px] mx-auto">
+            <button type="button" id="btnAdminToggleCamera" class="inline-flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
+              <i data-lucide="video" class="w-3.5 h-3.5"></i>
+              <span id="btnAdminToggleCameraText">Jeda Kamera</span>
+            </button>
+            <button type="button" id="btnAdminSwitchCamera" class="inline-flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
+              <i data-lucide="flip-horizontal" class="w-3.5 h-3.5"></i>
+              <span>Ganti Kamera</span>
+            </button>
+            <button type="button" id="btnAdminToggleAudio" class="inline-flex items-center gap-1 text-pastel-yellow hover:text-white transition-colors cursor-pointer" title="Suara Beep">
+              <i data-lucide="volume-2" id="iconAdminAudio" class="w-3.5 h-3.5"></i>
+              <span id="textAdminAudio">Audio ON</span>
+            </button>
+          </div>
+
+          <!-- Form Input Manual Kode Tiket -->
+          <form id="formAdminManualScan" class="flex gap-2 max-w-[340px] mx-auto">
+            <input 
+              type="text" 
+              id="inputAdminManualCode" 
+              placeholder="Input manual: #BB26-XXXX" 
+              class="flex-1 py-2 px-3 rounded-xl bg-night-input border border-night-border text-white text-xs font-mono uppercase focus:outline-none focus:border-pastel-purple"
+            />
+            <button type="submit" class="py-2 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors cursor-pointer">
+              Periksa
+            </button>
+          </form>
+        </div>
+
+        <!-- KOLOM KANAN: Persistent Result Card & Database Counter -->
+        <div class="flex flex-col justify-between space-y-4">
+          
+          <!-- Mini Stats Local DB -->
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-night-input border border-night-border text-center">
+              <span class="text-[10px] text-white/40 uppercase font-mono block">Database Lokal</span>
+              <span id="adminStatDbCount" class="font-display font-bold text-sm text-pastel-purple">0 Tiket</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-night-input border border-night-border text-center">
+              <span class="text-[10px] text-white/40 uppercase font-mono block">Sudah Masuk</span>
+              <span id="adminStatCheckinCount" class="font-display font-bold text-sm text-pastel-yellow">0 Orang</span>
+            </div>
+          </div>
+
+          <!-- Area Notifikasi Hasil Validasi (Persistent Result Card) -->
+          <div id="adminValidationContainer" class="flex-1 flex flex-col justify-center space-y-3">
+            
+            <!-- DEFAULT / IDLE STATE -->
+            <div id="adminNotifIdle" class="rounded-2xl bg-night-input border border-night-border p-6 text-center text-xs text-white/50 space-y-2">
+              <i data-lucide="scan" class="w-8 h-8 mx-auto text-pastel-purple mb-1 opacity-70"></i>
+              <h4 class="font-display font-bold text-sm text-white/80">Siap Memindai Tiket</h4>
+              <p class="text-[11px] text-white/40 max-w-xs mx-auto">Arahkan kamera ke QR Code tiket penonton atau gunakan form input manual di sebelah kiri.</p>
+            </div>
+
+            <!-- KARTU HIJAU: CHECK-IN BERHASIL -->
+            <div id="adminNotifSuccess" class="hidden rounded-3xl bg-gradient-to-b from-emerald-950/90 to-[#0d1f17] border-2 border-emerald-400 p-5 text-emerald-300 shadow-glow-green space-y-4">
+              <!-- Header Status -->
+              <div class="flex items-center justify-between">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-400 text-night font-display font-black text-xs tracking-wider uppercase shadow-md">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 stroke-[3]"></i>
+                  <span>CHECK-IN BERHASIL</span>
+                </div>
+                <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-400/20">
+                  VALID • ALL ACCESS
+                </span>
+              </div>
+
+              <!-- Nama Pemegang Tiket (Besar & Tebal) -->
+              <div class="space-y-0.5">
+                <span class="text-[11px] text-emerald-400/70 uppercase font-mono font-semibold tracking-wider">Nama Pemegang Tiket</span>
+                <h2 id="adminSuccessName" class="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-wide uppercase leading-tight break-words">
+                  -
+                </h2>
+              </div>
+
+              <!-- Detail Tiket -->
+              <div class="bg-black/40 rounded-2xl p-3.5 text-xs text-white/90 space-y-2 border border-emerald-400/20 divide-y divide-white/5">
+                <div class="flex justify-between items-center pb-1.5">
+                  <span class="text-white/50">Kategori / Varian:</span>
+                  <span id="adminSuccessVariant" class="font-bold text-pastel-yellow text-sm text-right">-</span>
+                </div>
+                <div class="flex justify-between items-center py-1.5 font-mono text-xs">
+                  <span class="text-white/50">Kode Tiket:</span>
+                  <span id="adminSuccessCode" class="text-emerald-300 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-400/30">-</span>
+                </div>
+                <div class="flex justify-between items-center pt-1.5 font-mono text-xs">
+                  <span class="text-white/50">Waktu Scan:</span>
+                  <span id="adminSuccessTime" class="text-white/80 font-semibold">-</span>
+                </div>
+              </div>
+
+              <!-- Tombol Aksi: Scan Tiket Berikutnya -->
+              <button 
+                type="button" 
+                id="btnAdminNextTicketSuccess" 
+                class="w-full py-3.5 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-night bg-gradient-to-r from-pastel-yellow via-amber-300 to-pastel-yellow hover:brightness-110 active:scale-[0.98] shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
+              >
+                <span>❯ Scan Tiket Berikutnya</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 stroke-[3]"></i>
+              </button>
+            </div>
+
+            <!-- KARTU KUNING: TIKET SUDAH PERNAH DIGUNAKAN -->
+            <div id="adminNotifWarning" class="hidden rounded-3xl bg-gradient-to-b from-amber-950/90 to-[#221609] border-2 border-amber-400 p-5 text-amber-300 shadow-glow-yellow space-y-4">
+              <!-- Header Status -->
+              <div class="flex items-center justify-between">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-400 text-night font-display font-black text-xs tracking-wider uppercase shadow-md">
+                  <i data-lucide="alert-triangle" class="w-4 h-4 stroke-[3]"></i>
+                  <span>TIKET SUDAH PERNAH DIGUNAKAN</span>
+                </div>
+                <span class="text-[10px] uppercase font-mono tracking-widest text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-400/20">
+                  DUPLIKASI SCAN
+                </span>
+              </div>
+
+              <!-- Nama Pemegang Tiket (Besar & Tebal) -->
+              <div class="space-y-0.5">
+                <span class="text-[11px] text-amber-400/70 uppercase font-mono font-semibold tracking-wider">Nama Pemegang Tiket</span>
+                <h2 id="adminWarningName" class="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-wide uppercase leading-tight break-words">
+                  -
+                </h2>
+              </div>
+
+              <!-- Detail Tiket -->
+              <div class="bg-black/40 rounded-2xl p-3.5 text-xs text-white/90 space-y-2 border border-amber-400/20 divide-y divide-white/5">
+                <div class="flex justify-between items-center pb-1.5">
+                  <span class="text-white/50">Kategori / Varian:</span>
+                  <span id="adminWarningVariant" class="font-bold text-pastel-yellow text-sm text-right">-</span>
+                </div>
+                <div class="flex justify-between items-center py-1.5 font-mono text-xs">
+                  <span class="text-white/50">Kode Tiket:</span>
+                  <span id="adminWarningCode" class="text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">-</span>
+                </div>
+                <div class="flex justify-between items-center pt-1.5 font-mono text-xs">
+                  <span class="text-white/50">Scan Pertama:</span>
+                  <span id="adminWarningTime" class="text-amber-300 font-bold">-</span>
+                </div>
+              </div>
+
+              <!-- Tombol Aksi: Scan Tiket Berikutnya -->
+              <button 
+                type="button" 
+                id="btnAdminNextTicketWarning" 
+                class="w-full py-3.5 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-night bg-gradient-to-r from-pastel-yellow via-amber-300 to-pastel-yellow hover:brightness-110 active:scale-[0.98] shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
+              >
+                <span>❯ Scan Tiket Berikutnya</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 stroke-[3]"></i>
+              </button>
+            </div>
+
+            <!-- KARTU MERAH: TIKET TIDAK VALID -->
+            <div id="adminNotifError" class="hidden rounded-3xl bg-gradient-to-b from-red-950/90 to-[#220909] border-2 border-red-500 p-5 text-red-300 shadow-glow-red space-y-4">
+              <!-- Header Status -->
+              <div class="flex items-center justify-between">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500 text-white font-display font-black text-xs tracking-wider uppercase shadow-md">
+                  <i data-lucide="x-circle" class="w-4 h-4 stroke-[3]"></i>
+                  <span>TIKET TIDAK VALID</span>
+                </div>
+                <span class="text-[10px] uppercase font-mono tracking-widest text-red-400 font-bold bg-red-500/10 px-2.5 py-1 rounded-md border border-red-500/20">
+                  DITOLAK
+                </span>
+              </div>
+
+              <!-- Kode yang Terbaca -->
+              <div class="space-y-0.5">
+                <span class="text-[11px] text-red-400/70 uppercase font-mono font-semibold tracking-wider">Kode Terdeteksi</span>
+                <div id="adminErrorCode" class="font-mono font-bold text-xl text-red-200 break-all bg-black/40 px-3 py-2 rounded-xl border border-red-500/30">
+                  -
+                </div>
+              </div>
+
+              <p id="adminErrorMessage" class="text-xs text-white/80 leading-relaxed bg-black/40 p-3 rounded-xl border border-red-500/20">
+                Kode tiket tidak ditemukan di database atau belum disetujui (APPROVED). Silakan periksa bukti struk fisik atau meja pendaftaran panitia.
+              </p>
+
+              <!-- Tombol Aksi: Coba Scan Ulang -->
+              <button 
+                type="button" 
+                id="btnAdminRetryError" 
+                class="w-full py-3.5 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-white bg-red-600 hover:bg-red-500 active:scale-[0.98] shadow-glow-red flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
+              >
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                <span>Coba Scan Ulang</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Tombol Unduh / Refresh Database Lokal -->
+          <div class="pt-2">
+            <button 
+              type="button" 
+              id="btnAdminSyncDb" 
+              class="w-full py-2.5 px-3 rounded-xl border border-night-border bg-night-input hover:bg-night-border text-white/80 hover:text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            >
+              <i data-lucide="download-cloud" class="w-4 h-4 text-pastel-purple"></i>
+              <span id="btnAdminSyncDbText">Perbarui Database Tiket dari Cloud</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
   </div>
 
@@ -689,6 +1032,447 @@
 
     // Tombol Segarkan Data
     btnRefreshData.addEventListener("click", loadPendingOrders);
+
+    // ===============================================================
+    // ==================== GATE SCANNER MODAL LOGIC =================
+    // ===============================================================
+    const DB_KEY = "bingkai_bisu_offline_db";
+
+    const adminScannerModal = document.getElementById("adminScannerModal");
+    const adminScannerModalContainer = document.getElementById("adminScannerModalContainer");
+    const btnOpenAdminScanner = document.getElementById("btnOpenAdminScanner");
+    const btnCloseAdminScanner = document.getElementById("btnCloseAdminScanner");
+
+    // Elemen Hasil Validasi Admin
+    const adminNotifIdle = document.getElementById("adminNotifIdle");
+    const adminNotifSuccess = document.getElementById("adminNotifSuccess");
+    const adminNotifWarning = document.getElementById("adminNotifWarning");
+    const adminNotifError = document.getElementById("adminNotifError");
+
+    const adminSuccessName = document.getElementById("adminSuccessName");
+    const adminSuccessVariant = document.getElementById("adminSuccessVariant");
+    const adminSuccessCode = document.getElementById("adminSuccessCode");
+    const adminSuccessTime = document.getElementById("adminSuccessTime");
+
+    const adminWarningName = document.getElementById("adminWarningName");
+    const adminWarningVariant = document.getElementById("adminWarningVariant");
+    const adminWarningCode = document.getElementById("adminWarningCode");
+    const adminWarningTime = document.getElementById("adminWarningTime");
+
+    const adminErrorCode = document.getElementById("adminErrorCode");
+    const adminErrorMessage = document.getElementById("adminErrorMessage");
+
+    const adminStatDbCount = document.getElementById("adminStatDbCount");
+    const adminStatCheckinCount = document.getElementById("adminStatCheckinCount");
+    const btnAdminSyncDb = document.getElementById("btnAdminSyncDb");
+    const btnAdminSyncDbText = document.getElementById("btnAdminSyncDbText");
+
+    // Audio Beep Synthesizer untuk Admin Scanner
+    let adminAudioContext = null;
+    let isAdminAudioEnabled = true;
+
+    function initAdminAudio() {
+      if (!adminAudioContext) {
+        adminAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (adminAudioContext.state === "suspended") {
+        adminAudioContext.resume();
+      }
+    }
+
+    function playAdminTone(freq, type, duration) {
+      if (!isAdminAudioEnabled) return;
+      try {
+        initAdminAudio();
+        const osc = adminAudioContext.createOscillator();
+        const gain = adminAudioContext.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, adminAudioContext.currentTime);
+        gain.gain.setValueAtTime(0.15, adminAudioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, adminAudioContext.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(adminAudioContext.destination);
+        osc.start();
+        osc.stop(adminAudioContext.currentTime + duration);
+      } catch (e) {
+        console.warn("Audio play warning:", e);
+      }
+    }
+
+    function soundAdminSuccess() {
+      playAdminTone(880, "sine", 0.15);
+      setTimeout(() => playAdminTone(1320, "sine", 0.25), 120);
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    }
+
+    function soundAdminWarning() {
+      playAdminTone(520, "square", 0.18);
+      setTimeout(() => playAdminTone(520, "square", 0.18), 220);
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    }
+
+    function soundAdminError() {
+      playAdminTone(220, "sawtooth", 0.35);
+      if (navigator.vibrate) navigator.vibrate(350);
+    }
+
+    document.getElementById("btnAdminToggleAudio").addEventListener("click", () => {
+      initAdminAudio();
+      isAdminAudioEnabled = !isAdminAudioEnabled;
+      const icon = document.getElementById("iconAdminAudio");
+      const text = document.getElementById("textAdminAudio");
+      if (isAdminAudioEnabled) {
+        icon.setAttribute("data-lucide", "volume-2");
+        text.textContent = "Audio ON";
+        document.getElementById("btnAdminToggleAudio").classList.replace("text-white/40", "text-pastel-yellow");
+      } else {
+        icon.setAttribute("data-lucide", "volume-x");
+        text.textContent = "Audio OFF";
+        document.getElementById("btnAdminToggleAudio").classList.replace("text-pastel-yellow", "text-white/40");
+      }
+      lucide.createIcons();
+    });
+
+    // Local Storage Helpers
+    function getAdminOfflineDb() {
+      try {
+        const raw = localStorage.getItem(DB_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveAdminOfflineDb(data) {
+      localStorage.setItem(DB_KEY, JSON.stringify(data));
+      updateAdminCounters();
+    }
+
+    function updateAdminCounters() {
+      const db = getAdminOfflineDb();
+      if (adminStatDbCount) adminStatDbCount.textContent = `${db.length} Tiket`;
+      const checkedIn = db.filter(item => item.statusCheckin === "SUDAH MASUK").length;
+      if (adminStatCheckinCount) adminStatCheckinCount.textContent = `${checkedIn} Orang`;
+    }
+
+    // Tampilkan Notifikasi Hasil Validasi
+    function resetAdminNotifications() {
+      adminNotifIdle.classList.remove("hidden");
+      adminNotifSuccess.classList.add("hidden");
+      adminNotifWarning.classList.add("hidden");
+      adminNotifError.classList.add("hidden");
+    }
+
+    function showAdminNotification(type, data) {
+      adminNotifIdle.classList.add("hidden");
+      adminNotifSuccess.classList.add("hidden");
+      adminNotifWarning.classList.add("hidden");
+      adminNotifError.classList.add("hidden");
+
+      if (type === "success") {
+        adminSuccessName.textContent = data.nama || "Peserta";
+        adminSuccessVariant.textContent = (data.varian || "2 Day Pass") + ` (${data.jumlah || 1} Orang)`;
+        adminSuccessCode.textContent = data.kodeTiket || "-";
+        adminSuccessTime.textContent = data.waktuScan || "-";
+        adminNotifSuccess.classList.remove("hidden");
+        soundAdminSuccess();
+      } else if (type === "warning") {
+        adminWarningName.textContent = data.nama || "Peserta";
+        adminWarningVariant.textContent = (data.varian || "2 Day Pass") + ` (${data.jumlah || 1} Orang)`;
+        adminWarningCode.textContent = data.kodeTiket || "-";
+        adminWarningTime.textContent = data.waktuScan || "Sebelumnya";
+        adminNotifWarning.classList.remove("hidden");
+        soundAdminWarning();
+      } else if (type === "error") {
+        adminErrorCode.textContent = data.code || "-";
+        if (data.message) adminErrorMessage.textContent = data.message;
+        adminNotifError.classList.remove("hidden");
+        soundAdminError();
+      }
+
+      lucide.createIcons();
+      // Hasil scan bersifat PERSISTENT: tidak ada timer setTimeout yang mereset layar otomatis!
+    }
+
+    // Scanner Pause & Resume Controls
+    let isAdminScanningPaused = false;
+    let isAdminProcessingScan = false;
+
+    function pauseAdminScanner() {
+      isAdminScanningPaused = true;
+      const guides = document.getElementById("adminScanGuides");
+      const badge = document.getElementById("adminScanPausedBadge");
+      if (guides) guides.classList.add("opacity-20");
+      if (badge) badge.classList.remove("hidden");
+
+      try {
+        if (adminHtml5QrCode && isAdminCameraRunning) {
+          adminHtml5QrCode.pause(true);
+        }
+      } catch (e) {
+        console.warn("Pause admin camera error:", e);
+      }
+    }
+
+    function resumeAdminScanner() {
+      isAdminScanningPaused = false;
+      isAdminProcessingScan = false;
+
+      resetAdminNotifications();
+
+      const input = document.getElementById("inputAdminManualCode");
+      if (input) input.value = "";
+
+      const guides = document.getElementById("adminScanGuides");
+      const badge = document.getElementById("adminScanPausedBadge");
+      if (guides) guides.classList.remove("opacity-20");
+      if (badge) badge.classList.add("hidden");
+
+      try {
+        if (adminHtml5QrCode && isAdminCameraRunning) {
+          adminHtml5QrCode.resume();
+        }
+      } catch (e) {
+        console.warn("Resume admin camera error:", e);
+      }
+    }
+
+    document.getElementById("btnAdminNextTicketSuccess").addEventListener("click", resumeAdminScanner);
+    document.getElementById("btnAdminNextTicketWarning").addEventListener("click", resumeAdminScanner);
+    document.getElementById("btnAdminRetryError").addEventListener("click", resumeAdminScanner);
+
+    // Scan Validation Logic
+    function cleanScanCodeAdmin(rawText) {
+      if (!rawText) return "";
+      let code = rawText.trim();
+      const match = code.match(/BB26-[A-Za-z0-9]+/i);
+      if (match) {
+        return "#" + match[0].toUpperCase();
+      }
+      return code.toUpperCase();
+    }
+
+    function validateAdminTicketCode(scannedRaw) {
+      if (isAdminScanningPaused || isAdminProcessingScan) return;
+      isAdminProcessingScan = true;
+
+      // Segera jeda pemindaian kamera begitu QR code terdeteksi
+      pauseAdminScanner();
+
+      const code = cleanScanCodeAdmin(scannedRaw);
+      console.log("[Admin Scanner] Memeriksa kode:", code);
+
+      const db = getAdminOfflineDb();
+
+      const targetIndex = db.findIndex(item => {
+        const itemCode = (item.kodeTiket || item.ticketCode || "").toString().trim().toUpperCase();
+        return itemCode === code || itemCode.replace("#", "") === code.replace("#", "");
+      });
+
+      // 1. Tidak Ditemukan -> Tiket Tidak Valid
+      if (targetIndex === -1) {
+        showAdminNotification("error", {
+          code: code || scannedRaw,
+          message: "Kode tiket tidak ditemukan di database atau pembayaran belum disetujui (APPROVED). Pastikan database sudah diperbarui atau periksa struk fisik."
+        });
+        return;
+      }
+
+      const ticket = db[targetIndex];
+
+      // 2. Ditemukan dan SUDAH MASUK -> Tiket Sudah Pernah Digunakan
+      if (ticket.statusCheckin === "SUDAH MASUK") {
+        showAdminNotification("warning", ticket);
+        return;
+      }
+
+      // 3. Ditemukan dan BELUM MASUK -> Lakukan Check-In (Hijau)
+      const nowWib = new Date().toLocaleString("id-ID", {
+        timeZone: "Asia/Jakarta",
+        hour12: false
+      }) + " WIB";
+
+      ticket.statusCheckin = "SUDAH MASUK";
+      ticket.waktuScan = nowWib;
+      db[targetIndex] = ticket;
+
+      saveAdminOfflineDb(db);
+      showAdminNotification("success", ticket);
+    }
+
+    // Form Manual Scan
+    document.getElementById("formAdminManualScan").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("inputAdminManualCode");
+      if (input.value.trim()) {
+        validateAdminTicketCode(input.value.trim());
+      }
+    });
+
+    // HTML5-QRCode Camera Integration
+    let adminHtml5QrCode = null;
+    let isAdminCameraRunning = false;
+    let adminFacingMode = "environment";
+
+    async function startAdminCamera() {
+      try {
+        if (!adminHtml5QrCode) {
+          adminHtml5QrCode = new Html5Qrcode("adminReader");
+        }
+
+        const config = {
+          fps: 15,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0
+        };
+
+        await adminHtml5QrCode.start(
+          { facingMode: adminFacingMode },
+          config,
+          (decodedText) => {
+            validateAdminTicketCode(decodedText);
+          },
+          (errorMessage) => {
+            // Abaikan frame parse errors
+          }
+        );
+
+        isAdminCameraRunning = true;
+        document.getElementById("adminCameraPlaceholder").classList.add("hidden");
+        document.getElementById("adminScanGuides").classList.remove("hidden");
+        document.getElementById("btnAdminToggleCameraText").textContent = "Jeda Kamera";
+      } catch (err) {
+        console.warn("Gagal memulai kamera admin:", err);
+        document.getElementById("adminCameraPlaceholder").classList.remove("hidden");
+        document.getElementById("adminScanGuides").classList.add("hidden");
+        isAdminCameraRunning = false;
+      }
+    }
+
+    async function stopAdminCamera() {
+      if (adminHtml5QrCode && isAdminCameraRunning) {
+        await adminHtml5QrCode.stop();
+        isAdminCameraRunning = false;
+        document.getElementById("adminCameraPlaceholder").classList.remove("hidden");
+        document.getElementById("adminScanGuides").classList.add("hidden");
+        document.getElementById("btnAdminToggleCameraText").textContent = "Nyalakan Kamera";
+      }
+    }
+
+    document.getElementById("btnAdminToggleCamera").addEventListener("click", () => {
+      if (isAdminCameraRunning) {
+        stopAdminCamera();
+      } else {
+        startAdminCamera();
+      }
+    });
+
+    document.getElementById("btnAdminStartCamera").addEventListener("click", startAdminCamera);
+
+    document.getElementById("btnAdminSwitchCamera").addEventListener("click", async () => {
+      adminFacingMode = adminFacingMode === "environment" ? "user" : "environment";
+      if (isAdminCameraRunning) {
+        await stopAdminCamera();
+        startAdminCamera();
+      }
+    });
+
+    // Sinkronisasi Database Tiket dari Cloud
+    async function syncAdminDbFromCloud() {
+      btnAdminSyncDb.disabled = true;
+      btnAdminSyncDbText.textContent = "Mengunduh Database dari Cloud...";
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "cors",
+          redirect: "follow",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            action: "download_offline_db"
+          })
+        });
+
+        const res = await response.json();
+
+        if (res && res.status === "SUCCESS") {
+          const cloudTickets = res.tickets || res.data || [];
+          const currentLocalDb = getAdminOfflineDb();
+
+          // Pertahankan status check-in lokal jika sudah ada
+          const mergedDb = cloudTickets.map(cloudItem => {
+            const localMatch = currentLocalDb.find(l => 
+              (l.kodeTiket || "").toUpperCase() === (cloudItem.kodeTiket || "").toUpperCase()
+            );
+            if (localMatch && localMatch.statusCheckin === "SUDAH MASUK") {
+              return {
+                ...cloudItem,
+                statusCheckin: "SUDAH MASUK",
+                waktuScan: localMatch.waktuScan
+              };
+            }
+            return {
+              ...cloudItem,
+              statusCheckin: cloudItem.statusCheckin || "BELUM MASUK",
+              waktuScan: cloudItem.waktuScan || ""
+            };
+          });
+
+          saveAdminOfflineDb(mergedDb);
+          alert(`Sukses! ${mergedDb.length} data tiket terverifikasi berhasil diperbarui ke memori.`);
+        } else {
+          throw new Error(res.message || "Respon server tidak valid");
+        }
+      } catch (err) {
+        console.error("Gagal update database:", err);
+        alert("Gagal update database tiket: " + err.message);
+      } finally {
+        btnAdminSyncDb.disabled = false;
+        btnAdminSyncDbText.textContent = "Perbarui Database Tiket dari Cloud";
+        updateAdminCounters();
+      }
+    }
+
+    btnAdminSyncDb.addEventListener("click", syncAdminDbFromCloud);
+
+    // Buka & Tutup Modal Scanner Admin
+    function openAdminScannerModal() {
+      adminScannerModal.classList.remove("opacity-0", "pointer-events-none");
+      adminScannerModalContainer.classList.remove("scale-95");
+      adminScannerModalContainer.classList.add("scale-100");
+
+      updateAdminCounters();
+
+      // Jika database lokal kosong, coba unduh otomatis
+      const db = getAdminOfflineDb();
+      if (db.length === 0 && navigator.onLine) {
+        syncAdminDbFromCloud();
+      }
+
+      // Mulai kamera otomatis
+      setTimeout(() => {
+        startAdminCamera();
+      }, 300);
+
+      lucide.createIcons();
+    }
+
+    function closeAdminScannerModal() {
+      adminScannerModalContainer.classList.remove("scale-100");
+      adminScannerModalContainer.classList.add("scale-95");
+      adminScannerModal.classList.add("opacity-0", "pointer-events-none");
+
+      stopAdminCamera();
+      resumeAdminScanner();
+    }
+
+    btnOpenAdminScanner.addEventListener("click", openAdminScannerModal);
+    btnCloseAdminScanner.addEventListener("click", closeAdminScannerModal);
+    adminScannerModal.addEventListener("click", (e) => {
+      if (e.target === adminScannerModal) closeAdminScannerModal();
+    });
 
     // Initial check
     checkSessionAuth();
