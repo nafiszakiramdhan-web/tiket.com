@@ -755,6 +755,7 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRMLG227dO9VkqJh__-Prb6HGw_t1JMY14FLLeQHO6kMwq5jlClzXlkMTfMYOh31zw/exec";
     const DEFAULT_PIN = "2026";
+    const ADMIN_SECRET_PIN = DEFAULT_PIN;
     const ADMIN_PIN = DEFAULT_PIN;
 
     // Inisialisasi Lucide Icons
@@ -830,11 +831,10 @@
 
       const cleanWa = (noWa || "").toString().replace(/[^0-9]/g, '').replace(/^0/, '62');
       const safeLinkPdf = linkPdf || "https://drive.google.com";
+      const secretPin = sessionStorage.getItem("admin_pin") || (typeof ADMIN_SECRET_PIN !== "undefined" ? ADMIN_SECRET_PIN : DEFAULT_PIN);
 
       try {
-        const pinToUse = sessionStorage.getItem("admin_pin") || ADMIN_PIN;
-
-        // Ambil file PDF melalui backend Apps Script untuk menghindari CORS Google Drive
+        // Bypass Masalah CORS Google Drive: fetch data base64 PDF ke Apps Script
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
           mode: "cors",
@@ -845,48 +845,50 @@
           body: JSON.stringify({
             action: "get_pdf_base64",
             pdfUrl: safeLinkPdf,
-            pin: pinToUse
+            pin: secretPin
           })
         });
 
         const res = await response.json();
 
         if (res && res.base64) {
+          // Konversikan string base64 menjadi Uint8Array lalu objek File
           const byteCharacters = atob(res.base64);
           const byteNumbers = new Array(byteCharacters.length);
           for (let i = 0; i < byteCharacters.length; i++) {
             byteNumbers[i] = byteCharacters.charCodeAt(i);
           }
           const byteArray = new Uint8Array(byteNumbers);
-          const file = new File([byteArray], `E-Ticket_BingkaiBisu_${(nama || "Pengunjung").replace(/\s+/g, '_')}.pdf`, { type: "application/pdf" });
+          const pdfFile = new File([byteArray], `E-Ticket_BingkaiBisu_${nama.replace(/\s+/g, '_')}.pdf`, { type: "application/pdf" });
 
-          // Panggil Web Share API (Fitur Bawaan HP)
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // Pemicu WhatsApp via Web Share API
+          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
             await navigator.share({
-              files: [file],
+              files: [pdfFile],
               title: 'E-Ticket Bingkai Bisu 2026',
-              text: `Halo ${nama}! 👋\nBerikut adalah E-Ticket resmi kamu untuk pameran foto Bingkai Bisu - Fixlens Festival 2026.\nSilakan tunjukkan QR Code pada tiket ini di pintu masuk Hetero Space Banyumas.`
+              text: `Halo ${nama}! 👋\n\nPembayaran tiket kamu untuk Fixlens Festival 2026 - Bingkai Bisu telah terverifikasi.\nFile PDF di atas adalah E-Ticket resmi kamu. Tunjukkan QR Code pada tiket ini saat tiba di pintu masuk Hetero Space Banyumas.`
             });
           } else {
-            // Fallback jika dibuka dari browser Laptop/PC yang tidak mendukung Share File
-            const pesan = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu dapat diunduh di tautan berikut: ${safeLinkPdf}`;
-            window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesan)}`, '_blank');
+            // Fallback otomatis jika dibuka dari laptop/PC yang tidak mendukung Share File:
+            const pesanWa = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu sudah terbit dan dapat diunduh di tautan berikut:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code di gate masuk.`;
+            window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
           }
         } else {
-          // Fallback jika respon tidak memuat base64
-          const pesan = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu dapat diunduh di tautan berikut: ${safeLinkPdf}`;
-          window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesan)}`, '_blank');
+          // Fallback otomatis jika respon server belum/tidak memuat base64
+          const pesanWa = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu sudah terbit dan dapat diunduh di tautan berikut:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code di gate masuk.`;
+          window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
         }
       } catch (err) {
-        console.warn("Gagal mengambil file PDF via server, menggunakan fallback WhatsApp link:", err);
-        const pesan = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu dapat diunduh di tautan berikut: ${safeLinkPdf}`;
-        window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesan)}`, '_blank');
+        console.warn("Gagal membagikan file PDF via Web Share, menggunakan fallback WhatsApp link:", err);
+        const pesanWa = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu sudah terbit dan dapat diunduh di tautan berikut:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code di gate masuk.`;
+        window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
       } finally {
         if (buttonElement) {
           buttonElement.disabled = false;
+          buttonElement.className = "btn-send-wa inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer";
           buttonElement.innerHTML = `
             <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-            <span>📤 Kirim File PDF ke WA</span>
+            <span>📤 Kirim File ke WA</span>
           `;
           lucide.createIcons();
         }
@@ -1102,7 +1104,7 @@
                 data-pdf="${linkPdf}"
               >
                 <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-                <span>📤 Kirim File PDF ke WA</span>
+                <span>📤 Kirim File ke WA</span>
               </button>
             ` : `
               <button 
@@ -1143,7 +1145,7 @@
         });
       });
 
-      // Bind Tombol "📤 Kirim File PDF ke WA"
+      // Bind Tombol "📤 Kirim File ke WA" (Tombol Manual di Riwayat Pesanan)
       document.querySelectorAll(".btn-send-wa").forEach(btn => {
         btn.addEventListener("click", (e) => {
           const name = e.currentTarget.dataset.name;
@@ -1193,7 +1195,7 @@
         btnModalAcc.className = "flex-1 w-full py-3.5 px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer";
         btnModalAcc.innerHTML = `
           <i data-lucide="share-2" class="w-4 h-4"></i>
-          <span>📤 Kirim File PDF ke WA</span>
+          <span>📤 Kirim File ke WA</span>
         `;
         btnModalAcc.onclick = () => {
           bagikanPdfKeWhatsApp(item.nama || "Peserta", item.whatsapp || "", item.linkPdf || "https://drive.google.com", btnModalAcc);
@@ -1227,12 +1229,8 @@
       if (e.target === receiptModal) closeReceiptModal();
     });
 
-    // ================== EKSEKUSI ACC TIKET ==================
+    // ================== EKSEKUSI ACC TIKET & AUTO TRIGGER WA ==================
     async function executeAccTicket(rowIndex, attendeeName, buttonElement, itemData) {
-      if (!confirm(`Konfirmasi pembayaran atas nama "${attendeeName}" dan terbitkan E-Ticket (PDF)?`)) {
-        return;
-      }
-
       const originalHtml = buttonElement ? buttonElement.innerHTML : "";
       if (buttonElement) {
         buttonElement.disabled = true;
@@ -1241,7 +1239,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
           </svg>
-          <span>Menerbitkan...</span>
+          <span>Memproses tiket & menyiapkan file PDF WhatsApp...</span>
         `;
       }
 
@@ -1266,54 +1264,58 @@
         }
 
         const linkPdf = (res && res.linkPdf) || (itemData && itemData.linkPdf) || (itemData && itemData.pdfUrl) || "https://drive.google.com";
-        const noWa = (itemData && itemData.whatsapp) || "";
+        const orderNama = attendeeName || (itemData && itemData.nama) || "Peserta";
+        const orderWa = (itemData && itemData.whatsapp) || "";
 
-        // Tandai item sudah di-ACC agar tombol langsung berganti menjadi Kirim File PDF ke WA
+        // Tandai item sudah di-ACC agar data terbarui
         if (itemData) {
           itemData.isAccDone = true;
           itemData.linkPdf = linkPdf;
           itemData.statusBayar = "APPROVED";
-          approvedOrdersList.unshift({
-            ...itemData,
-            statusBayar: "APPROVED",
-            linkPdf: linkPdf
-          });
-          badgeApprovedCount.textContent = approvedOrdersList.length;
+          if (res && res.kodeTiket) itemData.kodeTiket = res.kodeTiket;
+
+          // Pindahkan/masukkan ke approvedOrdersList
+          if (!approvedOrdersList.some(o => o.rowIndex == rowIndex)) {
+            approvedOrdersList.unshift({
+              ...itemData,
+              statusBayar: "APPROVED",
+              linkPdf: linkPdf
+            });
+            badgeApprovedCount.textContent = approvedOrdersList.length;
+          }
         }
 
-        // Tampilkan tombol hijau [ 📤 Kirim File PDF ke WA ] sesaat setelah ACC
+        // Ubah tombol di baris tabel menjadi tombol hijau [ 📤 Kirim File ke WA ]
         if (buttonElement) {
           buttonElement.disabled = false;
           buttonElement.className = "btn-send-wa inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer";
           buttonElement.innerHTML = `
             <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-            <span>📤 Kirim File PDF ke WA</span>
+            <span>📤 Kirim File ke WA</span>
           `;
           buttonElement.onclick = (e) => {
             e.stopPropagation();
-            bagikanPdfKeWhatsApp(attendeeName, noWa, linkPdf, buttonElement);
+            bagikanPdfKeWhatsApp(orderNama, orderWa, linkPdf, buttonElement);
           };
           lucide.createIcons();
         }
 
-        // Jika tombol ACC di modal pratinjau diklik, ubah juga tombol modal menjadi Kirim File PDF ke WA
+        // Jika dipicu dari modal pratinjau struk
         if (buttonElement === btnModalAcc || (btnModalAcc && currentModalItem && currentModalItem.rowIndex == rowIndex)) {
           btnModalAcc.disabled = false;
           btnModalAcc.className = "flex-1 w-full py-3.5 px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer";
           btnModalAcc.innerHTML = `
             <i data-lucide="share-2" class="w-4 h-4"></i>
-            <span>📤 Kirim File PDF ke WA</span>
+            <span>📤 Kirim File ke WA</span>
           `;
           btnModalAcc.onclick = () => {
-            bagikanPdfKeWhatsApp(attendeeName, noWa, linkPdf, btnModalAcc);
+            bagikanPdfKeWhatsApp(orderNama, orderWa, linkPdf, btnModalAcc);
           };
           lucide.createIcons();
         }
 
-        // Tawarkan untuk langsung membagikan PDF ke WhatsApp
-        if (confirm(`Sukses! Pembayaran "${attendeeName}" telah di-ACC dan E-Ticket resmi diterbitkan.\n\nKirimkan file PDF E-Ticket sekarang ke WhatsApp ${attendeeName}?`)) {
-          bagikanPdfKeWhatsApp(attendeeName, noWa, linkPdf, buttonElement);
-        }
+        // JANGAN berhenti di alert biasa! Panggil fungsi bagikanPdfKeWhatsApp secara otomatis detik itu juga!
+        await bagikanPdfKeWhatsApp(orderNama, orderWa, linkPdf, buttonElement);
 
       } catch (err) {
         console.error("Gagal ACC tiket:", err);
