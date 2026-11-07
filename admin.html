@@ -98,6 +98,10 @@
       50% { opacity: 1; }
       100% { top: 85%; opacity: 0.3; }
     }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
   </style>
 </head>
 <body class="selection:bg-pastel-purple selection:text-night flex flex-col justify-between min-h-screen">
@@ -1353,7 +1357,49 @@
       if (e.target === receiptModal) closeReceiptModal();
     });
 
-    // ================== EKSEKUSI ACC TIKET & AUTO TRIGGER WA ==================
+    // ================== TOAST NOTIFIKASI SUKSES ACC ==================
+    function showAccSuccessToast(nama) {
+      // Hapus toast lama jika ada
+      const existing = document.getElementById("accSuccessToast");
+      if (existing) existing.remove();
+
+      const toast = document.createElement("div");
+      toast.id = "accSuccessToast";
+      toast.className = [
+        "fixed bottom-6 left-1/2 -translate-x-1/2 z-[60]",
+        "flex items-start gap-3 px-5 py-4 rounded-2xl shadow-2xl",
+        "bg-gradient-to-r from-emerald-900/95 to-night-card/95 border border-emerald-400/40",
+        "backdrop-blur-md max-w-sm w-[calc(100%-2rem)]",
+        "animate-[fadeInUp_0.3s_ease]"
+      ].join(" ");
+
+      toast.innerHTML = `
+        <div class="shrink-0 w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-white leading-snug">✅ Tiket <span class="text-emerald-300">${nama}</span> berhasil di-ACC!</p>
+          <p class="text-xs text-white/60 mt-0.5 leading-relaxed">Notifikasi WhatsApp &amp; link PDF Google Drive telah otomatis dikirimkan ke pembeli via server.</p>
+        </div>
+        <button onclick="this.parentElement.remove()" class="shrink-0 text-white/30 hover:text-white transition-colors mt-0.5 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      `;
+
+      document.body.appendChild(toast);
+
+      // Auto-dismiss setelah 5 detik
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+          toast.style.opacity = "0";
+          toast.style.transform = "translateX(-50%) translateY(12px)";
+          setTimeout(() => toast.remove(), 400);
+        }
+      }, 5000);
+    }
+
+    // ================== EKSEKUSI ACC TIKET ==================
     async function executeAccTicket(rowIndex, attendeeName, buttonElement, itemData) {
       const originalHtml = buttonElement ? buttonElement.innerHTML : "";
       if (buttonElement) {
@@ -1363,7 +1409,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
           </svg>
-          <span>Memproses tiket & menyiapkan file PDF WhatsApp...</span>
+          <span>Memproses tiket...</span>
         `;
       }
 
@@ -1372,9 +1418,7 @@
           method: "POST",
           mode: "cors",
           redirect: "follow",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
             action: "admin_acc",
             rowIndex: parseInt(rowIndex, 10)
@@ -1387,58 +1431,23 @@
           throw new Error(res.message || "Gagal verifikasi di server.");
         }
 
-        const linkPdf = (res && res.linkPdf) || (itemData && itemData.linkPdf) || (itemData && itemData.pdfUrl) || "https://drive.google.com";
+        const linkPdf = (res && res.linkPdf) || (itemData && itemData.linkPdf) || (itemData && itemData.pdfUrl) || "";
         const orderNama = attendeeName || (itemData && itemData.nama) || "Peserta";
-        const orderWa = (itemData && itemData.whatsapp) || "";
 
-        // Tandai item sudah di-ACC agar data terbarui
+        // Tandai item sudah di-ACC & masukkan ke approvedOrdersList
         if (itemData) {
           itemData.isAccDone = true;
           itemData.linkPdf = linkPdf;
           itemData.statusBayar = "APPROVED";
           if (res && res.kodeTiket) itemData.kodeTiket = res.kodeTiket;
 
-          // Pindahkan/masukkan ke approvedOrdersList
           if (!approvedOrdersList.some(o => o.rowIndex == rowIndex)) {
-            approvedOrdersList.unshift({
-              ...itemData,
-              statusBayar: "APPROVED",
-              linkPdf: linkPdf
-            });
+            approvedOrdersList.unshift({ ...itemData, statusBayar: "APPROVED", linkPdf });
             badgeApprovedCount.textContent = approvedOrdersList.length;
           }
         }
 
-        // Ubah tombol di baris tabel menjadi tombol hijau [ 📤 Kirim File ke WA ]
-        if (buttonElement) {
-          buttonElement.disabled = false;
-          buttonElement.className = "btn-send-wa inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer";
-          buttonElement.innerHTML = `
-            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-            <span>📤 Kirim File ke WA</span>
-          `;
-          buttonElement.onclick = (e) => {
-            e.stopPropagation();
-            bagikanPdfKeWhatsApp(orderNama, orderWa, linkPdf, buttonElement);
-          };
-          lucide.createIcons();
-        }
-
-        // Jika dipicu dari modal pratinjau struk
-        if (buttonElement === btnModalAcc || (btnModalAcc && currentModalItem && currentModalItem.rowIndex == rowIndex)) {
-          btnModalAcc.disabled = false;
-          btnModalAcc.className = "flex-1 w-full py-3.5 px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer";
-          btnModalAcc.innerHTML = `
-            <i data-lucide="share-2" class="w-4 h-4"></i>
-            <span>📤 Kirim File ke WA</span>
-          `;
-          btnModalAcc.onclick = () => {
-            bagikanPdfKeWhatsApp(orderNama, orderWa, linkPdf, btnModalAcc);
-          };
-          lucide.createIcons();
-        }
-
-        // Hapus dari pendingOrdersList agar tabel langsung bersih tanpa perlu refresh
+        // Hapus dari pendingOrdersList → tabel langsung bersih
         const pendingIdx = pendingOrdersList.findIndex(o => o.rowIndex == rowIndex);
         if (pendingIdx !== -1) {
           pendingOrdersList.splice(pendingIdx, 1);
@@ -1446,35 +1455,12 @@
           statPendingCount.textContent = pendingOrdersList.length;
         }
 
-        // Jika modal pratinjau struk sedang terbuka, tutup terlebih dahulu
+        // Tutup modal struk jika terbuka, lalu render ulang tabel
         closeReceiptModal();
-
-        // Render ulang tabel agar baris pending yang di-ACC langsung hilang
         renderCurrentTabTable();
 
-        // ---- BUKA WHATSAPP LANGSUNG (TANPA ALERT) ----
-        const nama = orderNama;
-        const wa = orderWa;
-        const kode = (res && res.kodeTiket) || (itemData && itemData.kodeTiket) || "-";
-        const varian = (itemData && itemData.varian) || "";
-
-        let cleanWa = (wa || "").toString().replace(/[^0-9]/g, '');
-        if (cleanWa.startsWith("0")) cleanWa = "62" + cleanWa.slice(1);
-        if (cleanWa.startsWith("8")) cleanWa = "62" + cleanWa;
-
-        let pesan = `Halo kak *${nama}*! 👋\n`;
-        pesan += `Pembayaran tiket kamu untuk *Bingkai Bisu - Fixlens Festival 2026* telah *TERVERIFIKASI*.\n\n`;
-        pesan += `📋 *DETAIL TIKET RESMI:*\n`;
-        pesan += `• Kategori: ${varian}\n`;
-        pesan += `• Kode Unik Gate: *${kode}*\n\n`;
-        pesan += `🎟️ *UNDUH / BUKA E-TICKET (PDF):*\n${linkPdf}\n\n`;
-        pesan += `_Tunjukkan QR Code pada tiket saat tiba di pintu masuk Hetero Space Banyumas (29-30 Nov 2026). Sampai jumpa!_ 📸`;
-
-        const urlWa = `https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(pesan)}`;
-        window.open(urlWa, '_blank');
-
-        // Juga siapkan file PDF di background untuk tombol Kirim File ke WA manual (non-blocking)
-        prepareTicketPdf(orderNama, orderWa, linkPdf).catch(() => {});
+        // Tampilkan toast notifikasi sukses (WA & PDF sudah dikirim server via Fonnte)
+        showAccSuccessToast(orderNama);
 
       } catch (err) {
         console.error("Gagal ACC tiket:", err);
