@@ -427,6 +427,57 @@
   </div>
 
 
+  <!-- ==================== MODAL DIALOG SUKSES SHARE PDF WHATSAPP ==================== -->
+  <div 
+    id="pdfShareSuccessModal" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night/95 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div 
+      id="pdfShareSuccessContainer" 
+      class="w-full max-w-md bg-night-card border-2 border-emerald-400 rounded-3xl p-6 sm:p-7 text-center shadow-glow-green transform scale-95 transition-all duration-300 space-y-5 relative overflow-hidden"
+    >
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/15 rounded-full blur-2xl"></div>
+      <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-pastel-yellow/15 rounded-full blur-2xl"></div>
+
+      <!-- Centang Sukses Glowing -->
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+        <i data-lucide="check-circle" class="w-9 h-9 stroke-[2.5]"></i>
+      </div>
+
+      <div class="space-y-1.5">
+        <h3 class="font-display font-extrabold text-xl sm:text-2xl text-white">
+          ✅ Tiket Berhasil Diterbitkan!
+        </h3>
+        <p class="text-xs text-white/70 leading-relaxed">
+          E-Ticket untuk <strong id="shareModalAttendeeName" class="text-pastel-yellow font-bold">-</strong> siap dikirimkan ke WhatsApp.
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-2.5 pt-2">
+        <button 
+          type="button" 
+          id="btnTriggerWebShare" 
+          class="w-full py-4 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-night bg-gradient-to-r from-emerald-400 via-emerald-300 to-emerald-400 hover:brightness-110 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <i data-lucide="share-2" class="w-4 h-4 stroke-[2.5]"></i>
+          <span>📤 Kirim File PDF ke WA Pengunjung</span>
+        </button>
+
+        <button 
+          type="button" 
+          id="btnCloseShareModal" 
+          class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+        >
+          Nanti Saja / Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+
   <!-- ==================== MODAL GATE SCANNER ADMIN ==================== -->
   <div 
     id="adminScannerModal" 
@@ -798,6 +849,19 @@
     const btnReceiptOpenNewTab = document.getElementById("btnReceiptOpenNewTab");
     const btnModalAcc = document.getElementById("btnModalAcc");
 
+    // DOM Elements Modal Sukses Share PDF
+    const pdfShareSuccessModal = document.getElementById("pdfShareSuccessModal");
+    const pdfShareSuccessContainer = document.getElementById("pdfShareSuccessContainer");
+    const shareModalAttendeeName = document.getElementById("shareModalAttendeeName");
+    const btnTriggerWebShare = document.getElementById("btnTriggerWebShare");
+    const btnCloseShareModal = document.getElementById("btnCloseShareModal");
+
+    // Globals untuk Web Share API tanpa delay gesture
+    window.activeTicketPdf = null;
+    window.activeRecipientWa = "";
+    window.activeRecipientName = "";
+    window.activeTicketPdfUrl = "";
+
     let currentModalItem = null;
     let currentTab = "pending"; // 'pending' | 'approved'
     let pendingOrdersList = [];
@@ -815,26 +879,17 @@
       }).format(num).replace(/\s+/g, " ");
     }
 
-    // ================== LOGIKA BERBAGI FILE PDF LANGSUNG (WEB SHARE API) ==================
-    async function bagikanPdfKeWhatsApp(nama, noWa, linkPdf, buttonElement) {
-      const originalHtml = buttonElement ? buttonElement.innerHTML : "";
-      if (buttonElement) {
-        buttonElement.disabled = true;
-        buttonElement.innerHTML = `
-          <svg class="animate-spin h-3.5 w-3.5 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-          </svg>
-          <span>Menyiapkan file PDF...</span>
-        `;
-      }
+    // ================== PERSIAPAN FILE PDF & MODAL SHARE WHATSAPP ==================
+    async function prepareTicketPdf(nama, noWa, linkPdf) {
+      window.activeRecipientName = nama || "Peserta";
+      window.activeRecipientWa = noWa || "";
+      window.activeTicketPdfUrl = linkPdf || "https://drive.google.com";
+      window.activeTicketPdf = null;
 
-      const cleanWa = (noWa || "").toString().replace(/[^0-9]/g, '').replace(/^0/, '62');
       const safeLinkPdf = linkPdf || "https://drive.google.com";
       const secretPin = sessionStorage.getItem("admin_pin") || (typeof ADMIN_SECRET_PIN !== "undefined" ? ADMIN_SECRET_PIN : DEFAULT_PIN);
 
       try {
-        // Bypass Masalah CORS Google Drive: fetch data base64 PDF ke Apps Script
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
           mode: "cors",
@@ -852,35 +907,104 @@
         const res = await response.json();
 
         if (res && res.base64) {
-          // Konversikan string base64 menjadi Uint8Array lalu objek File
           const byteCharacters = atob(res.base64);
           const byteNumbers = new Array(byteCharacters.length);
           for (let i = 0; i < byteCharacters.length; i++) {
             byteNumbers[i] = byteCharacters.charCodeAt(i);
           }
           const byteArray = new Uint8Array(byteNumbers);
-          const pdfFile = new File([byteArray], `E-Ticket_BingkaiBisu_${nama.replace(/\s+/g, '_')}.pdf`, { type: "application/pdf" });
-
-          // Pemicu WhatsApp via Web Share API
-          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-            await navigator.share({
-              files: [pdfFile],
-              title: 'E-Ticket Bingkai Bisu 2026',
-              text: `Halo ${nama}! 👋\n\nPembayaran tiket kamu untuk Fixlens Festival 2026 - Bingkai Bisu telah terverifikasi.\nFile PDF di atas adalah E-Ticket resmi kamu. Tunjukkan QR Code pada tiket ini saat tiba di pintu masuk Hetero Space Banyumas.`
-            });
-          } else {
-            // Fallback otomatis jika dibuka dari laptop/PC yang tidak mendukung Share File:
-            const pesanWa = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu sudah terbit dan dapat diunduh di tautan berikut:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code di gate masuk.`;
-            window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
-          }
-        } else {
-          // Fallback otomatis jika respon server belum/tidak memuat base64
-          const pesanWa = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu sudah terbit dan dapat diunduh di tautan berikut:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code di gate masuk.`;
-          window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
+          const pdfFile = new File([byteArray], `E-Ticket_BingkaiBisu_${(nama || 'Peserta').replace(/\s+/g, '_')}.pdf`, { type: "application/pdf" });
+          window.activeTicketPdf = pdfFile;
+          return pdfFile;
         }
       } catch (err) {
-        console.warn("Gagal membagikan file PDF via Web Share, menggunakan fallback WhatsApp link:", err);
-        const pesanWa = `Halo ${nama}! E-Ticket resmi Bingkai Bisu 2026 kamu sudah terbit dan dapat diunduh di tautan berikut:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code di gate masuk.`;
+        console.warn("Gagal mengambil base64 PDF dari Apps Script:", err);
+      }
+      return null;
+    }
+
+    function showPdfShareModal(nama, noWa, linkPdf) {
+      if (shareModalAttendeeName) {
+        shareModalAttendeeName.textContent = nama || "Peserta";
+      }
+      if (pdfShareSuccessModal && pdfShareSuccessContainer) {
+        pdfShareSuccessModal.classList.remove("opacity-0", "pointer-events-none");
+        pdfShareSuccessContainer.classList.remove("scale-95");
+        pdfShareSuccessContainer.classList.add("scale-100");
+        lucide.createIcons();
+      }
+    }
+
+    function closePdfShareModal() {
+      if (pdfShareSuccessModal && pdfShareSuccessContainer) {
+        pdfShareSuccessContainer.classList.remove("scale-100");
+        pdfShareSuccessContainer.classList.add("scale-95");
+        pdfShareSuccessModal.classList.add("opacity-0", "pointer-events-none");
+      }
+    }
+
+    if (btnCloseShareModal) {
+      btnCloseShareModal.addEventListener("click", closePdfShareModal);
+    }
+    if (pdfShareSuccessModal) {
+      pdfShareSuccessModal.addEventListener("click", (e) => {
+        if (e.target === pdfShareSuccessModal) closePdfShareModal();
+      });
+    }
+
+    // Pemicu WhatsApp via Web Share API dengan User Gesture Instan & Murni
+    if (btnTriggerWebShare) {
+      btnTriggerWebShare.addEventListener("click", async () => {
+        const cleanWa = (window.activeRecipientWa || "").toString().replace(/[^0-9]/g, '').replace(/^0/, '62');
+        const safeLinkPdf = window.activeTicketPdfUrl || "https://drive.google.com";
+        const nama = window.activeRecipientName || "Peserta";
+
+        try {
+          if (window.activeTicketPdf && navigator.canShare && navigator.canShare({ files: [window.activeTicketPdf] })) {
+            await navigator.share({
+              files: [window.activeTicketPdf],
+              title: 'E-Ticket Bingkai Bisu 2026',
+              text: `Halo ${nama}! 👋\nBerikut adalah E-Ticket resmi kamu untuk Bingkai Bisu - Fixlens Festival 2026.\nHarap tunjukkan QR Code pada tiket ini di gate masuk Hetero Space Banyumas.`
+            });
+          } else {
+            // Fallback link WhatsApp jika dibuka dari browser/device tanpa dukungan share file
+            const pesanWa = `Halo ${nama}! 👋\nBerikut adalah tautan E-Ticket resmi kamu untuk Bingkai Bisu - Fixlens Festival 2026:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code pada tiket ini di gate masuk Hetero Space Banyumas.`;
+            window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
+          }
+        } catch (err) {
+          if (err.name !== "AbortError") {
+            console.warn("Web Share error, beralih ke WhatsApp link fallback:", err);
+            const pesanWa = `Halo ${nama}! 👋\nBerikut adalah tautan E-Ticket resmi kamu untuk Bingkai Bisu - Fixlens Festival 2026:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code pada tiket ini di gate masuk Hetero Space Banyumas.`;
+            window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
+          }
+        } finally {
+          closePdfShareModal();
+        }
+      });
+    }
+
+    // ================== LOGIKA BERBAGI FILE PDF LANGSUNG (TOMBOL MANUAL TABEL) ==================
+    async function bagikanPdfKeWhatsApp(nama, noWa, linkPdf, buttonElement) {
+      const originalHtml = buttonElement ? buttonElement.innerHTML : "";
+      if (buttonElement) {
+        buttonElement.disabled = true;
+        buttonElement.innerHTML = `
+          <svg class="animate-spin h-3.5 w-3.5 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <span>Menyiapkan file PDF...</span>
+        `;
+      }
+
+      try {
+        await prepareTicketPdf(nama, noWa, linkPdf);
+        showPdfShareModal(nama, noWa, linkPdf);
+      } catch (err) {
+        console.warn("Gagal menyiapkan PDF via Web Share, membuka fallback WhatsApp link:", err);
+        const cleanWa = (noWa || "").toString().replace(/[^0-9]/g, '').replace(/^0/, '62');
+        const safeLinkPdf = linkPdf || "https://drive.google.com";
+        const pesanWa = `Halo ${nama}! 👋\nBerikut adalah tautan E-Ticket resmi kamu untuk Bingkai Bisu - Fixlens Festival 2026:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code pada tiket ini di gate masuk Hetero Space Banyumas.`;
         window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
       } finally {
         if (buttonElement) {
@@ -1314,8 +1438,14 @@
           lucide.createIcons();
         }
 
-        // JANGAN berhenti di alert biasa! Panggil fungsi bagikanPdfKeWhatsApp secara otomatis detik itu juga!
-        await bagikanPdfKeWhatsApp(orderNama, orderWa, linkPdf, buttonElement);
+        // Ambil data file PDF base64 dari Apps Script lalu ubah menjadi objek File di window.activeTicketPdf
+        await prepareTicketPdf(orderNama, orderWa, linkPdf);
+
+        // Jika modal pratinjau struk sedang terbuka, tutup agar dialog sukses terlihat jelas
+        closeReceiptModal();
+
+        // Tampilkan Modal Dialog Sukses di tengah layar untuk trigger Web Share instan
+        showPdfShareModal(orderNama, orderWa, linkPdf);
 
       } catch (err) {
         console.error("Gagal ACC tiket:", err);

@@ -113,7 +113,7 @@
     <!-- Header Section -->
     <header class="text-center pt-2">
       <div class="flex items-center justify-between mb-2">
-        <a href="index.html" class="p-2 rounded-xl bg-night-card border border-night-border text-white/60 hover:text-white transition-colors" title="Kembali">
+        <a href="admin.html" class="p-2 rounded-xl bg-night-card border border-night-border text-white/60 hover:text-white transition-colors" title="Dashboard Admin Panitia">
           <i data-lucide="arrow-left" class="w-4 h-4"></i>
         </a>
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pastel-purple/10 border border-pastel-purple/20 text-pastel-purple text-[11px] font-semibold tracking-wider uppercase">
@@ -423,6 +423,54 @@
 
   </div>
 
+  <!-- ==================== SOUVENIR MODAL GUARD ==================== -->
+  <div 
+    id="souvenirModal" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div 
+      id="souvenirModalContainer" 
+      class="w-full max-w-sm bg-gradient-to-b from-[#241708] to-[#120c04] border-2 border-amber-400 rounded-3xl p-6 sm:p-7 text-center shadow-glow-yellow transform scale-95 transition-all duration-300 relative space-y-4"
+    >
+      <!-- Glowing Icon -->
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-night flex items-center justify-center shadow-lg shadow-amber-500/30 animate-bounce">
+        <i data-lucide="gift" class="w-8 h-8 stroke-[2.5]"></i>
+      </div>
+
+      <div class="space-y-1">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[11px] font-black uppercase tracking-widest animate-pulse">
+          ⚠️ WAJIB SERAHKAN SOUVENIR
+        </span>
+        <h3 id="souvenirAttendeeName" class="font-display font-extrabold text-2xl text-white uppercase tracking-wide break-words pt-1">
+          -
+        </h3>
+        <p id="souvenirTicketVariant" class="text-xs text-pastel-yellow font-medium">
+          -
+        </p>
+      </div>
+
+      <!-- Detail Barang Souvenir Box -->
+      <div class="p-4 rounded-2xl bg-black/60 border border-amber-400/40 space-y-1">
+        <span class="text-[10px] text-amber-300/80 uppercase font-mono tracking-wider font-semibold">Rincian Barang Souvenir:</span>
+        <div id="souvenirItemDetail" class="font-display font-black text-base text-amber-300 leading-snug">
+          -
+        </div>
+      </div>
+
+      <!-- Action Button: Confirmation (Terkunci sampai panitia menekan tombol) -->
+      <button 
+        type="button" 
+        id="btnConfirmSouvenir" 
+        class="w-full py-4 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-night bg-gradient-to-r from-pastel-yellow via-amber-300 to-pastel-yellow hover:brightness-110 active:scale-[0.98] transition-all duration-200 shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer"
+      >
+        <i data-lucide="check-circle" class="w-5 h-5 stroke-[2.5]"></i>
+        <span>✔ SOUVENIR SUDAH DIBERIKAN (LANJUT)</span>
+      </button>
+    </div>
+  </div>
+
 
   <!-- ==================== LOGIKA JAVASCRIPT ==================== -->
   <script>
@@ -609,6 +657,9 @@
           if (merchBanner) merchBanner.classList.remove("hidden");
           if (merchText) merchText.textContent = "🎁 SERAHKAN KE PENGUNJUNG: " + merch.item;
           if (noMerchBadge) noMerchBadge.classList.add("hidden");
+
+          // Pop-up Notifikasi Souvenir di Tengah Layar (Kamera terkunci sampai dikonfirmasi)
+          openSouvenirModal(data, merch);
         } else {
           if (merchBanner) merchBanner.classList.add("hidden");
           if (noMerchBadge) noMerchBadge.classList.remove("hidden");
@@ -698,6 +749,44 @@
     document.getElementById("btnNextTicketSuccess").addEventListener("click", resumeScanner);
     document.getElementById("btnNextTicketWarning").addEventListener("click", resumeScanner);
     document.getElementById("btnRetryError").addEventListener("click", resumeScanner);
+
+    // ================== POP-UP NOTIFIKASI SOUVENIR MODAL ==================
+    const souvenirModal = document.getElementById("souvenirModal");
+    const souvenirModalContainer = document.getElementById("souvenirModalContainer");
+    const souvenirAttendeeName = document.getElementById("souvenirAttendeeName");
+    const souvenirTicketVariant = document.getElementById("souvenirTicketVariant");
+    const souvenirItemDetail = document.getElementById("souvenirItemDetail");
+    const btnConfirmSouvenir = document.getElementById("btnConfirmSouvenir");
+
+    function openSouvenirModal(data, merch) {
+      // Tahan / jeda stream kamera scanner (scanner.pause(true))
+      pauseScanner();
+
+      if (souvenirAttendeeName) souvenirAttendeeName.textContent = data.nama || "Peserta";
+      if (souvenirTicketVariant) souvenirTicketVariant.textContent = (data.varian || "Tiket Reguler") + ` (${data.jumlah || 1} Orang)`;
+      if (souvenirItemDetail) souvenirItemDetail.textContent = (merch && merch.item) || "1x Souvenir Eksklusif";
+
+      if (souvenirModal && souvenirModalContainer) {
+        souvenirModal.classList.remove("opacity-0", "pointer-events-none");
+        souvenirModalContainer.classList.remove("scale-95");
+        souvenirModalContainer.classList.add("scale-100");
+        lucide.createIcons();
+      }
+    }
+
+    function closeSouvenirModal() {
+      if (souvenirModal && souvenirModalContainer) {
+        souvenirModalContainer.classList.remove("scale-100");
+        souvenirModalContainer.classList.add("scale-95");
+        souvenirModal.classList.add("opacity-0", "pointer-events-none");
+      }
+      // Kamera dibuka kembali setelah panitia menekan tombol konfirmasi
+      resumeScanner();
+    }
+
+    if (btnConfirmSouvenir) {
+      btnConfirmSouvenir.addEventListener("click", closeSouvenirModal);
+    }
 
     // ================== SCAN VALIDATION LOGIC ==================
     function cleanScanCode(rawText) {
