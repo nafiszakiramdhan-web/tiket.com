@@ -1438,14 +1438,43 @@
           lucide.createIcons();
         }
 
-        // Ambil data file PDF base64 dari Apps Script lalu ubah menjadi objek File di window.activeTicketPdf
-        await prepareTicketPdf(orderNama, orderWa, linkPdf);
+        // Hapus dari pendingOrdersList agar tabel langsung bersih tanpa perlu refresh
+        const pendingIdx = pendingOrdersList.findIndex(o => o.rowIndex == rowIndex);
+        if (pendingIdx !== -1) {
+          pendingOrdersList.splice(pendingIdx, 1);
+          badgePendingCount.textContent = pendingOrdersList.length;
+          statPendingCount.textContent = pendingOrdersList.length;
+        }
 
-        // Jika modal pratinjau struk sedang terbuka, tutup agar dialog sukses terlihat jelas
+        // Jika modal pratinjau struk sedang terbuka, tutup terlebih dahulu
         closeReceiptModal();
 
-        // Tampilkan Modal Dialog Sukses di tengah layar untuk trigger Web Share instan
-        showPdfShareModal(orderNama, orderWa, linkPdf);
+        // Render ulang tabel agar baris pending yang di-ACC langsung hilang
+        renderCurrentTabTable();
+
+        // ---- BUKA WHATSAPP LANGSUNG (TANPA ALERT) ----
+        const nama = orderNama;
+        const wa = orderWa;
+        const kode = (res && res.kodeTiket) || (itemData && itemData.kodeTiket) || "-";
+        const varian = (itemData && itemData.varian) || "";
+
+        let cleanWa = (wa || "").toString().replace(/[^0-9]/g, '');
+        if (cleanWa.startsWith("0")) cleanWa = "62" + cleanWa.slice(1);
+        if (cleanWa.startsWith("8")) cleanWa = "62" + cleanWa;
+
+        let pesan = `Halo kak *${nama}*! 👋\n`;
+        pesan += `Pembayaran tiket kamu untuk *Bingkai Bisu - Fixlens Festival 2026* telah *TERVERIFIKASI*.\n\n`;
+        pesan += `📋 *DETAIL TIKET RESMI:*\n`;
+        pesan += `• Kategori: ${varian}\n`;
+        pesan += `• Kode Unik Gate: *${kode}*\n\n`;
+        pesan += `🎟️ *UNDUH / BUKA E-TICKET (PDF):*\n${linkPdf}\n\n`;
+        pesan += `_Tunjukkan QR Code pada tiket saat tiba di pintu masuk Hetero Space Banyumas (29-30 Nov 2026). Sampai jumpa!_ 📸`;
+
+        const urlWa = `https://api.whatsapp.com/send?phone=${cleanWa}&text=${encodeURIComponent(pesan)}`;
+        window.open(urlWa, '_blank');
+
+        // Juga siapkan file PDF di background untuk tombol Kirim File ke WA manual (non-blocking)
+        prepareTicketPdf(orderNama, orderWa, linkPdf).catch(() => {});
 
       } catch (err) {
         console.error("Gagal ACC tiket:", err);

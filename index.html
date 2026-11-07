@@ -477,6 +477,11 @@
               <i data-lucide="plus" class="w-4 h-4"></i>
             </button>
           </div>
+          <!-- Pesan error jika qty bundling melebihi sisa kuota -->
+          <p id="errBundlingQty" class="text-xs text-amber-400 hidden col-span-full mt-1 flex items-center gap-1">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 shrink-0"></i>
+            <span></span>
+          </p>
         </div>
 
         <!-- 3. Form Input Data Diri -->
@@ -1167,6 +1172,9 @@
       const inputBundling = document.querySelector('input[name="ticketVariant"][value="bundling_spesial"]');
       const soldOutBadge = document.getElementById("bundlingSoldOutBadge");
 
+      // Simpan varian yang sedang dipilih sebelum fetch agar tidak auto-downgrade
+      const variantBeforeFetch = selectedVariantKey;
+
       try {
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
@@ -1186,6 +1194,9 @@
           const sisa = typeof q.sisa !== "undefined" ? q.sisa : (typeof q.remaining !== "undefined" ? q.remaining : (maxSlot - (q.terjual || q.booked || 0)));
           const isSoldOut = q.isSoldOut === true || sisa <= 0;
 
+          // Simpan sisa kuota untuk validasi qty
+          currentBundlingSisa = isSoldOut ? 0 : sisa;
+
           if (isSoldOut) {
             // Nonaktifkan opsi Bundling 10k dan beri label "SOLD OUT / HABIS"
             cardBundling.classList.add("opacity-50", "cursor-not-allowed", "pointer-events-none");
@@ -1193,16 +1204,22 @@
             if (soldOutBadge) soldOutBadge.classList.remove("hidden");
             if (quotaElem) quotaElem.innerHTML = `<span class="text-red-400 font-bold">SOLD OUT / HABIS (0 Slot)</span>`;
 
-            if (selectedVariantKey === "bundling_spesial") {
+            // HANYA pindah varian jika terpaksa (bundling sold out & user masih pilih bundling)
+            // Gunakan variantBeforeFetch agar tidak overwrite pilihan yang baru diklik user
+            if (variantBeforeFetch === "bundling_spesial") {
+              // Pindah ke tiket_2hari sebagai fallback karena slot habis
               updateVariantSelection("tiket_2hari");
             }
           } else {
+            currentBundlingSisa = sisa;
             if (quotaElem) quotaElem.innerHTML = `Sisa kuota: <span class="text-amber-300 font-bold">${sisa}</span> dari ${maxSlot} slot`;
+            // JANGAN ubah selectedVariantKey — biarkan pilihan user tetap
           }
         }
       } catch (err) {
         console.warn("Gagal mengecek kuota bundling dari server:", err);
         if (quotaElem) quotaElem.textContent = "🔥 Tersedia Terbatas 95 Slot";
+        // Jika fetch gagal, biarkan selectedVariantKey tidak berubah
       }
     }
 
@@ -1223,6 +1240,8 @@
       if (q > 1) {
         ticketQtyInput.value = q - 1;
         selectedQuantity = q - 1;
+        // Validasi kuota bundling: jika qty baru masih aman, biarkan pilihan varian
+        validateBundlingQtyLimit();
       }
     });
 
@@ -1231,6 +1250,7 @@
       if (q < 20) {
         ticketQtyInput.value = q + 1;
         selectedQuantity = q + 1;
+        validateBundlingQtyLimit();
       }
     });
 
@@ -1240,7 +1260,28 @@
       if (q > 20) q = 20;
       ticketQtyInput.value = q;
       selectedQuantity = q;
+      validateBundlingQtyLimit();
     });
+
+    // Validasi kuota bundling vs jumlah yang dipilih — TIDAK PERNAH auto-downgrade varian
+    let currentBundlingSisa = 95; // default sampai fetch selesai
+    function validateBundlingQtyLimit() {
+      if (selectedVariantKey !== "bundling_spesial") return;
+      const errBundlingQty = document.getElementById("errBundlingQty");
+      const errSpan = errBundlingQty ? errBundlingQty.querySelector("span") : null;
+      if (selectedQuantity > currentBundlingSisa) {
+        // Blok qty supaya tidak melebihi sisa kuota, tapi JANGAN ganti variannya
+        selectedQuantity = currentBundlingSisa < 1 ? 1 : currentBundlingSisa;
+        ticketQtyInput.value = selectedQuantity;
+        if (errBundlingQty) {
+          if (errSpan) errSpan.textContent = `Kuota Bundling tersisa ${currentBundlingSisa} slot. Jumlah tiket disesuaikan.`;
+          errBundlingQty.classList.remove("hidden");
+          setTimeout(() => errBundlingQty.classList.add("hidden"), 4000);
+        }
+      } else {
+        if (errBundlingQty) errBundlingQty.classList.add("hidden");
+      }
+    }
 
     // ================== STEP TRANSITIONS ==================
     const step1Container = document.getElementById("step1Container");
@@ -1288,6 +1329,9 @@
 
     btnGoToStep2.addEventListener("click", () => {
       if (!validateStep1()) return;
+
+      // Pastikan qty bundling tidak melebihi sisa kuota sebelum lanjut
+      validateBundlingQtyLimit();
 
       const currentVariant = VARIANTS[selectedVariantKey];
       const totalAmount = currentVariant.price * selectedQuantity;
