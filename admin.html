@@ -6,10 +6,10 @@
   <title>Admin Dashboard - Panel Verifikasi Tiket | Bingkai Bisu 2026</title>
   <meta name="robots" content="noindex, nofollow" />
 
-  <!-- Google Fonts: Plus Jakarta Sans, Syne, Space Mono -->
+  <!-- Google Fonts: Inter, EB Garamond (Italic), Bebas Neue, Space Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -19,27 +19,37 @@
       theme: {
         extend: {
           colors: {
-            night: '#0F0F14',
-            'night-card': '#16161E',
-            'night-input': '#1D1D27',
-            'night-border': '#2A2A38',
+            brand: {
+              yellow: '#FFDC17',
+              'yellow-hover': '#ECC90E',
+              dark: '#2D2A1A',
+              navy: '#081B59',
+              'navy-dark': '#051138',
+              violet: '#2A0859',
+              'violet-card': '#2A0859',
+            },
+            night: '#081B59',
+            'night-card': '#2A0859',
+            'night-input': '#081B59',
+            'night-border': 'rgba(255, 220, 23, 0.25)',
             pastel: {
-              purple: '#B8A9E3',
-              'purple-hover': '#A695D8',
-              'purple-light': '#D6CDF3',
-              yellow: '#F7D070',
-              'yellow-hover': '#EAC15B',
+              purple: '#FFDC17',
+              'purple-hover': '#ECC90E',
+              'purple-light': '#FFF08A',
+              yellow: '#FFDC17',
+              'yellow-hover': '#ECC90E',
             }
           },
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            display: ['"Syne"', 'sans-serif'],
+            sans: ['"Inter"', 'sans-serif'],
+            display: ['"Bebas Neue"', 'sans-serif'],
+            serif: ['"EB Garamond"', 'serif'],
             mono: ['"Space Mono"', 'monospace'],
           },
           boxShadow: {
-            'glow-purple': '0 0 35px -5px rgba(184, 169, 227, 0.25)',
-            'glow-yellow': '0 0 30px -5px rgba(247, 208, 112, 0.25)',
-            'glow-green': '0 0 30px -5px rgba(52, 211, 153, 0.3)',
+            'glow-yellow': '0 0 25px rgba(255, 220, 23, 0.35)',
+            'glow-purple': '0 0 35px rgba(42, 8, 89, 0.6)',
+            'glow-green': '0 0 30px rgba(52, 211, 153, 0.3)',
           }
         }
       }
@@ -54,19 +64,19 @@
 
   <style>
     body {
-      background-color: #0F0F14;
+      background-color: #081B59;
       color: #FFFFFF;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
       min-height: 100vh;
       background-image: 
-        radial-gradient(circle at 10% 10%, rgba(184, 169, 227, 0.07) 0%, transparent 40%),
-        radial-gradient(circle at 90% 90%, rgba(247, 208, 112, 0.05) 0%, transparent 40%);
+        radial-gradient(circle at 10% 10%, rgba(42, 8, 89, 0.8) 0%, transparent 45%),
+        radial-gradient(circle at 90% 90%, rgba(255, 220, 23, 0.08) 0%, transparent 40%);
       background-attachment: fixed;
     }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #0F0F14; }
-    ::-webkit-scrollbar-thumb { background: #2A2A38; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #B8A9E3; }
+    ::-webkit-scrollbar-track { background: #081B59; }
+    ::-webkit-scrollbar-thumb { background: #2A0859; border-radius: 4px; border: 1px solid rgba(255, 220, 23, 0.2); }
+    ::-webkit-scrollbar-thumb:hover { background: #FFDC17; }
 
     #adminReader video {
       border-radius: 1rem;
@@ -87,8 +97,8 @@
       left: 10%;
       right: 10%;
       height: 2px;
-      background: linear-gradient(90deg, transparent, #F7D070, transparent);
-      box-shadow: 0 0 15px #F7D070;
+      background: linear-gradient(90deg, transparent, #FFDC17, transparent);
+      box-shadow: 0 0 15px #FFDC17;
       animation: scanLaser 2s linear infinite alternate;
       z-index: 10;
       pointer-events: none;
@@ -104,10 +114,10 @@
     }
   </style>
 </head>
-<body class="selection:bg-pastel-purple selection:text-night flex flex-col justify-between min-h-screen">
+<body class="selection:bg-brand-yellow selection:text-brand-dark flex flex-col justify-between min-h-screen">
 
   <!-- Top Accent Bar -->
-  <div class="h-1 w-full bg-gradient-to-r from-pastel-purple via-pastel-yellow to-pastel-purple"></div>
+  <div class="h-1.5 w-full bg-[#FFDC17] shadow-glow-yellow"></div>
 
   <!-- ==================== PIN AUTHENTICATION MODAL ==================== -->
   <div 
@@ -326,10 +336,10 @@
 
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="border-b border-night-border bg-[#14141E] text-white/50 uppercase font-mono tracking-wider text-[11px]">
+              <tr class="border-b border-night-border bg-[#081B59] text-white/70 uppercase font-mono tracking-wider text-[11px]">
                 <th class="py-3.5 px-4 w-12 text-center">No</th>
                 <th class="py-3.5 px-4">Waktu</th>
-                <th class="py-3.5 px-4">Nama Pemesan</th>
+                <th class="py-3.5 px-4">Nama & Email Pemesan</th>
                 <th class="py-3.5 px-4">WhatsApp</th>
                 <th class="py-3.5 px-4">Varian & Jumlah</th>
                 <th class="py-3.5 px-4">Total Bayar</th>
@@ -1179,14 +1189,18 @@
             ${waktuPesan}
           </td>
           <td class="py-4 px-4 font-semibold text-white">
-            <div>${item.nama || "-"}</div>
-            ${item.kodeTiket ? `<span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-400/20">${item.kodeTiket}</span>` : ''}
+            <div class="text-sm font-bold text-white">${item.nama || "-"}</div>
+            <div class="text-[11px] font-mono text-slate-300 flex items-center gap-1 mt-0.5">
+              <i data-lucide="mail" class="w-3 h-3 text-[#FFDC17]"></i>
+              <span class="truncate max-w-[180px]">${item.email || item.mail || "-"}</span>
+            </div>
+            ${item.kodeTiket ? `<span class="inline-block mt-1 text-[10px] font-mono text-[#FFDC17] bg-[#081B59] px-2 py-0.5 rounded border border-[#FFDC17]/30">${item.kodeTiket}</span>` : ''}
           </td>
           <td class="py-4 px-4 whitespace-nowrap">
             <a 
               href="${waLink}" 
               target="_blank" 
-              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 font-mono transition-colors"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FFDC17]/10 text-[#FFDC17] hover:bg-[#FFDC17]/20 font-mono transition-colors"
               title="Chat WhatsApp"
             >
               <i data-lucide="phone" class="w-3 h-3"></i>
@@ -1195,9 +1209,9 @@
           </td>
           <td class="py-4 px-4">
             <span class="block font-medium text-white">${item.varian || "Tiket Reguler"}</span>
-            <span class="text-[11px] text-pastel-yellow font-semibold">${item.jumlah || 1} Tiket</span>
+            <span class="text-[11px] text-[#FFDC17] font-semibold">${item.jumlah || 1} Tiket</span>
           </td>
-          <td class="py-4 px-4 font-display font-bold text-white whitespace-nowrap">
+          <td class="py-4 px-4 font-display font-bold text-white whitespace-nowrap text-base">
             ${formatRupiah(item.total)}
           </td>
           <td class="py-4 px-4 text-center whitespace-nowrap">
@@ -1205,7 +1219,7 @@
               <a 
                 href="${linkPdf}" 
                 target="_blank" 
-                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 transition-colors font-medium text-xs font-mono"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#FFDC17]/15 text-[#FFDC17] hover:bg-[#FFDC17]/25 transition-colors font-medium text-xs font-mono"
                 title="Buka File PDF E-Ticket"
               >
                 <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
@@ -1214,7 +1228,7 @@
             ` : (buktiUrl && buktiUrl !== "-" ? `
               <button 
                 type="button" 
-                class="btn-preview-receipt inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pastel-purple/15 text-pastel-purple hover:bg-pastel-purple/25 transition-colors font-medium text-xs cursor-pointer"
+                class="btn-preview-receipt inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FFDC17]/15 text-[#FFDC17] hover:bg-[#FFDC17]/25 transition-colors font-medium text-xs cursor-pointer"
                 data-index="${index}"
               >
                 <i data-lucide="search" class="w-3.5 h-3.5"></i>
@@ -1226,7 +1240,7 @@
             ${isApproved ? `
               <button 
                 type="button" 
-                class="btn-send-wa inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer"
+                class="btn-send-wa inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 text-[#2D2A1A] font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-yellow cursor-pointer"
                 data-name="${item.nama || 'Peserta'}"
                 data-wa="${item.whatsapp || ''}"
                 data-pdf="${linkPdf}"
@@ -1237,15 +1251,16 @@
             ` : `
               <button 
                 type="button" 
-                class="btn-acc inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer disabled:opacity-50"
+                class="btn-acc inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 text-[#2D2A1A] font-display font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-yellow cursor-pointer disabled:opacity-50"
                 data-row="${item.rowIndex}"
                 data-index="${index}"
                 data-name="${item.nama || 'Peserta'}"
+                data-email="${item.email || item.mail || ''}"
                 data-wa="${item.whatsapp || ''}"
                 data-pdf="${linkPdf}"
               >
-                <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                <span>✔ ACC & Terbitkan Tiket</span>
+                <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
+                <span>✔ ACC Pesanan</span>
               </button>
             `}
           </td>
@@ -1329,10 +1344,10 @@
           bagikanPdfKeWhatsApp(item.nama || "Peserta", item.whatsapp || "", item.linkPdf || "https://drive.google.com", btnModalAcc);
         };
       } else {
-        btnModalAcc.className = "flex-1 w-full py-3.5 px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer";
+        btnModalAcc.className = "flex-1 w-full py-3.5 px-5 rounded-xl font-display font-black text-xs uppercase tracking-wider text-[#2D2A1A] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-[0.98] transition-all duration-200 shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer";
         btnModalAcc.innerHTML = `
-          <i data-lucide="check" class="w-4 h-4"></i>
-          <span>✔ Setujui Pembayaran Ini</span>
+          <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+          <span>✔ ACC Pesanan Ini</span>
         `;
         btnModalAcc.onclick = () => {
           executeAccTicket(item.rowIndex, item.nama || "Peserta", btnModalAcc, item);
@@ -1358,37 +1373,44 @@
     });
 
     // ================== TOAST NOTIFIKASI SUKSES ACC ==================
-    function showAccSuccessToast(nama) {
+    function showAccSuccessToast(nama, email) {
       // Hapus toast lama jika ada
       const existing = document.getElementById("accSuccessToast");
       if (existing) existing.remove();
+
+      const safeEmail = email && email !== "-" ? email : "email terdaftar pemesan";
 
       const toast = document.createElement("div");
       toast.id = "accSuccessToast";
       toast.className = [
         "fixed bottom-6 left-1/2 -translate-x-1/2 z-[60]",
-        "flex items-start gap-3 px-5 py-4 rounded-2xl shadow-2xl",
-        "bg-gradient-to-r from-emerald-900/95 to-night-card/95 border border-emerald-400/40",
-        "backdrop-blur-md max-w-sm w-[calc(100%-2rem)]",
-        "animate-[fadeInUp_0.3s_ease]"
+        "flex items-start gap-3.5 px-5 py-4 rounded-2xl shadow-2xl",
+        "bg-[#2A0859] border-2 border-[#FFDC17]",
+        "backdrop-blur-md max-w-md w-[calc(100%-2rem)]",
+        "animate-[fadeInUp_0.3s_ease] shadow-glow-yellow"
       ].join(" ");
 
       toast.innerHTML = `
-        <div class="shrink-0 w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        <div class="shrink-0 w-9 h-9 rounded-xl bg-[#FFDC17] flex items-center justify-center text-[#2D2A1A] font-black">
+          <i data-lucide="check" class="w-5 h-5 stroke-[3]"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-bold text-white leading-snug">✅ Tiket <span class="text-emerald-300">${nama}</span> berhasil di-ACC!</p>
-          <p class="text-xs text-white/60 mt-0.5 leading-relaxed">Notifikasi WhatsApp &amp; link PDF Google Drive telah otomatis dikirimkan ke pembeli via server.</p>
+          <p class="text-sm font-bold text-white leading-snug">
+            ✅ Tiket <span class="text-[#FFDC17]">${nama}</span> berhasil di-ACC!
+          </p>
+          <p class="text-xs text-slate-200 mt-1 leading-relaxed">
+            File E-Ticket (PDF) telah otomatis dikirimkan ke email: <strong class="text-[#FFDC17] font-mono">${safeEmail}</strong>.
+          </p>
         </div>
-        <button onclick="this.parentElement.remove()" class="shrink-0 text-white/30 hover:text-white transition-colors mt-0.5 cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        <button onclick="this.parentElement.remove()" class="shrink-0 text-white/40 hover:text-white transition-colors mt-0.5 cursor-pointer">
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       `;
 
       document.body.appendChild(toast);
+      lucide.createIcons();
 
-      // Auto-dismiss setelah 5 detik
+      // Auto-dismiss setelah 5.5 detik
       setTimeout(() => {
         if (toast.parentElement) {
           toast.style.transition = "opacity 0.4s ease, transform 0.4s ease";
@@ -1396,7 +1418,7 @@
           toast.style.transform = "translateX(-50%) translateY(12px)";
           setTimeout(() => toast.remove(), 400);
         }
-      }, 5000);
+      }, 5500);
     }
 
     // ================== EKSEKUSI ACC TIKET ==================
@@ -1405,7 +1427,7 @@
       if (buttonElement) {
         buttonElement.disabled = true;
         buttonElement.innerHTML = `
-          <svg class="animate-spin h-3.5 w-3.5 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg class="animate-spin h-3.5 w-3.5 text-[#2D2A1A]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
           </svg>
@@ -1433,6 +1455,7 @@
 
         const linkPdf = (res && res.linkPdf) || (itemData && itemData.linkPdf) || (itemData && itemData.pdfUrl) || "";
         const orderNama = attendeeName || (itemData && itemData.nama) || "Peserta";
+        const orderEmail = (itemData && (itemData.email || itemData.mail)) || (buttonElement && buttonElement.dataset.email) || (res && res.email) || "-";
 
         // Tandai item sudah di-ACC & masukkan ke approvedOrdersList
         if (itemData) {
@@ -1447,7 +1470,7 @@
           }
         }
 
-        // Hapus dari pendingOrdersList → tabel langsung bersih
+        // Hapus dari pendingOrdersList → tabel antrean pending langsung bersih
         const pendingIdx = pendingOrdersList.findIndex(o => o.rowIndex == rowIndex);
         if (pendingIdx !== -1) {
           pendingOrdersList.splice(pendingIdx, 1);
@@ -1459,8 +1482,8 @@
         closeReceiptModal();
         renderCurrentTabTable();
 
-        // Tampilkan toast notifikasi sukses (WA & PDF sudah dikirim server via Fonnte)
-        showAccSuccessToast(orderNama);
+        // Tampilkan pop-up toast sukses dengan info email terkirim
+        showAccSuccessToast(orderNama, orderEmail);
 
       } catch (err) {
         console.error("Gagal ACC tiket:", err);

@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-title" content="GateScanner" />
   <link rel="apple-touch-icon" href="asset/LOGO_BINGKAI_BISU.png" />
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts: Inter, EB Garamond (Italic), Bebas Neue, Space Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -26,28 +26,38 @@
       theme: {
         extend: {
           colors: {
-            night: '#0F0F14',
-            'night-card': '#16161E',
-            'night-input': '#1D1D27',
-            'night-border': '#2A2A38',
+            brand: {
+              yellow: '#FFDC17',
+              'yellow-hover': '#ECC90E',
+              dark: '#2D2A1A',
+              navy: '#081B59',
+              'navy-dark': '#051138',
+              violet: '#2A0859',
+              'violet-card': '#2A0859',
+            },
+            night: '#081B59',
+            'night-card': '#2A0859',
+            'night-input': '#081B59',
+            'night-border': 'rgba(255, 220, 23, 0.25)',
             pastel: {
-              purple: '#B8A9E3',
-              'purple-hover': '#A695D8',
-              'purple-light': '#D6CDF3',
-              yellow: '#F7D070',
-              'yellow-hover': '#EAC15B',
+              purple: '#FFDC17',
+              'purple-hover': '#ECC90E',
+              'purple-light': '#FFF08A',
+              yellow: '#FFDC17',
+              'yellow-hover': '#ECC90E',
             }
           },
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            display: ['"Syne"', 'sans-serif'],
+            sans: ['"Inter"', 'sans-serif'],
+            display: ['"Bebas Neue"', 'sans-serif'],
+            serif: ['"EB Garamond"', 'serif'],
             mono: ['"Space Mono"', 'monospace'],
           },
           boxShadow: {
-            'glow-purple': '0 0 35px -5px rgba(184, 169, 227, 0.25)',
-            'glow-yellow': '0 0 30px -5px rgba(247, 208, 112, 0.25)',
-            'glow-green': '0 0 30px -5px rgba(52, 211, 153, 0.3)',
-            'glow-red': '0 0 30px -5px rgba(239, 68, 68, 0.3)',
+            'glow-purple': '0 0 35px rgba(42, 8, 89, 0.6)',
+            'glow-yellow': '0 0 30px rgba(255, 220, 23, 0.35)',
+            'glow-green': '0 0 30px rgba(52, 211, 153, 0.3)',
+            'glow-red': '0 0 30px rgba(239, 68, 68, 0.3)',
           }
         }
       }
@@ -62,12 +72,16 @@
 
   <style>
     body {
-      background-color: #0F0F14;
+      background-color: #081B59;
       color: #FFFFFF;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
       min-height: 100vh;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(42, 8, 89, 0.8) 0%, transparent 45%),
+        radial-gradient(circle at 90% 90%, rgba(255, 220, 23, 0.08) 0%, transparent 40%);
+      background-attachment: fixed;
     }
     #reader video {
       border-radius: 1rem;
@@ -89,8 +103,8 @@
       left: 10%;
       right: 10%;
       height: 2px;
-      background: linear-gradient(90deg, transparent, #F7D070, transparent);
-      box-shadow: 0 0 15px #F7D070;
+      background: linear-gradient(90deg, transparent, #FFDC17, transparent);
+      box-shadow: 0 0 15px #FFDC17;
       animation: scanLaser 2s linear infinite alternate;
       z-index: 10;
       pointer-events: none;
@@ -102,10 +116,10 @@
     }
   </style>
 </head>
-<body class="flex flex-col justify-between selection:bg-pastel-purple selection:text-night">
+<body class="flex flex-col justify-between selection:bg-brand-yellow selection:text-brand-dark">
 
-  <!-- Top Accent Bar -->
-  <div class="h-1 w-full bg-gradient-to-r from-pastel-purple via-pastel-yellow to-pastel-purple"></div>
+  <!-- Top Accent Bar: Vivid Yellow -->
+  <div class="h-1.5 w-full bg-[#FFDC17] shadow-glow-yellow"></div>
 
   <!-- Main Container -->
   <div class="max-w-md mx-auto w-full px-4 py-4 flex-1 flex flex-col justify-between space-y-4">
@@ -432,29 +446,29 @@
   >
     <div 
       id="souvenirModalContainer" 
-      class="w-full max-w-sm bg-gradient-to-b from-[#241708] to-[#120c04] border-2 border-amber-400 rounded-3xl p-6 sm:p-7 text-center shadow-glow-yellow transform scale-95 transition-all duration-300 relative space-y-4"
+      class="w-full max-w-sm bg-gradient-to-b from-[#2A0859] to-[#081B59] border-2 border-[#FFDC17] rounded-3xl p-6 sm:p-7 text-center shadow-glow-yellow transform scale-95 transition-all duration-300 relative space-y-4"
     >
       <!-- Glowing Icon -->
-      <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-night flex items-center justify-center shadow-lg shadow-amber-500/30 animate-bounce">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-[#FFDC17] text-[#2D2A1A] flex items-center justify-center shadow-lg shadow-[#FFDC17]/40 animate-bounce">
         <i data-lucide="gift" class="w-8 h-8 stroke-[2.5]"></i>
       </div>
 
       <div class="space-y-1">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[11px] font-black uppercase tracking-widest animate-pulse">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFDC17] text-[#2D2A1A] border border-[#FFDC17] text-[11px] font-black uppercase tracking-widest animate-pulse">
           ⚠️ WAJIB SERAHKAN SOUVENIR
         </span>
         <h3 id="souvenirAttendeeName" class="font-display font-extrabold text-2xl text-white uppercase tracking-wide break-words pt-1">
           -
         </h3>
-        <p id="souvenirTicketVariant" class="text-xs text-pastel-yellow font-medium">
+        <p id="souvenirTicketVariant" class="text-xs text-[#FFDC17] font-medium">
           -
         </p>
       </div>
 
       <!-- Detail Barang Souvenir Box -->
-      <div class="p-4 rounded-2xl bg-black/60 border border-amber-400/40 space-y-1">
-        <span class="text-[10px] text-amber-300/80 uppercase font-mono tracking-wider font-semibold">Rincian Barang Souvenir:</span>
-        <div id="souvenirItemDetail" class="font-display font-black text-base text-amber-300 leading-snug">
+      <div class="p-4 rounded-2xl bg-[#081B59]/90 border border-[#FFDC17]/40 space-y-1">
+        <span class="text-[10px] text-slate-300 uppercase font-mono tracking-wider font-semibold">Rincian Barang Souvenir:</span>
+        <div id="souvenirItemDetail" class="font-display font-black text-base text-[#FFDC17] leading-snug">
           -
         </div>
       </div>
@@ -463,7 +477,7 @@
       <button 
         type="button" 
         id="btnConfirmSouvenir" 
-        class="w-full py-4 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-night bg-gradient-to-r from-pastel-yellow via-amber-300 to-pastel-yellow hover:brightness-110 active:scale-[0.98] transition-all duration-200 shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer"
+        class="w-full py-4 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-[#2D2A1A] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-[0.98] transition-all duration-200 shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer"
       >
         <i data-lucide="check-circle" class="w-5 h-5 stroke-[2.5]"></i>
         <span>✔ SOUVENIR SUDAH DIBERIKAN (LANJUT)</span>
