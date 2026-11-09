@@ -150,7 +150,7 @@
 
         <button 
           type="submit" 
-          class="w-full py-3.5 rounded-xl font-sans font-black text-sm uppercase tracking-wider text-[#2D2A1A] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-[0.98] transition-all shadow-glow-yellow cursor-pointer"
+          class="w-full py-3.5 rounded-xl font-sans font-black text-sm uppercase tracking-wider text-[#2D2A1A] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-glow-yellow"
         >
           Buka Dashboard
         </button>
@@ -174,7 +174,7 @@
           ✅ Tiket berhasil di-ACC! File PDF telah otomatis terkirim ke email.
         </p>
       </div>
-      <button type="button" onclick="hideAccToast()" class="text-slate-400 hover:text-white p-1">
+      <button type="button" onclick="hideAccToast()" class="text-slate-400 hover:text-white p-1 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
     </div>
@@ -203,7 +203,7 @@
           </div>
         </div>
 
-        <!-- Action Buttons Right -->
+        <!-- Action Buttons Right (Dengan Tactile Button Feedback) -->
         <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
           
           <!-- Tombol Segarkan Data -->
@@ -211,7 +211,7 @@
             type="button" 
             id="btnRefreshData" 
             onclick="loadOrdersData(true)"
-            class="py-2 px-3.5 rounded-xl text-xs font-semibold bg-[#2A0859] border border-[#FFDC17]/30 text-white hover:border-[#FFDC17] transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            class="py-2 px-3.5 rounded-xl text-xs font-semibold bg-[#2A0859] border border-[#FFDC17]/30 text-white hover:border-[#FFDC17] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-sm flex items-center gap-1.5"
           >
             <i data-lucide="refresh-cw" id="iconRefresh" class="w-3.5 h-3.5"></i>
             <span>Segarkan</span>
@@ -221,7 +221,7 @@
           <button 
             type="button" 
             onclick="openAdminScannerModal()" 
-            class="py-2 px-3.5 rounded-xl text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] hover:bg-[#ECC90E] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-glow-yellow"
+            class="py-2 px-3.5 rounded-xl text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-glow-yellow flex items-center gap-1.5"
           >
             <i data-lucide="scan-line" class="w-3.5 h-3.5 stroke-[2.5]"></i>
             <span>Scan Gate</span>
@@ -230,7 +230,7 @@
           <!-- Standalone PWA Scanner -->
           <a 
             href="scanner.html" 
-            class="py-2 px-3.5 rounded-xl text-xs font-semibold bg-[#2A0859] border border-[#FFDC17]/30 text-[#FFDC17] hover:bg-[#FFDC17]/10 transition-all flex items-center gap-1.5"
+            class="py-2 px-3.5 rounded-xl text-xs font-semibold bg-[#2A0859] border border-[#FFDC17]/30 text-[#FFDC17] hover:bg-[#FFDC17]/10 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer flex items-center gap-1.5"
             title="Buka PWA Scanner Gate Offline Penuh"
           >
             <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
@@ -241,7 +241,7 @@
           <a 
             href="index.html" 
             target="_blank" 
-            class="py-2 px-3 rounded-xl text-xs font-semibold bg-[#2A0859] border border-[#FFDC17]/30 text-slate-300 hover:text-white transition-all flex items-center gap-1.5"
+            class="py-2 px-3 rounded-xl text-xs font-semibold bg-[#2A0859] border border-[#FFDC17]/30 text-slate-300 hover:text-white active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer flex items-center gap-1.5"
             title="Lihat Web Publik"
           >
             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
@@ -252,7 +252,7 @@
           <button 
             type="button" 
             onclick="handleLogout()" 
-            class="p-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer"
+            class="p-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
             title="Kunci Dashboard"
           >
             <i data-lucide="log-out" class="w-4 h-4"></i>
@@ -269,7 +269,7 @@
       <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- KPI 1: Total Tiket Approved -->
-        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet">
+        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet select-none">
           <div>
             <span class="text-xs uppercase font-mono tracking-wider text-slate-400 block font-medium">Total Tiket Approved</span>
             <span id="statTotalApproved" class="font-display font-extrabold text-3xl sm:text-4xl text-[#FFDC17] leading-none mt-1 block">0</span>
@@ -281,7 +281,7 @@
         </div>
 
         <!-- KPI 2: Total Kas Masuk (Rp) -->
-        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet">
+        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet select-none">
           <div>
             <span class="text-xs uppercase font-mono tracking-wider text-slate-400 block font-medium">Total Kas Masuk (Rp)</span>
             <span id="statTotalRevenue" class="font-display font-extrabold text-2xl sm:text-3xl text-emerald-400 leading-none mt-1 block">Rp 0</span>
@@ -293,7 +293,7 @@
         </div>
 
         <!-- KPI 3: Sisa Kuota Bundling (/95) -->
-        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet">
+        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet select-none">
           <div>
             <span class="text-xs uppercase font-mono tracking-wider text-slate-400 block font-medium">Sisa Kuota Bundling</span>
             <span id="statQuotaBundling" class="font-display font-extrabold text-3xl sm:text-4xl text-[#FFDC17] leading-none mt-1 block">95 / 95</span>
@@ -305,7 +305,7 @@
         </div>
 
         <!-- KPI 4: Total Pengunjung Checked-In -->
-        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet">
+        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet select-none">
           <div>
             <span class="text-xs uppercase font-mono tracking-wider text-slate-400 block font-medium">Pengunjung Checked-In</span>
             <span id="statTotalCheckedIn" class="font-display font-extrabold text-3xl sm:text-4xl text-cyan-400 leading-none mt-1 block">0</span>
@@ -328,17 +328,17 @@
               Antrean Verifikasi & Data Pembayaran
             </h2>
             <p id="tableSectionDesc" class="text-xs text-slate-300 font-sans mt-0.5">
-              Kelola pembayaran pending, lakukan verifikasi struk transfer, dan terbitkan e-ticket PDF ke email pemesan.
+              Kelola pembayaran pending, lakukan verifikasi struk transfer QRIS, dan terbitkan e-ticket PDF ke email pemesan.
             </p>
           </div>
 
-          <!-- Switch Tabs Pending / Approved -->
-          <div class="flex items-center gap-1.5 p-1 bg-[#081B59] rounded-xl border border-[#FFDC17]/25 self-start sm:self-auto">
+          <!-- Switch Tabs Pending / Approved (Dengan Tactile Feedback) -->
+          <div class="flex items-center gap-1.5 p-1 bg-[#081B59] rounded-xl border border-[#FFDC17]/25 self-start sm:self-auto select-none">
             <button 
               type="button" 
               id="tabBtnPending" 
               onclick="switchTab('pending')" 
-              class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 cursor-pointer"
+              class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
             >
               <span>Antrean Pending</span>
               <span id="badgePendingCount" class="px-1.5 py-0.2 rounded-full bg-[#2D2A1A] text-[#FFDC17] text-[10px] font-mono">0</span>
@@ -347,7 +347,7 @@
               type="button" 
               id="tabBtnApproved" 
               onclick="switchTab('approved')" 
-              class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer"
+              class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
             >
               <span>Sudah di-ACC</span>
               <span id="badgeApprovedCount" class="px-1.5 py-0.2 rounded-full bg-white/10 text-white text-[10px] font-mono">0</span>
@@ -432,7 +432,7 @@
         <button 
           type="button" 
           onclick="closeReceiptModal()" 
-          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
         >
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
@@ -458,7 +458,7 @@
           id="btnReceiptOpenNewTab" 
           href="#" 
           target="_blank" 
-          class="w-full sm:w-1/2 py-2.5 px-4 rounded-xl text-xs font-semibold text-center bg-[#081B59] border border-[#FFDC17]/30 text-slate-200 hover:border-[#FFDC17] transition-all flex items-center justify-center gap-1.5"
+          class="w-full sm:w-1/2 py-2.5 px-4 rounded-xl text-xs font-semibold text-center bg-[#081B59] border border-[#FFDC17]/30 text-slate-200 hover:border-[#FFDC17] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer flex items-center justify-center gap-1.5"
         >
           <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
           <span>Buka di Tab Baru</span>
@@ -467,7 +467,7 @@
         <button 
           type="button" 
           id="btnModalAcc" 
-          class="w-full sm:w-1/2 py-2.5 px-4 rounded-xl text-xs font-black uppercase text-center bg-[#FFDC17] text-[#2D2A1A] hover:bg-[#ECC90E] transition-all flex items-center justify-center gap-1.5 shadow-glow-yellow cursor-pointer"
+          class="w-full sm:w-1/2 py-2.5 px-4 rounded-xl text-xs font-black uppercase text-center bg-[#FFDC17] text-[#2D2A1A] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer flex items-center justify-center gap-1.5 shadow-glow-yellow"
         >
           <i data-lucide="check-circle" class="w-4 h-4 stroke-[2.5]"></i>
           <span>ACC Tiket Ini</span>
@@ -493,7 +493,7 @@
         <button 
           type="button" 
           onclick="closeAdminScannerModal()" 
-          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10"
+          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
         >
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
@@ -512,7 +512,7 @@
 
       <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1 font-mono">
         <span>GATE HETERO SPACE</span>
-        <a href="scanner.html" class="text-[#FFDC17] hover:underline font-bold">Buka PWA Full ↗</a>
+        <a href="scanner.html" class="text-[#FFDC17] hover:underline font-bold active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer">Buka PWA Full ↗</a>
       </div>
     </div>
   </div>
@@ -568,7 +568,6 @@
         input.value = "";
         checkSessionAuth();
       } else {
-        // Animasi shake & teks merah
         if (container) {
           container.classList.remove("animate-shake");
           void container.offsetWidth;
@@ -597,7 +596,6 @@
       tableLoading.classList.remove("hidden");
 
       try {
-        // Ambil data pending, approved, dan kuota
         const pendingPromise = fetch(SCRIPT_URL, {
           method: "POST",
           mode: "cors",
@@ -659,7 +657,6 @@
 
     // ================== 3. UPDATE 4 KARTU METRIK KPI ==================
     function updateKpiMetrics(approvedList, quotaRes) {
-      // 1. Total Tiket Approved
       let totalApprovedTickets = 0;
       let totalRevenue = 0;
       let totalCheckedIn = 0;
@@ -668,7 +665,6 @@
         const qty = parseInt(item.jumlah, 10) || 1;
         totalApprovedTickets += qty;
 
-        // Hitung total bayar jika tersedia atau estimasi dari varian
         if (item.total && parseInt(item.total, 10)) {
           totalRevenue += parseInt(item.total, 10);
         } else {
@@ -678,14 +674,12 @@
           else totalRevenue += (4000 * qty);
         }
 
-        // Hitung yang sudah masuk check-in
         const checkin = (item.statusCheckin || "").toUpperCase();
         if (checkin.includes("SUDAH")) {
           totalCheckedIn += qty;
         }
       });
 
-      // 3. Sisa Kuota Bundling
       let sisaBundling = 95;
       if (quotaRes && quotaRes.quotaBundling && typeof quotaRes.quotaBundling.sisa !== "undefined") {
         sisaBundling = parseInt(quotaRes.quotaBundling.sisa, 10);
@@ -705,12 +699,12 @@
       const desc = document.getElementById("tableSectionDesc");
 
       if (target === "pending") {
-        btnPending.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 cursor-pointer";
-        btnApproved.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer";
-        desc.textContent = "Kelola pembayaran pending, lakukan verifikasi struk transfer, dan terbitkan e-ticket PDF ke email pemesan.";
+        btnPending.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
+        btnApproved.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
+        desc.textContent = "Kelola pembayaran pending, lakukan verifikasi struk transfer QRIS, dan terbitkan e-ticket PDF ke email pemesan.";
       } else {
-        btnApproved.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 cursor-pointer";
-        btnPending.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer";
+        btnApproved.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
+        btnPending.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
         desc.textContent = "Daftar tiket yang telah disetujui (APPROVED), file PDF e-ticket telah aktif dan dapat dibuka.";
       }
 
@@ -770,7 +764,7 @@
             <a 
               href="${waLink}" 
               target="_blank" 
-              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FFDC17]/10 text-[#FFDC17] hover:bg-[#FFDC17]/20 font-mono text-[11px] transition-colors"
+              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FFDC17]/10 text-[#FFDC17] hover:bg-[#FFDC17]/20 font-mono text-[11px] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
             >
               <i data-lucide="phone" class="w-3 h-3"></i>
               <span>${cleanWa}</span>
@@ -788,7 +782,7 @@
               <button 
                 type="button" 
                 onclick="openReceiptModal(${idx})" 
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FFDC17]/15 text-[#FFDC17] hover:bg-[#FFDC17]/25 text-[11px] font-semibold cursor-pointer"
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FFDC17]/15 text-[#FFDC17] hover:bg-[#FFDC17]/25 text-[11px] font-semibold active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
               >
                 <i data-lucide="search" class="w-3 h-3"></i>
                 <span>Lihat Struk</span>
@@ -813,7 +807,7 @@
               <a 
                 href="${linkPdf}" 
                 target="_blank" 
-                class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#FFDC17] text-[#2D2A1A] font-bold text-[11px] uppercase hover:bg-[#ECC90E]"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#FFDC17] text-[#2D2A1A] font-bold text-[11px] uppercase hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
               >
                 <i data-lucide="file-text" class="w-3 h-3 stroke-[2.5]"></i>
                 <span>Buka PDF</span>
@@ -822,7 +816,7 @@
               <button 
                 type="button" 
                 onclick="executeAccTicket(${item.rowIndex || (idx + 2)}, '${encodeURIComponent(item.nama || "")}', '${encodeURIComponent(email)}', this)" 
-                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#FFDC17] text-[#2D2A1A] font-black text-xs uppercase hover:bg-[#ECC90E] active:scale-95 transition-all shadow-glow-yellow cursor-pointer"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#FFDC17] text-[#2D2A1A] font-black text-xs uppercase hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-glow-yellow"
               >
                 <i data-lucide="check-circle" class="w-3.5 h-3.5 stroke-[2.5]"></i>
                 <span>ACC Tiket</span>
@@ -869,11 +863,8 @@
           throw new Error(res.message || "Gagal verifikasi tiket.");
         }
 
-        // Tampilkan Notifikasi ACC Resmi:
-        // "✅ Tiket [Nama] berhasil di-ACC! File PDF telah otomatis terkirim ke email: [Email]."
         showAccNotification(nama, email);
 
-        // Hapus dari antrean pending & tambahkan ke approved
         const pIdx = pendingOrdersList.findIndex(o => o.rowIndex == rowIndex);
         if (pIdx !== -1) {
           const accItem = pendingOrdersList.splice(pIdx, 1)[0];
@@ -884,7 +875,7 @@
 
         closeReceiptModal();
         renderCurrentTabTable();
-        loadOrdersData(); // sinkronisasi total KPI
+        loadOrdersData();
 
       } catch (err) {
         console.error("Gagal ACC tiket:", err);
@@ -894,7 +885,6 @@
       }
     }
 
-    // Tampilkan Toast Notifikasi ACC
     let toastTimer = null;
     function showAccNotification(nama, email) {
       const toast = document.getElementById("accToastNotification");
@@ -1033,7 +1023,6 @@
       }
     }
 
-    // Inisialisasi Auth Sesi pada Pemuatan Dokumen
     document.addEventListener("DOMContentLoaded", () => {
       checkSessionAuth();
       lucide.createIcons();
