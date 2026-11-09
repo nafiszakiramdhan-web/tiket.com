@@ -32,11 +32,22 @@ function doPost(e) {
       var data = sheet.getDataRange().getValues();
       var pendingList = [];
 
+      var headers = (data.length > 0) ? data[0] : [];
+      var emailColIdx = -1;
+      for (var h = 0; h < headers.length; h++) {
+        var hStr = (headers[h] || "").toString().toLowerCase();
+        if (hStr.includes("email")) {
+          emailColIdx = h;
+          break;
+        }
+      }
+
       // Format kolom: [0]Timestamp, [1]KodeTiket, [2]Nama, [3]WhatsApp, [4]Varian, [5]Jumlah, [6]Total, [7]BuktiUrl, [8]Status, [9]LinkPdf
       for (var i = 1; i < data.length; i++) {
         var rowStatus = (data[i][8] || "PENDING").toString().toUpperCase().trim();
         if (rowStatus === "PENDING") {
           var fileBukti = data[i][7] || "-";
+          var rowEmail = (emailColIdx !== -1 && data[i][emailColIdx]) ? data[i][emailColIdx].toString().trim() : "-";
           pendingList.push({
             rowIndex: i + 1, // Baris 1-indexed untuk SpreadsheetApp
             waktu: data[i][0] ? data[i][0].toString() : "-",
@@ -44,6 +55,7 @@ function doPost(e) {
             kodeTiket: data[i][1] || ("#BB26-" + (i + 100)),
             ticketCode: data[i][1] || ("#BB26-" + (i + 100)),
             nama: data[i][2] || "-",
+            email: rowEmail,
             whatsapp: (data[i][3] || "").toString().replace(/['\s-]/g, ""),
             varian: data[i][4] || "2 Day Pass",
             jumlah: data[i][5] || 1,
@@ -405,8 +417,18 @@ function doPost(e) {
         }
       }
 
-      // Tambah baris baru ke Sheet (Default: PENDING)
-      sheet.appendRow([
+      // Ambil header untuk mendeteksi kolom Email
+      var headers = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 1)).getValues()[0];
+      var emailColIdx = -1;
+      for (var h = 0; h < headers.length; h++) {
+        var hStr = (headers[h] || "").toString().toLowerCase();
+        if (hStr.includes("email")) {
+          emailColIdx = h;
+          break;
+        }
+      }
+
+      var newRow = [
         new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }),
         ticketCode,
         payload.nama,
@@ -419,7 +441,18 @@ function doPost(e) {
         "",
         "BELUM MASUK",
         ""
-      ]);
+      ];
+
+      if (emailColIdx !== -1) {
+        newRow.splice(emailColIdx, 0, payload.email || "-");
+      } else {
+        var lastCol = Math.max(sheet.getLastColumn(), 1);
+        sheet.getRange(1, lastCol + 1).setValue("Email Pemesan");
+        newRow.push(payload.email || "-");
+      }
+
+      // Tambah baris baru ke Sheet (Default: PENDING)
+      sheet.appendRow(newRow);
 
       return createJsonResponse({
         status: "SUCCESS",

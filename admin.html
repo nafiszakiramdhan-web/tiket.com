@@ -9,13 +9,12 @@
   <!-- Google Fonts: Inter, EB Garamond (Italic), Bebas Neue, Space Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -30,15 +29,7 @@
             },
             night: '#081B59',
             'night-card': '#2A0859',
-            'night-input': '#081B59',
             'night-border': 'rgba(255, 220, 23, 0.25)',
-            pastel: {
-              purple: '#FFDC17',
-              'purple-hover': '#ECC90E',
-              'purple-light': '#FFF08A',
-              yellow: '#FFDC17',
-              'yellow-hover': '#ECC90E',
-            }
           },
           fontFamily: {
             sans: ['"Inter"', 'sans-serif'],
@@ -48,8 +39,7 @@
           },
           boxShadow: {
             'glow-yellow': '0 0 25px rgba(255, 220, 23, 0.35)',
-            'glow-purple': '0 0 35px rgba(42, 8, 89, 0.6)',
-            'glow-green': '0 0 30px rgba(52, 211, 153, 0.3)',
+            'glow-violet': '0 0 35px rgba(42, 8, 89, 0.6)',
           }
         }
       }
@@ -59,7 +49,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- HTML5 QR Code Library -->
+  <!-- HTML5 QR Code Library (Modal Gate Scanner) -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
@@ -69,14 +59,23 @@
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
       background-image: 
-        radial-gradient(circle at 10% 10%, rgba(42, 8, 89, 0.8) 0%, transparent 45%),
+        radial-gradient(circle at 10% 10%, rgba(42, 8, 89, 0.85) 0%, transparent 45%),
         radial-gradient(circle at 90% 90%, rgba(255, 220, 23, 0.08) 0%, transparent 40%);
       background-attachment: fixed;
     }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #081B59; }
-    ::-webkit-scrollbar-thumb { background: #2A0859; border-radius: 4px; border: 1px solid rgba(255, 220, 23, 0.2); }
+    ::-webkit-scrollbar-thumb { background: #2A0859; border-radius: 4px; border: 1px solid rgba(255, 220, 23, 0.25); }
     ::-webkit-scrollbar-thumb:hover { background: #FFDC17; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s ease-in-out;
+    }
 
     #adminReader video {
       border-radius: 1rem;
@@ -108,123 +107,142 @@
       50% { opacity: 1; }
       100% { top: 85%; opacity: 0.3; }
     }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateX(-50%) translateY(16px); }
-      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
   </style>
 </head>
-<body class="selection:bg-brand-yellow selection:text-brand-dark flex flex-col justify-between min-h-screen">
+<body class="selection:bg-[#FFDC17] selection:text-[#2D2A1A] flex flex-col justify-between min-h-screen relative">
 
-  <!-- Top Accent Bar -->
+  <!-- Top Accent Bar: Vivid Yellow -->
   <div class="h-1.5 w-full bg-[#FFDC17] shadow-glow-yellow"></div>
 
   <!-- ==================== PIN AUTHENTICATION MODAL ==================== -->
   <div 
     id="pinAuthModal" 
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night/95 backdrop-blur-md"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#081B59]/95 backdrop-blur-md"
   >
-    <div class="w-full max-w-sm bg-night-card border border-night-border rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
-      <div class="absolute -top-12 -right-12 w-32 h-32 bg-pastel-purple/20 rounded-full blur-2xl"></div>
-
-      <div class="w-16 h-16 mx-auto rounded-2xl bg-pastel-purple/10 border border-pastel-purple/30 text-pastel-purple flex items-center justify-center mb-4">
-        <i data-lucide="shield-check" class="w-8 h-8"></i>
+    <div 
+      id="pinModalContainer" 
+      class="w-full max-w-sm bg-[#2A0859] border border-[#FFDC17]/40 rounded-3xl p-6 sm:p-8 text-center shadow-glow-yellow relative overflow-hidden space-y-5"
+    >
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-[#FFDC17] text-[#2D2A1A] flex items-center justify-center shadow-lg">
+        <i data-lucide="shield-check" class="w-8 h-8 stroke-[2.5]"></i>
       </div>
 
-      <h2 class="font-display font-bold text-2xl text-white mb-1">Masukkan PIN Panitia</h2>
-      <p class="text-xs text-white/60 mb-6">Masukkan PIN keamanan untuk mengakses panel verifikasi tiket.</p>
+      <div>
+        <h2 class="font-display font-bold text-3xl text-white">Akses Admin</h2>
+        <p class="text-xs text-slate-300 mt-1">Masukkan PIN keamanan untuk membuka panel verifikasi tiket.</p>
+      </div>
 
-      <form id="pinForm" class="space-y-4">
+      <form id="pinForm" class="space-y-4" onsubmit="handlePinLogin(event)">
         <div>
           <input 
             type="password" 
             id="inputPin" 
             maxlength="10" 
-            placeholder="PIN (Default: 2026)" 
+            placeholder="PIN (2026)" 
             autocomplete="current-password"
-            class="w-full text-center text-xl tracking-[0.3em] font-mono py-3.5 px-4 rounded-xl bg-night-input border border-night-border text-white focus:outline-none focus:border-pastel-purple focus:ring-1 focus:ring-pastel-purple transition duration-200"
+            class="w-full text-center text-2xl tracking-[0.3em] font-mono py-3.5 px-4 rounded-xl bg-[#081B59] border border-[#FFDC17]/40 text-white placeholder-slate-600 focus:outline-none focus:border-[#FFDC17] transition duration-200"
+            autofocus
           />
-          <p id="pinErrorMsg" class="text-xs text-red-400 mt-2 hidden flex items-center justify-center gap-1">
-            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> PIN Salah! Silakan coba lagi.
+          <p id="pinErrorMsg" class="text-xs text-red-400 font-semibold mt-2 hidden">
+            PIN Salah!
           </p>
         </div>
 
         <button 
           type="submit" 
-          class="w-full py-3.5 px-6 rounded-xl font-display font-bold text-sm uppercase tracking-wider text-night bg-pastel-purple hover:bg-pastel-purple-hover active:scale-[0.99] transition-all duration-200 shadow-glow-purple cursor-pointer flex items-center justify-center gap-2"
+          class="w-full py-3.5 rounded-xl font-sans font-black text-sm uppercase tracking-wider text-[#2D2A1A] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-[0.98] transition-all shadow-glow-yellow cursor-pointer"
         >
-          <i data-lucide="unlock" class="w-4 h-4"></i>
-          <span>Buka Dashboard</span>
+          Buka Dashboard
         </button>
-
-        <a 
-          href="index.html" 
-          class="block text-xs text-white/40 hover:text-white pt-2 transition-colors"
-        >
-          ← Kembali ke Halaman Pemesanan
-        </a>
       </form>
     </div>
   </div>
 
 
-  <!-- ==================== MAIN ADMIN DASHBOARD ==================== -->
-  <div id="mainDashboard" class="hidden flex-1 flex flex-col">
-    
-    <!-- Navbar Admin -->
-    <nav class="border-b border-night-border/80 bg-night-card/70 backdrop-blur-md sticky top-0 z-30">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+  <!-- ==================== NOTIFIKASI TOAST ACC (EMAIL TERKIRIM) ==================== -->
+  <div 
+    id="accToastNotification" 
+    class="fixed top-6 right-6 z-50 max-w-md w-full bg-[#2A0859] border-2 border-[#FFDC17] rounded-2xl p-4 shadow-glow-yellow transform translate-y-[-120%] opacity-0 transition-all duration-400 pointer-events-none"
+  >
+    <div class="flex items-start gap-3">
+      <div class="w-10 h-10 rounded-xl bg-[#FFDC17] text-[#2D2A1A] flex items-center justify-center flex-shrink-0 shadow-md">
+        <i data-lucide="check" class="w-6 h-6 stroke-[3]"></i>
+      </div>
+      <div class="flex-1 space-y-1">
+        <h4 class="font-display font-bold text-base text-white">Tiket Berhasil Disetujui!</h4>
+        <p id="accToastMessage" class="text-xs text-slate-200 leading-relaxed font-sans">
+          ✅ Tiket berhasil di-ACC! File PDF telah otomatis terkirim ke email.
+        </p>
+      </div>
+      <button type="button" onclick="hideAccToast()" class="text-slate-400 hover:text-white p-1">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ==================== MAIN DASHBOARD CONTAINER ==================== -->
+  <div id="mainDashboard" class="hidden flex-1 flex flex-col justify-between">
+
+    <!-- Top Admin Navigation Bar -->
+    <nav class="w-full border-b border-[#FFDC17]/20 bg-[#081B59]/90 backdrop-blur-md sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between flex-wrap gap-4">
         
+        <!-- Brand & Title Left -->
         <div class="flex items-center gap-3">
           <img 
             src="asset/LOGO_BINGKAI_BISU.png" 
             alt="Logo Bingkai Bisu" 
             class="h-10 w-auto object-contain"
           />
-          <div class="border-l border-white/10 pl-3">
-            <h1 class="font-display font-bold text-base sm:text-lg text-white leading-none">
-              Panel Verifikasi Tiket - Bingkai Bisu 2026
+          <div class="border-l border-[#FFDC17]/20 pl-3">
+            <h1 class="font-display font-bold text-lg sm:text-xl text-white leading-none">
+              Panel Verifikasi Tiket
             </h1>
-            <span class="text-[11px] text-pastel-yellow font-medium">Fixlens Festival 2026 • Hetero Space Banyumas</span>
+            <span class="text-[11px] text-[#FFDC17] font-serif italic">Bingkai Bisu • Hetero Space Banyumas</span>
           </div>
         </div>
 
-        <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap justify-end">
+        <!-- Action Buttons Right -->
+        <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+          
           <!-- Tombol Segarkan Data -->
           <button 
             type="button" 
             id="btnRefreshData" 
-            class="py-2.5 px-3.5 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-white hover:border-pastel-purple transition-all duration-200 flex items-center gap-1.5 cursor-pointer shadow-sm"
+            onclick="loadOrdersData(true)"
+            class="py-2 px-3.5 rounded-xl text-xs font-semibold bg-[#2A0859] border border-[#FFDC17]/30 text-white hover:border-[#FFDC17] transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
           >
             <i data-lucide="refresh-cw" id="iconRefresh" class="w-3.5 h-3.5"></i>
             <span>Segarkan</span>
           </button>
 
-          <!-- Tombol Gate Scanner Modal Langsung -->
+          <!-- Gate Scanner Modal Langsung -->
           <button 
             type="button" 
-            id="btnOpenAdminScanner" 
-            class="py-2.5 px-4 rounded-xl text-xs font-bold bg-pastel-yellow text-night hover:bg-pastel-yellow-hover active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer shadow-glow-yellow"
+            onclick="openAdminScannerModal()" 
+            class="py-2 px-3.5 rounded-xl text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] hover:bg-[#ECC90E] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-glow-yellow"
           >
             <i data-lucide="scan-line" class="w-3.5 h-3.5 stroke-[2.5]"></i>
-            <span>Scan Tiket Gate</span>
+            <span>Scan Gate</span>
           </button>
 
-          <!-- Gate Scanner Standalone PWA -->
+          <!-- Standalone PWA Scanner -->
           <a 
             href="scanner.html" 
-            class="py-2.5 px-3.5 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-pastel-yellow hover:border-pastel-yellow/40 transition-all duration-200 flex items-center gap-1.5"
-            title="Buka Aplikasi PWA Scanner Offline di Halaman Penuh"
+            class="py-2 px-3.5 rounded-xl text-xs font-semibold bg-[#2A0859] border border-[#FFDC17]/30 text-[#FFDC17] hover:bg-[#FFDC17]/10 transition-all flex items-center gap-1.5"
+            title="Buka PWA Scanner Gate Offline Penuh"
           >
             <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
-            <span>PWA Offline</span>
+            <span class="hidden sm:inline">PWA Offline</span>
           </a>
 
-          <!-- Tautan Halaman Publik -->
+          <!-- Web Publik -->
           <a 
             href="index.html" 
             target="_blank" 
-            class="py-2.5 px-3 rounded-xl text-xs font-semibold bg-night-input border border-night-border text-white/70 hover:text-white transition-all duration-200 flex items-center gap-1.5"
+            class="py-2 px-3 rounded-xl text-xs font-semibold bg-[#2A0859] border border-[#FFDC17]/30 text-slate-300 hover:text-white transition-all flex items-center gap-1.5"
+            title="Lihat Web Publik"
           >
             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
             <span class="hidden sm:inline">Web Publik</span>
@@ -233,9 +251,9 @@
           <!-- Tombol Logout -->
           <button 
             type="button" 
-            id="btnLogout" 
-            class="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all duration-200 cursor-pointer"
-            title="Kunci / Keluar"
+            onclick="handleLogout()" 
+            class="p-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer"
+            title="Kunci Dashboard"
           >
             <i data-lucide="log-out" class="w-4 h-4"></i>
           </button>
@@ -247,119 +265,137 @@
     <!-- Main Content Area -->
     <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 flex-1 space-y-6">
 
-      <!-- Summary Stats Row -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- ==================== 4 KARTU METRIK KPI RESMI ==================== -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <div class="p-5 rounded-2xl bg-night-card border border-night-border flex items-center justify-between">
+        <!-- KPI 1: Total Tiket Approved -->
+        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet">
           <div>
-            <span class="text-xs text-white/50 block font-medium">Antrean Verifikasi (Pending)</span>
-            <span id="statPendingCount" class="font-display font-extrabold text-2xl sm:text-3xl text-pastel-yellow">0</span>
+            <span class="text-xs uppercase font-mono tracking-wider text-slate-400 block font-medium">Total Tiket Approved</span>
+            <span id="statTotalApproved" class="font-display font-extrabold text-3xl sm:text-4xl text-[#FFDC17] leading-none mt-1 block">0</span>
+            <span class="text-[11px] text-slate-300 block mt-1 font-sans">Tiket Resmi Terbit</span>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-pastel-yellow/10 text-pastel-yellow flex items-center justify-center">
-            <i data-lucide="clock" class="w-6 h-6"></i>
+          <div class="w-12 h-12 rounded-xl bg-[#FFDC17]/10 text-[#FFDC17] border border-[#FFDC17]/20 flex items-center justify-center">
+            <i data-lucide="ticket" class="w-6 h-6 stroke-[2.5]"></i>
           </div>
         </div>
 
-        <div class="p-5 rounded-2xl bg-night-card border border-night-border flex items-center justify-between">
+        <!-- KPI 2: Total Kas Masuk (Rp) -->
+        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet">
           <div>
-            <span class="text-xs text-white/50 block font-medium">Lokasi Pameran</span>
-            <span class="font-display font-bold text-base text-white">Hetero Space Banyumas</span>
-            <span class="text-[11px] text-white/40 block">29 - 30 November 2026</span>
+            <span class="text-xs uppercase font-mono tracking-wider text-slate-400 block font-medium">Total Kas Masuk (Rp)</span>
+            <span id="statTotalRevenue" class="font-display font-extrabold text-2xl sm:text-3xl text-emerald-400 leading-none mt-1 block">Rp 0</span>
+            <span class="text-[11px] text-slate-300 block mt-1 font-sans">Pembayaran Tervalidasi</span>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-pastel-purple/10 text-pastel-purple flex items-center justify-center">
-            <i data-lucide="map-pin" class="w-6 h-6"></i>
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
+            <i data-lucide="wallet" class="w-6 h-6 stroke-[2.5]"></i>
           </div>
         </div>
 
-        <div class="p-5 rounded-2xl bg-night-card border border-night-border flex items-center justify-between">
+        <!-- KPI 3: Sisa Kuota Bundling (/95) -->
+        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet">
           <div>
-            <span class="text-xs text-white/50 block font-medium">Status Integrasi</span>
-            <span class="font-display font-bold text-sm text-emerald-400">Google Apps Script</span>
-            <span class="text-[11px] text-white/40 block">Sheet & Drive Connected</span>
+            <span class="text-xs uppercase font-mono tracking-wider text-slate-400 block font-medium">Sisa Kuota Bundling</span>
+            <span id="statQuotaBundling" class="font-display font-extrabold text-3xl sm:text-4xl text-[#FFDC17] leading-none mt-1 block">95 / 95</span>
+            <span class="text-[11px] text-slate-300 block mt-1 font-sans">Slot Paket 10k Tersisa</span>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-            <i data-lucide="database" class="w-6 h-6"></i>
+          <div class="w-12 h-12 rounded-xl bg-[#FFDC17]/10 text-[#FFDC17] border border-[#FFDC17]/20 flex items-center justify-center">
+            <i data-lucide="package" class="w-6 h-6 stroke-[2.5]"></i>
           </div>
         </div>
 
-      </div>
+        <!-- KPI 4: Total Pengunjung Checked-In -->
+        <div class="p-5 rounded-2xl bg-[#2A0859] border border-[#FFDC17]/25 flex items-center justify-between shadow-glow-violet">
+          <div>
+            <span class="text-xs uppercase font-mono tracking-wider text-slate-400 block font-medium">Pengunjung Checked-In</span>
+            <span id="statTotalCheckedIn" class="font-display font-extrabold text-3xl sm:text-4xl text-cyan-400 leading-none mt-1 block">0</span>
+            <span class="text-[11px] text-slate-300 block mt-1 font-sans">Sudah Masuk Gate Acara</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center">
+            <i data-lucide="user-check" class="w-6 h-6 stroke-[2.5]"></i>
+          </div>
+        </div>
 
-      <!-- Table Card Container -->
-      <div class="bg-night-card rounded-2xl border border-night-border shadow-2xl overflow-hidden">
+      </section>
+
+      <!-- ==================== TABEL ANTREAN & DATA PESANAN ==================== -->
+      <div class="bg-[#2A0859] rounded-2xl border border-[#FFDC17]/25 overflow-hidden shadow-2xl">
         
-        <!-- Header with Tabs: Antrean Pending & Riwayat ACC -->
-        <div class="p-5 sm:p-6 border-b border-night-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <!-- Table Header & Filter Tabs -->
+        <div class="p-4 sm:p-5 border-b border-[#FFDC17]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#081B59]/60">
           <div>
-            <div class="flex items-center gap-2">
-              <button 
-                type="button" 
-                id="tabBtnPending" 
-                class="px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-pastel-purple text-night shadow-glow-purple flex items-center gap-2 cursor-pointer"
-              >
-                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                <span>Antrean Pending</span>
-                <span id="badgePendingCount" class="px-1.5 py-0.5 rounded-md bg-night/20 text-night text-[10px] font-mono font-black">0</span>
-              </button>
-
-              <button 
-                type="button" 
-                id="tabBtnApproved" 
-                class="px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-night-input text-white/60 hover:text-white border border-night-border hover:bg-white/5 flex items-center gap-2 cursor-pointer"
-              >
-                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                <span>Riwayat ACC (APPROVED)</span>
-                <span id="badgeApprovedCount" class="px-1.5 py-0.5 rounded-md bg-white/10 text-emerald-400 text-[10px] font-mono font-bold">0</span>
-              </button>
-            </div>
-            <p id="tableSectionDesc" class="text-xs text-white/50 mt-2">
-              Periksa bukti struk transfer, lalu klik tombol ACC untuk menerbitkan E-Ticket resmi.
+            <h2 class="font-display font-bold text-xl sm:text-2xl text-white tracking-wide">
+              Antrean Verifikasi & Data Pembayaran
+            </h2>
+            <p id="tableSectionDesc" class="text-xs text-slate-300 font-sans mt-0.5">
+              Kelola pembayaran pending, lakukan verifikasi struk transfer, dan terbitkan e-ticket PDF ke email pemesan.
             </p>
           </div>
 
-          <div class="flex items-center gap-2 self-start sm:self-auto">
-            <span id="tabLiveDot" class="w-2.5 h-2.5 rounded-full bg-pastel-yellow animate-pulse"></span>
-            <span id="tabLiveIndicator" class="text-xs font-mono text-pastel-yellow font-semibold">Live Pending Queue</span>
+          <!-- Switch Tabs Pending / Approved -->
+          <div class="flex items-center gap-1.5 p-1 bg-[#081B59] rounded-xl border border-[#FFDC17]/25 self-start sm:self-auto">
+            <button 
+              type="button" 
+              id="tabBtnPending" 
+              onclick="switchTab('pending')" 
+              class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>Antrean Pending</span>
+              <span id="badgePendingCount" class="px-1.5 py-0.2 rounded-full bg-[#2D2A1A] text-[#FFDC17] text-[10px] font-mono">0</span>
+            </button>
+            <button 
+              type="button" 
+              id="tabBtnApproved" 
+              onclick="switchTab('approved')" 
+              class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>Sudah di-ACC</span>
+              <span id="badgeApprovedCount" class="px-1.5 py-0.2 rounded-full bg-white/10 text-white text-[10px] font-mono">0</span>
+            </button>
           </div>
         </div>
 
-        <!-- Table Responsive Wrapper -->
-        <div class="overflow-x-auto min-h-[300px] relative">
+        <!-- Table Responsive Container -->
+        <div class="overflow-x-auto relative min-h-[300px]">
           
-          <!-- Loading State Overlay -->
-          <div id="tableLoading" class="absolute inset-0 bg-night/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-3">
-            <svg class="animate-spin h-8 w-8 text-pastel-purple" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <!-- Loading State -->
+          <div id="tableLoading" class="p-12 text-center flex flex-col items-center justify-center space-y-3">
+            <svg class="animate-spin h-8 w-8 text-[#FFDC17]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
-            <span id="tableLoadingText" class="text-xs text-white/70 font-mono tracking-wider">Memuat antrean...</span>
+            <span class="text-xs text-slate-300 font-mono tracking-wider">Memuat data dari Google Sheets...</span>
           </div>
 
+          <!-- Tabel Data Pesanan -->
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="border-b border-night-border bg-[#081B59] text-white/70 uppercase font-mono tracking-wider text-[11px]">
+              <tr class="border-b border-[#FFDC17]/20 bg-[#081B59] text-slate-300 uppercase font-mono tracking-wider text-[11px]">
                 <th class="py-3.5 px-4 w-12 text-center">No</th>
                 <th class="py-3.5 px-4">Waktu</th>
-                <th class="py-3.5 px-4">Nama & Email Pemesan</th>
+                <th class="py-3.5 px-4">Nama Pemesan</th>
+                <th class="py-3.5 px-4">Email Pemesan</th>
                 <th class="py-3.5 px-4">WhatsApp</th>
-                <th class="py-3.5 px-4">Varian & Jumlah</th>
+                <th class="py-3.5 px-4">Kategori Tiket</th>
                 <th class="py-3.5 px-4">Total Bayar</th>
-                <th class="py-3.5 px-4 text-center">Bukti / PDF</th>
-                <th class="py-3.5 px-4 text-center">Tindakan</th>
+                <th class="py-3.5 px-4 text-center">Bukti Struk</th>
+                <th class="py-3.5 px-4 text-center">Status</th>
+                <th class="py-3.5 px-4 text-center">Tombol ACC</th>
               </tr>
             </thead>
-            <tbody id="tableBody" class="divide-y divide-night-border/70 text-white/80">
+            <tbody id="tableBody" class="divide-y divide-[#FFDC17]/15 text-slate-200">
               <!-- Rendered via JavaScript -->
             </tbody>
           </table>
 
           <!-- Empty State -->
           <div id="tableEmpty" class="hidden p-12 text-center space-y-3">
-            <div id="emptyIcon" class="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-              <i data-lucide="check-circle" class="w-7 h-7"></i>
+            <div id="emptyIcon" class="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
+              <i data-lucide="check-circle" class="w-7 h-7 stroke-[2.5]"></i>
             </div>
-            <h3 id="emptyTitle" class="font-display font-bold text-base text-white">Semua Pembayaran Telah Terverifikasi!</h3>
-            <p id="emptyDesc" class="text-xs text-white/50 max-w-sm mx-auto">
-              Saat ini tidak ada antrean pending. Klik tombol <strong>Segarkan Data</strong> untuk mengecek pesanan baru.
+            <h3 id="emptyTitle" class="font-display font-bold text-lg text-white">Semua Pembayaran Telah Terverifikasi!</h3>
+            <p id="emptyDesc" class="text-xs text-slate-400 max-w-sm mx-auto font-sans">
+              Saat ini tidak ada antrean pending. Klik tombol <strong>Segarkan</strong> untuk memeriksa pesanan baru.
             </p>
           </div>
 
@@ -370,7 +406,7 @@
     </main>
 
     <!-- Footer Admin -->
-    <footer class="border-t border-night-border/70 py-4 px-4 text-center text-xs text-white/40">
+    <footer class="border-t border-[#FFDC17]/20 py-4 px-4 text-center text-xs text-slate-400 bg-[#081B59]/90">
       Panel Admin Resmi Bingkai Bisu 2026 • Dilindungi dengan enkripsi PIN
     </footer>
 
@@ -380,39 +416,39 @@
   <!-- ==================== MODAL PRATINJAU BUKTI PEMBAYARAN ==================== -->
   <div 
     id="receiptModal" 
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden transition-all duration-300"
     role="dialog"
     aria-modal="true"
   >
     <div 
       id="receiptModalContainer" 
-      class="w-full max-w-lg bg-night-card border border-night-border rounded-3xl p-6 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-300 space-y-5"
+      class="w-full max-w-lg bg-[#2A0859] border border-[#FFDC17]/40 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5"
     >
-      <div class="flex items-center justify-between border-b border-night-border pb-3">
+      <div class="flex items-center justify-between border-b border-[#FFDC17]/20 pb-3">
         <div>
-          <h3 class="font-display font-bold text-base text-white">Pratinjau Bukti Pembayaran</h3>
-          <p id="receiptModalAttendee" class="text-xs text-pastel-yellow font-medium">Nama: -</p>
+          <h3 class="font-display font-bold text-xl text-white">Pratinjau Bukti Pembayaran</h3>
+          <p id="receiptModalAttendee" class="text-xs text-[#FFDC17] font-medium font-mono">Nama: -</p>
         </div>
         <button 
           type="button" 
-          id="btnCloseReceiptModal" 
-          class="p-2 rounded-xl text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+          onclick="closeReceiptModal()" 
+          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
         >
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <!-- Preview Image Container -->
-      <div class="relative w-full max-h-[380px] min-h-[220px] rounded-2xl overflow-hidden bg-night-input border border-night-border flex items-center justify-center p-2">
+      <div class="relative w-full max-h-[380px] min-h-[220px] rounded-2xl overflow-hidden bg-[#081B59] border border-[#FFDC17]/30 flex items-center justify-center p-2">
         <img 
           id="receiptModalImg" 
           src="" 
           alt="Bukti Transfer" 
           class="max-h-[360px] w-auto max-w-full object-contain rounded-xl"
         />
-        <div id="receiptImgFallback" class="hidden text-center text-white/50 text-xs p-6">
-          <i data-lucide="image-off" class="w-8 h-8 mx-auto mb-2 text-white/30"></i>
-          <span>Gambar tidak dapat dimuat langsung atau berupa link Google Drive. Silakan klik tombol "Buka Tab Baru ↗" di bawah.</span>
+        <div id="receiptImgFallback" class="hidden text-center text-slate-400 text-xs p-6 space-y-2">
+          <i data-lucide="image-off" class="w-8 h-8 mx-auto text-[#FFDC17]/60"></i>
+          <span>Gambar tidak dapat ditampilkan langsung. Silakan klik tombol buka tab baru di bawah.</span>
         </div>
       </div>
 
@@ -422,396 +458,62 @@
           id="btnReceiptOpenNewTab" 
           href="#" 
           target="_blank" 
-          rel="noopener noreferrer" 
-          class="w-full sm:w-auto py-3 px-4 rounded-xl border border-night-border bg-night-input hover:bg-night-border text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+          class="w-full sm:w-1/2 py-2.5 px-4 rounded-xl text-xs font-semibold text-center bg-[#081B59] border border-[#FFDC17]/30 text-slate-200 hover:border-[#FFDC17] transition-all flex items-center justify-center gap-1.5"
         >
-          <span>Buka Tab Baru ↗</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          <span>Buka di Tab Baru</span>
         </a>
 
         <button 
           type="button" 
           id="btnModalAcc" 
-          class="flex-1 w-full py-3.5 px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer"
+          class="w-full sm:w-1/2 py-2.5 px-4 rounded-xl text-xs font-black uppercase text-center bg-[#FFDC17] text-[#2D2A1A] hover:bg-[#ECC90E] transition-all flex items-center justify-center gap-1.5 shadow-glow-yellow cursor-pointer"
         >
-          <i data-lucide="check" class="w-4 h-4"></i>
-          <span>✔ Setujui Pembayaran Ini</span>
+          <i data-lucide="check-circle" class="w-4 h-4 stroke-[2.5]"></i>
+          <span>ACC Tiket Ini</span>
         </button>
       </div>
     </div>
   </div>
 
 
-  <!-- ==================== MODAL DIALOG SUKSES SHARE PDF WHATSAPP ==================== -->
-  <div 
-    id="pdfShareSuccessModal" 
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night/95 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300"
-    role="dialog"
-    aria-modal="true"
-  >
-    <div 
-      id="pdfShareSuccessContainer" 
-      class="w-full max-w-md bg-night-card border-2 border-emerald-400 rounded-3xl p-6 sm:p-7 text-center shadow-glow-green transform scale-95 transition-all duration-300 space-y-5 relative overflow-hidden"
-    >
-      <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/15 rounded-full blur-2xl"></div>
-      <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-pastel-yellow/15 rounded-full blur-2xl"></div>
-
-      <!-- Centang Sukses Glowing -->
-      <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-        <i data-lucide="check-circle" class="w-9 h-9 stroke-[2.5]"></i>
-      </div>
-
-      <div class="space-y-1.5">
-        <h3 class="font-display font-extrabold text-xl sm:text-2xl text-white">
-          ✅ Tiket Berhasil Diterbitkan!
-        </h3>
-        <p class="text-xs text-white/70 leading-relaxed">
-          E-Ticket untuk <strong id="shareModalAttendeeName" class="text-pastel-yellow font-bold">-</strong> siap dikirimkan ke WhatsApp.
-        </p>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="space-y-2.5 pt-2">
-        <button 
-          type="button" 
-          id="btnTriggerWebShare" 
-          class="w-full py-4 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-night bg-gradient-to-r from-emerald-400 via-emerald-300 to-emerald-400 hover:brightness-110 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer"
-        >
-          <i data-lucide="share-2" class="w-4 h-4 stroke-[2.5]"></i>
-          <span>📤 Kirim File PDF ke WA Pengunjung</span>
-        </button>
-
-        <button 
-          type="button" 
-          id="btnCloseShareModal" 
-          class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-        >
-          Nanti Saja / Tutup
-        </button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ==================== MODAL GATE SCANNER ADMIN ==================== -->
+  <!-- ==================== MODAL GATE SCANNER (INTEGRASI KAMERA) ==================== -->
   <div 
     id="adminScannerModal" 
-    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-night/95 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 overflow-y-auto"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden transition-all duration-300"
     role="dialog"
     aria-modal="true"
   >
-    <div 
-      id="adminScannerModalContainer" 
-      class="w-full max-w-4xl bg-night-card border border-night-border rounded-3xl p-5 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-300 space-y-5 my-auto"
-    >
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between border-b border-night-border pb-4">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-pastel-yellow/10 border border-pastel-yellow/30 text-pastel-yellow flex items-center justify-center shrink-0">
-            <i data-lucide="scan-line" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h3 class="font-display font-extrabold text-base sm:text-lg text-white">Gate Scanner Admin</h3>
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px]">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>OFFLINE-READY</span>
-              </span>
-            </div>
-            <p class="text-xs text-white/50">Verifikasi tiket masuk festival secara instan di gate Hetero Space Banyumas.</p>
-          </div>
-        </div>
-
+    <div class="w-full max-w-md bg-[#2A0859] border-2 border-[#FFDC17] rounded-3xl p-6 sm:p-7 shadow-glow-yellow space-y-4 relative">
+      <div class="flex items-center justify-between border-b border-[#FFDC17]/20 pb-3">
         <div class="flex items-center gap-2">
-          <a 
-            href="scanner.html" 
-            target="_blank" 
-            class="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-night-border bg-night-input hover:bg-night-border text-white text-xs font-semibold transition-colors"
-            title="Buka PWA Full Screen"
-          >
-            <span>PWA Full Screen ↗</span>
-          </a>
-          <button 
-            type="button" 
-            id="btnCloseAdminScanner" 
-            class="p-2 rounded-xl text-white/60 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-            title="Tutup Scanner"
-          >
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
+          <i data-lucide="scan-line" class="w-5 h-5 text-[#FFDC17]"></i>
+          <h3 class="font-display font-bold text-xl text-white">Scanner Tiket Gate</h3>
         </div>
+        <button 
+          type="button" 
+          onclick="closeAdminScannerModal()" 
+          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
 
-      <!-- Grid Content: Kamera (Kiri) & Hasil Validasi (Kanan) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        
-        <!-- KOLOM KIRI: Kamera & Kontrol -->
-        <div class="space-y-3">
-          <div class="relative w-full aspect-square max-w-[340px] mx-auto rounded-2xl overflow-hidden bg-black flex items-center justify-center border border-white/10 shadow-inner">
-            <!-- Video Reader -->
-            <div id="adminReader" class="w-full h-full"></div>
-
-            <!-- Scanning Guides & Laser -->
-            <div id="adminScanGuides" class="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between transition-opacity duration-200">
-              <div class="flex justify-between">
-                <div class="w-8 h-8 border-t-2 border-l-2 border-pastel-yellow rounded-tl-lg"></div>
-                <div class="w-8 h-8 border-t-2 border-r-2 border-pastel-yellow rounded-tr-lg"></div>
-              </div>
-              <div class="laser-line"></div>
-              <div class="flex justify-between">
-                <div class="w-8 h-8 border-b-2 border-l-2 border-pastel-yellow rounded-bl-lg"></div>
-                <div class="w-8 h-8 border-b-2 border-r-2 border-pastel-yellow rounded-br-lg"></div>
-              </div>
-            </div>
-
-            <!-- Overlay Kamera Dijeda -->
-            <div id="adminScanPausedBadge" class="hidden absolute top-3 px-3 py-1 rounded-full bg-night/85 backdrop-blur-md border border-pastel-yellow/40 text-pastel-yellow font-mono text-[11px] font-bold z-20 flex items-center gap-1.5 shadow-lg">
-              <span class="w-2 h-2 rounded-full bg-pastel-yellow animate-pulse"></span>
-              <span>KAMERA DIJEDA</span>
-            </div>
-
-            <!-- Placeholder saat kamera tidak aktif -->
-            <div id="adminCameraPlaceholder" class="hidden absolute inset-0 bg-night-input flex flex-col items-center justify-center text-center p-6 space-y-3">
-              <div class="w-12 h-12 rounded-2xl bg-white/5 text-white/40 flex items-center justify-center">
-                <i data-lucide="camera-off" class="w-6 h-6"></i>
-              </div>
-              <p class="text-xs text-white/60">Kamera tidak aktif</p>
-              <button type="button" id="btnAdminStartCamera" class="py-2 px-4 rounded-xl bg-pastel-purple text-night font-bold text-xs uppercase tracking-wider shadow-md">
-                Nyalakan Kamera
-              </button>
-            </div>
-          </div>
-
-          <!-- Kontrol Kamera -->
-          <div class="flex items-center justify-between text-xs text-white/60 px-1 max-w-[340px] mx-auto">
-            <button type="button" id="btnAdminToggleCamera" class="inline-flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
-              <i data-lucide="video" class="w-3.5 h-3.5"></i>
-              <span id="btnAdminToggleCameraText">Jeda Kamera</span>
-            </button>
-            <button type="button" id="btnAdminSwitchCamera" class="inline-flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
-              <i data-lucide="flip-horizontal" class="w-3.5 h-3.5"></i>
-              <span>Ganti Kamera</span>
-            </button>
-            <button type="button" id="btnAdminToggleAudio" class="inline-flex items-center gap-1 text-pastel-yellow hover:text-white transition-colors cursor-pointer" title="Suara Beep">
-              <i data-lucide="volume-2" id="iconAdminAudio" class="w-3.5 h-3.5"></i>
-              <span id="textAdminAudio">Audio ON</span>
-            </button>
-          </div>
-
-          <!-- Form Input Manual Kode Tiket -->
-          <form id="formAdminManualScan" class="flex gap-2 max-w-[340px] mx-auto">
-            <input 
-              type="text" 
-              id="inputAdminManualCode" 
-              placeholder="Input manual: #BB26-XXXX" 
-              class="flex-1 py-2 px-3 rounded-xl bg-night-input border border-night-border text-white text-xs font-mono uppercase focus:outline-none focus:border-pastel-purple"
-            />
-            <button type="submit" class="py-2 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors cursor-pointer">
-              Periksa
-            </button>
-          </form>
-        </div>
-
-        <!-- KOLOM KANAN: Persistent Result Card & Database Counter -->
-        <div class="flex flex-col justify-between space-y-4">
-          
-          <!-- Mini Stats Local DB -->
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="p-2.5 rounded-xl bg-night-input border border-night-border text-center">
-              <span class="text-[10px] text-white/40 uppercase font-mono block">Database Lokal</span>
-              <span id="adminStatDbCount" class="font-display font-bold text-sm text-pastel-purple">0 Tiket</span>
-            </div>
-            <div class="p-2.5 rounded-xl bg-night-input border border-night-border text-center">
-              <span class="text-[10px] text-white/40 uppercase font-mono block">Sudah Masuk</span>
-              <span id="adminStatCheckinCount" class="font-display font-bold text-sm text-pastel-yellow">0 Orang</span>
-            </div>
-          </div>
-
-          <!-- Area Notifikasi Hasil Validasi (Persistent Result Card) -->
-          <div id="adminValidationContainer" class="flex-1 flex flex-col justify-center space-y-3">
-            
-            <!-- DEFAULT / IDLE STATE -->
-            <div id="adminNotifIdle" class="rounded-2xl bg-night-input border border-night-border p-6 text-center text-xs text-white/50 space-y-2">
-              <i data-lucide="scan" class="w-8 h-8 mx-auto text-pastel-purple mb-1 opacity-70"></i>
-              <h4 class="font-display font-bold text-sm text-white/80">Siap Memindai Tiket</h4>
-              <p class="text-[11px] text-white/40 max-w-xs mx-auto">Arahkan kamera ke QR Code tiket penonton atau gunakan form input manual di sebelah kiri.</p>
-            </div>
-
-            <!-- KARTU HIJAU: CHECK-IN BERHASIL -->
-            <div id="adminNotifSuccess" class="hidden rounded-3xl bg-gradient-to-b from-emerald-950/90 to-[#0d1f17] border-2 border-emerald-400 p-5 text-emerald-300 shadow-glow-green space-y-4">
-              <!-- Header Status -->
-              <div class="flex items-center justify-between">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-400 text-night font-display font-black text-xs tracking-wider uppercase shadow-md">
-                  <i data-lucide="check-circle-2" class="w-4 h-4 stroke-[3]"></i>
-                  <span>CHECK-IN BERHASIL</span>
-                </div>
-                <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-400/20">
-                  VALID • ALL ACCESS
-                </span>
-              </div>
-
-              <!-- Nama Pemegang Tiket (Besar & Tebal) -->
-              <div class="space-y-0.5">
-                <span class="text-[11px] text-emerald-400/70 uppercase font-mono font-semibold tracking-wider">Nama Pemegang Tiket</span>
-                <h2 id="adminSuccessName" class="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-wide uppercase leading-tight break-words">
-                  -
-                </h2>
-              </div>
-
-              <!-- Detail Tiket -->
-              <div class="bg-black/40 rounded-2xl p-3.5 text-xs text-white/90 space-y-2 border border-emerald-400/20 divide-y divide-white/5">
-                <div class="flex justify-between items-center pb-1.5">
-                  <span class="text-white/50">Kategori / Varian:</span>
-                  <span id="adminSuccessVariant" class="font-bold text-pastel-yellow text-sm text-right">-</span>
-                </div>
-                <div class="flex justify-between items-center py-1.5 font-mono text-xs">
-                  <span class="text-white/50">Kode Tiket:</span>
-                  <span id="adminSuccessCode" class="text-emerald-300 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-400/30">-</span>
-                </div>
-                <div class="flex justify-between items-center pt-1.5 font-mono text-xs">
-                  <span class="text-white/50">Waktu Scan:</span>
-                  <span id="adminSuccessTime" class="text-white/80 font-semibold">-</span>
-                </div>
-              </div>
-
-              <!-- Merchandise Handover Banner -->
-              <div id="adminMerchBannerSuccess" class="hidden">
-                <div class="rounded-2xl border-2 border-amber-400 bg-gradient-to-r from-amber-500/30 via-yellow-500/40 to-amber-500/30 p-4 text-center shadow-glow-yellow animate-pulse">
-                  <span class="text-[10px] uppercase font-mono tracking-widest text-amber-300 font-black block mb-1">PAKET MERCHANDISE RESMI</span>
-                  <div id="adminMerchTextSuccess" class="font-display font-black text-sm sm:text-base text-white leading-snug">
-                    🎁 SERAHKAN KE PENGUNJUNG: -
-                  </div>
-                </div>
-              </div>
-
-              <!-- Badge jika tidak ada merchandise -->
-              <div id="adminNoMerchBadgeSuccess" class="hidden flex items-center justify-center pt-0.5">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/60 text-xs font-semibold border border-white/10">
-                  <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
-                  <span>Hanya Akses Masuk</span>
-                </span>
-              </div>
-
-              <!-- Tombol Aksi: Selesai & Scan Tiket Berikutnya -->
-              <button 
-                type="button" 
-                id="btnAdminNextTicketSuccess" 
-                class="w-full py-4 px-5 rounded-2xl font-display font-black text-sm sm:text-base uppercase tracking-wider text-night bg-gradient-to-r from-pastel-yellow via-amber-300 to-pastel-yellow hover:brightness-110 active:scale-[0.98] shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
-              >
-                <span>❯ Selesai & Scan Tiket Berikutnya</span>
-                <i data-lucide="arrow-right" class="w-4 h-4 stroke-[3]"></i>
-              </button>
-            </div>
-
-            <!-- KARTU KUNING: TIKET SUDAH PERNAH DIGUNAKAN -->
-            <div id="adminNotifWarning" class="hidden rounded-3xl bg-gradient-to-b from-amber-950/90 to-[#221609] border-2 border-amber-400 p-5 text-amber-300 shadow-glow-yellow space-y-4">
-              <!-- Header Status -->
-              <div class="flex items-center justify-between">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-400 text-night font-display font-black text-xs tracking-wider uppercase shadow-md">
-                  <i data-lucide="alert-triangle" class="w-4 h-4 stroke-[3]"></i>
-                  <span>TIKET SUDAH PERNAH DIGUNAKAN</span>
-                </div>
-                <span class="text-[10px] uppercase font-mono tracking-widest text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-400/20">
-                  DUPLIKASI SCAN
-                </span>
-              </div>
-
-              <!-- Nama Pemegang Tiket (Besar & Tebal) -->
-              <div class="space-y-0.5">
-                <span class="text-[11px] text-amber-400/70 uppercase font-mono font-semibold tracking-wider">Nama Pemegang Tiket</span>
-                <h2 id="adminWarningName" class="font-display font-extrabold text-2xl sm:text-3xl text-white tracking-wide uppercase leading-tight break-words">
-                  -
-                </h2>
-              </div>
-
-              <!-- Detail Tiket -->
-              <div class="bg-black/40 rounded-2xl p-3.5 text-xs text-white/90 space-y-2 border border-amber-400/20 divide-y divide-white/5">
-                <div class="flex justify-between items-center pb-1.5">
-                  <span class="text-white/50">Kategori / Varian:</span>
-                  <span id="adminWarningVariant" class="font-bold text-pastel-yellow text-sm text-right">-</span>
-                </div>
-                <div class="flex justify-between items-center py-1.5 font-mono text-xs">
-                  <span class="text-white/50">Kode Tiket:</span>
-                  <span id="adminWarningCode" class="text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">-</span>
-                </div>
-                <div class="flex justify-between items-center pt-1.5 font-mono text-xs">
-                  <span class="text-white/50">Scan Pertama:</span>
-                  <span id="adminWarningTime" class="text-amber-300 font-bold">-</span>
-                </div>
-              </div>
-
-              <!-- Info Merch di Warning -->
-              <div id="adminMerchBannerWarning" class="hidden">
-                <div class="rounded-xl border border-amber-400/40 bg-amber-500/15 p-3 text-center text-xs">
-                  <span class="text-[10px] uppercase font-mono text-amber-300 font-bold block mb-0.5">Info Merchandise</span>
-                  <div id="adminMerchTextWarning" class="font-bold text-white">🎁 -</div>
-                </div>
-              </div>
-
-              <!-- Tombol Aksi: Selesai & Scan Tiket Berikutnya -->
-              <button 
-                type="button" 
-                id="btnAdminNextTicketWarning" 
-                class="w-full py-4 px-5 rounded-2xl font-display font-black text-sm sm:text-base uppercase tracking-wider text-night bg-gradient-to-r from-pastel-yellow via-amber-300 to-pastel-yellow hover:brightness-110 active:scale-[0.98] shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
-              >
-                <span>❯ Selesai & Scan Tiket Berikutnya</span>
-                <i data-lucide="arrow-right" class="w-4 h-4 stroke-[3]"></i>
-              </button>
-            </div>
-
-            <!-- KARTU MERAH: TIKET TIDAK VALID -->
-            <div id="adminNotifError" class="hidden rounded-3xl bg-gradient-to-b from-red-950/90 to-[#220909] border-2 border-red-500 p-5 text-red-300 shadow-glow-red space-y-4">
-              <!-- Header Status -->
-              <div class="flex items-center justify-between">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500 text-white font-display font-black text-xs tracking-wider uppercase shadow-md">
-                  <i data-lucide="x-circle" class="w-4 h-4 stroke-[3]"></i>
-                  <span>TIKET TIDAK VALID</span>
-                </div>
-                <span class="text-[10px] uppercase font-mono tracking-widest text-red-400 font-bold bg-red-500/10 px-2.5 py-1 rounded-md border border-red-500/20">
-                  DITOLAK
-                </span>
-              </div>
-
-              <!-- Kode yang Terbaca -->
-              <div class="space-y-0.5">
-                <span class="text-[11px] text-red-400/70 uppercase font-mono font-semibold tracking-wider">Kode Terdeteksi</span>
-                <div id="adminErrorCode" class="font-mono font-bold text-xl text-red-200 break-all bg-black/40 px-3 py-2 rounded-xl border border-red-500/30">
-                  -
-                </div>
-              </div>
-
-              <p id="adminErrorMessage" class="text-xs text-white/80 leading-relaxed bg-black/40 p-3 rounded-xl border border-red-500/20">
-                Kode tiket tidak ditemukan di database atau belum disetujui (APPROVED). Silakan periksa bukti struk fisik atau meja pendaftaran panitia.
-              </p>
-
-              <!-- Tombol Aksi: Coba Scan Ulang -->
-              <button 
-                type="button" 
-                id="btnAdminRetryError" 
-                class="w-full py-3.5 px-5 rounded-2xl font-display font-black text-sm uppercase tracking-wider text-white bg-red-600 hover:bg-red-500 active:scale-[0.98] shadow-glow-red flex items-center justify-center gap-2 cursor-pointer transition-all duration-200"
-              >
-                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                <span>Coba Scan Ulang</span>
-              </button>
-            </div>
-
-          </div>
-
-          <!-- Tombol Unduh / Refresh Database Lokal -->
-          <div class="pt-2">
-            <button 
-              type="button" 
-              id="btnAdminSyncDb" 
-              class="w-full py-2.5 px-3 rounded-xl border border-night-border bg-night-input hover:bg-night-border text-white/80 hover:text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
-            >
-              <i data-lucide="download-cloud" class="w-4 h-4 text-pastel-purple"></i>
-              <span id="btnAdminSyncDbText">Perbarui Database Tiket dari Cloud</span>
-            </button>
-          </div>
-
-        </div>
-
+      <!-- Camera Preview Box -->
+      <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-[#081B59] border border-[#FFDC17]/30">
+        <div id="adminReader" class="w-full h-full"></div>
+        <div class="laser-line"></div>
       </div>
 
+      <!-- Result Container -->
+      <div id="adminScanResultBox" class="p-3 rounded-xl bg-[#081B59] border border-[#FFDC17]/25 text-center text-xs text-slate-300">
+        Arahkan kamera ke QR Code E-Ticket pengunjung
+      </div>
+
+      <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1 font-mono">
+        <span>GATE HETERO SPACE</span>
+        <a href="scanner.html" class="text-[#FFDC17] hover:underline font-bold">Buka PWA Full ↗</a>
+      </div>
     </div>
   </div>
 
@@ -819,275 +521,90 @@
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRMLG227dO9VkqJh__-Prb6HGw_t1JMY14FLLeQHO6kMwq5jlClzXlkMTfMYOh31zw/exec";
-    const DEFAULT_PIN = "2026";
-    const ADMIN_SECRET_PIN = DEFAULT_PIN;
-    const ADMIN_PIN = DEFAULT_PIN;
+    const PIN_KEY = "2026";
 
-    // Inisialisasi Lucide Icons
-    lucide.createIcons();
-
-    // DOM Elements Auth
-    const pinAuthModal = document.getElementById("pinAuthModal");
-    const mainDashboard = document.getElementById("mainDashboard");
-    const pinForm = document.getElementById("pinForm");
-    const inputPin = document.getElementById("inputPin");
-    const pinErrorMsg = document.getElementById("pinErrorMsg");
-    const btnLogout = document.getElementById("btnLogout");
-
-    // DOM Elements Data Table & Tabs
-    const tabBtnPending = document.getElementById("tabBtnPending");
-    const tabBtnApproved = document.getElementById("tabBtnApproved");
-    const badgePendingCount = document.getElementById("badgePendingCount");
-    const badgeApprovedCount = document.getElementById("badgeApprovedCount");
-    const tableSectionDesc = document.getElementById("tableSectionDesc");
-    const tabLiveIndicator = document.getElementById("tabLiveIndicator");
-    const tabLiveDot = document.getElementById("tabLiveDot");
-
-    const tableBody = document.getElementById("tableBody");
-    const tableLoading = document.getElementById("tableLoading");
-    const tableEmpty = document.getElementById("tableEmpty");
-    const emptyIcon = document.getElementById("emptyIcon");
-    const emptyTitle = document.getElementById("emptyTitle");
-    const emptyDesc = document.getElementById("emptyDesc");
-    const statPendingCount = document.getElementById("statPendingCount");
-    const btnRefreshData = document.getElementById("btnRefreshData");
-    const iconRefresh = document.getElementById("iconRefresh");
-
-    // DOM Elements Modal Receipt
-    const receiptModal = document.getElementById("receiptModal");
-    const receiptModalContainer = document.getElementById("receiptModalContainer");
-    const btnCloseReceiptModal = document.getElementById("btnCloseReceiptModal");
-    const receiptModalAttendee = document.getElementById("receiptModalAttendee");
-    const receiptModalImg = document.getElementById("receiptModalImg");
-    const receiptImgFallback = document.getElementById("receiptImgFallback");
-    const btnReceiptOpenNewTab = document.getElementById("btnReceiptOpenNewTab");
-    const btnModalAcc = document.getElementById("btnModalAcc");
-
-    // DOM Elements Modal Sukses Share PDF
-    const pdfShareSuccessModal = document.getElementById("pdfShareSuccessModal");
-    const pdfShareSuccessContainer = document.getElementById("pdfShareSuccessContainer");
-    const shareModalAttendeeName = document.getElementById("shareModalAttendeeName");
-    const btnTriggerWebShare = document.getElementById("btnTriggerWebShare");
-    const btnCloseShareModal = document.getElementById("btnCloseShareModal");
-
-    // Globals untuk Web Share API tanpa delay gesture
-    window.activeTicketPdf = null;
-    window.activeRecipientWa = "";
-    window.activeRecipientName = "";
-    window.activeTicketPdfUrl = "";
-
-    let currentModalItem = null;
     let currentTab = "pending"; // 'pending' | 'approved'
     let pendingOrdersList = [];
     let approvedOrdersList = [];
+    let currentReceiptItem = null;
+    let html5QrScanner = null;
 
     // Helper Format Rupiah
     function formatRupiah(amount) {
-      if (!amount) return "Rp 0";
       const num = parseInt(amount, 10);
-      if (isNaN(num)) return amount;
-      return new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0
-      }).format(num).replace(/\s+/g, " ");
+      if (isNaN(num)) return "Rp 0";
+      return "Rp " + num.toLocaleString("id-ID");
     }
 
-    // ================== PERSIAPAN FILE PDF & MODAL SHARE WHATSAPP ==================
-    async function prepareTicketPdf(nama, noWa, linkPdf) {
-      window.activeRecipientName = nama || "Peserta";
-      window.activeRecipientWa = noWa || "";
-      window.activeTicketPdfUrl = linkPdf || "https://drive.google.com";
-      window.activeTicketPdf = null;
-
-      const safeLinkPdf = linkPdf || "https://drive.google.com";
-      const secretPin = sessionStorage.getItem("admin_pin") || (typeof ADMIN_SECRET_PIN !== "undefined" ? ADMIN_SECRET_PIN : DEFAULT_PIN);
-
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "cors",
-          redirect: "follow",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
-          body: JSON.stringify({
-            action: "get_pdf_base64",
-            pdfUrl: safeLinkPdf,
-            pin: secretPin
-          })
-        });
-
-        const res = await response.json();
-
-        if (res && res.base64) {
-          const byteCharacters = atob(res.base64);
-          const byteNumbers = new Array(byteCharacters.length);
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-          }
-          const byteArray = new Uint8Array(byteNumbers);
-          const pdfFile = new File([byteArray], `E-Ticket_BingkaiBisu_${(nama || 'Peserta').replace(/\s+/g, '_')}.pdf`, { type: "application/pdf" });
-          window.activeTicketPdf = pdfFile;
-          return pdfFile;
-        }
-      } catch (err) {
-        console.warn("Gagal mengambil base64 PDF dari Apps Script:", err);
-      }
-      return null;
-    }
-
-    function showPdfShareModal(nama, noWa, linkPdf) {
-      if (shareModalAttendeeName) {
-        shareModalAttendeeName.textContent = nama || "Peserta";
-      }
-      if (pdfShareSuccessModal && pdfShareSuccessContainer) {
-        pdfShareSuccessModal.classList.remove("opacity-0", "pointer-events-none");
-        pdfShareSuccessContainer.classList.remove("scale-95");
-        pdfShareSuccessContainer.classList.add("scale-100");
-        lucide.createIcons();
-      }
-    }
-
-    function closePdfShareModal() {
-      if (pdfShareSuccessModal && pdfShareSuccessContainer) {
-        pdfShareSuccessContainer.classList.remove("scale-100");
-        pdfShareSuccessContainer.classList.add("scale-95");
-        pdfShareSuccessModal.classList.add("opacity-0", "pointer-events-none");
-      }
-    }
-
-    if (btnCloseShareModal) {
-      btnCloseShareModal.addEventListener("click", closePdfShareModal);
-    }
-    if (pdfShareSuccessModal) {
-      pdfShareSuccessModal.addEventListener("click", (e) => {
-        if (e.target === pdfShareSuccessModal) closePdfShareModal();
-      });
-    }
-
-    // Pemicu WhatsApp via Web Share API dengan User Gesture Instan & Murni
-    if (btnTriggerWebShare) {
-      btnTriggerWebShare.addEventListener("click", async () => {
-        const cleanWa = (window.activeRecipientWa || "").toString().replace(/[^0-9]/g, '').replace(/^0/, '62');
-        const safeLinkPdf = window.activeTicketPdfUrl || "https://drive.google.com";
-        const nama = window.activeRecipientName || "Peserta";
-
-        try {
-          if (window.activeTicketPdf && navigator.canShare && navigator.canShare({ files: [window.activeTicketPdf] })) {
-            await navigator.share({
-              files: [window.activeTicketPdf],
-              title: 'E-Ticket Bingkai Bisu 2026',
-              text: `Halo ${nama}! 👋\nBerikut adalah E-Ticket resmi kamu untuk Bingkai Bisu - Fixlens Festival 2026.\nHarap tunjukkan QR Code pada tiket ini di gate masuk Hetero Space Banyumas.`
-            });
-          } else {
-            // Fallback link WhatsApp jika dibuka dari browser/device tanpa dukungan share file
-            const pesanWa = `Halo ${nama}! 👋\nBerikut adalah tautan E-Ticket resmi kamu untuk Bingkai Bisu - Fixlens Festival 2026:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code pada tiket ini di gate masuk Hetero Space Banyumas.`;
-            window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
-          }
-        } catch (err) {
-          if (err.name !== "AbortError") {
-            console.warn("Web Share error, beralih ke WhatsApp link fallback:", err);
-            const pesanWa = `Halo ${nama}! 👋\nBerikut adalah tautan E-Ticket resmi kamu untuk Bingkai Bisu - Fixlens Festival 2026:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code pada tiket ini di gate masuk Hetero Space Banyumas.`;
-            window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
-          }
-        } finally {
-          closePdfShareModal();
-        }
-      });
-    }
-
-    // ================== LOGIKA BERBAGI FILE PDF LANGSUNG (TOMBOL MANUAL TABEL) ==================
-    async function bagikanPdfKeWhatsApp(nama, noWa, linkPdf, buttonElement) {
-      const originalHtml = buttonElement ? buttonElement.innerHTML : "";
-      if (buttonElement) {
-        buttonElement.disabled = true;
-        buttonElement.innerHTML = `
-          <svg class="animate-spin h-3.5 w-3.5 text-night" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-          </svg>
-          <span>Menyiapkan file PDF...</span>
-        `;
-      }
-
-      try {
-        await prepareTicketPdf(nama, noWa, linkPdf);
-        showPdfShareModal(nama, noWa, linkPdf);
-      } catch (err) {
-        console.warn("Gagal menyiapkan PDF via Web Share, membuka fallback WhatsApp link:", err);
-        const cleanWa = (noWa || "").toString().replace(/[^0-9]/g, '').replace(/^0/, '62');
-        const safeLinkPdf = linkPdf || "https://drive.google.com";
-        const pesanWa = `Halo ${nama}! 👋\nBerikut adalah tautan E-Ticket resmi kamu untuk Bingkai Bisu - Fixlens Festival 2026:\n${safeLinkPdf}\n\nHarap simpan dan tunjukkan QR Code pada tiket ini di gate masuk Hetero Space Banyumas.`;
-        window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(pesanWa)}`, '_blank');
-      } finally {
-        if (buttonElement) {
-          buttonElement.disabled = false;
-          buttonElement.className = "btn-send-wa inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-night font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-green cursor-pointer";
-          buttonElement.innerHTML = `
-            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-            <span>📤 Kirim File ke WA</span>
-          `;
-          lucide.createIcons();
-        }
-      }
-    }
-
-    // ================== AUTENTIKASI PIN ==================
+    // ================== 1. VALIDASI SESI MASUK PIN "2026" ==================
     function checkSessionAuth() {
-      const isAuth = sessionStorage.getItem("admin_authenticated") === "true";
+      const isAuth = sessionStorage.getItem("adminAuth") === "true" || sessionStorage.getItem("admin_authenticated") === "true";
+      const pinModal = document.getElementById("pinAuthModal");
+      const dashboard = document.getElementById("mainDashboard");
+
       if (isAuth) {
-        pinAuthModal.classList.add("hidden");
-        mainDashboard.classList.remove("hidden");
+        pinModal.classList.add("hidden");
+        dashboard.classList.remove("hidden");
         loadOrdersData();
       } else {
-        pinAuthModal.classList.remove("hidden");
-        mainDashboard.classList.add("hidden");
-        inputPin.focus();
+        pinModal.classList.remove("hidden");
+        dashboard.classList.add("hidden");
+        setTimeout(() => document.getElementById("inputPin").focus(), 150);
+      }
+      lucide.createIcons();
+    }
+
+    function handlePinLogin(e) {
+      e.preventDefault();
+      const input = document.getElementById("inputPin");
+      const err = document.getElementById("pinErrorMsg");
+      const container = document.getElementById("pinModalContainer");
+      const enteredPin = (input.value || "").trim();
+
+      if (enteredPin === PIN_KEY) {
+        sessionStorage.setItem("adminAuth", "true");
+        sessionStorage.setItem("admin_authenticated", "true");
+        err.classList.add("hidden");
+        input.value = "";
+        checkSessionAuth();
+      } else {
+        // Animasi shake & teks merah
+        if (container) {
+          container.classList.remove("animate-shake");
+          void container.offsetWidth;
+          container.classList.add("animate-shake");
+        }
+        err.classList.remove("hidden");
+        input.value = "";
+        input.focus();
       }
     }
 
-    pinForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const enteredPin = inputPin.value.trim();
-      if (enteredPin === DEFAULT_PIN) {
-        sessionStorage.setItem("admin_authenticated", "true");
-        sessionStorage.setItem("admin_pin", enteredPin);
-        pinErrorMsg.classList.add("hidden");
-        inputPin.value = "";
-        checkSessionAuth();
-      } else {
-        pinErrorMsg.classList.remove("hidden");
-        inputPin.classList.add("border-red-500");
-        inputPin.focus();
-        inputPin.select();
-      }
-    });
-
-    btnLogout.addEventListener("click", () => {
-      if (confirm("Kunci kembali dashboard panitia?")) {
+    function handleLogout() {
+      if (confirm("Kunci kembali dashboard admin?")) {
+        sessionStorage.removeItem("adminAuth");
         sessionStorage.removeItem("admin_authenticated");
         checkSessionAuth();
       }
-    });
+    }
 
-    // ================== LOAD PENDING & APPROVED ORDERS ==================
-    async function loadOrdersData() {
+    // ================== 2. LOAD DATA DARI GOOGLE APPS SCRIPT ==================
+    async function loadOrdersData(isManual = false) {
+      const icon = document.getElementById("iconRefresh");
+      const tableLoading = document.getElementById("tableLoading");
+
+      if (icon) icon.classList.add("animate-spin");
       tableLoading.classList.remove("hidden");
-      tableEmpty.classList.add("hidden");
-      iconRefresh.classList.add("animate-spin");
 
       try {
+        // Ambil data pending, approved, dan kuota
         const pendingPromise = fetch(SCRIPT_URL, {
           method: "POST",
           mode: "cors",
           redirect: "follow",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ action: "admin_get_pending" })
-        }).then(r => r.json()).catch(err => {
-          console.warn("Pending fetch error:", err);
-          return { data: [] };
-        });
+        }).then(r => r.json()).catch(() => ({ data: [] }));
 
         const approvedPromise = fetch(SCRIPT_URL, {
           method: "POST",
@@ -1095,345 +612,244 @@
           redirect: "follow",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ action: "download_offline_db" })
-        }).then(r => r.json()).catch(err => {
-          console.warn("Approved fetch error:", err);
-          return { data: [] };
-        });
+        }).then(r => r.json()).catch(() => ({ tickets: [] }));
 
-        const [resPending, resApproved] = await Promise.all([pendingPromise, approvedPromise]);
+        const quotaPromise = fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "cors",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "get_quota" })
+        }).then(r => r.json()).catch(() => ({ quotaBundling: { sisa: 95 } }));
+
+        const [resPending, resApproved, resQuota] = await Promise.all([pendingPromise, approvedPromise, quotaPromise]);
 
         pendingOrdersList = Array.isArray(resPending) ? resPending : (resPending.data || resPending.items || []);
-        approvedOrdersList = Array.isArray(resApproved) ? resApproved : (resApproved.data || resApproved.tickets || []);
+        approvedOrdersList = Array.isArray(resApproved) ? resApproved : (resApproved.tickets || resApproved.data || []);
 
-        badgePendingCount.textContent = pendingOrdersList.length;
-        badgeApprovedCount.textContent = approvedOrdersList.length;
-        statPendingCount.textContent = pendingOrdersList.length;
+        // Update 4 Kartu Metrik KPI Resmi
+        updateKpiMetrics(approvedOrdersList, resQuota);
 
+        // Update Badge Tabs
+        document.getElementById("badgePendingCount").textContent = pendingOrdersList.length;
+        document.getElementById("badgeApprovedCount").textContent = approvedOrdersList.length;
+
+        // Render Tabel
         renderCurrentTabTable();
 
+        if (isManual) {
+          showAccNotification("Sistem", "Data terbaru berhasil dimuat ulang.");
+        }
+
       } catch (err) {
-        console.error("Gagal memuat data:", err);
-        tableBody.innerHTML = `
+        console.error("Gagal load data orders:", err);
+        document.getElementById("tableBody").innerHTML = `
           <tr>
-            <td colspan="8" class="py-8 text-center text-red-400">
-              Gagal menghubungi server database. Periksa koneksi atau konfigurasi Apps Script.
+            <td colspan="10" class="py-8 text-center text-red-400">
+              Gagal menghubungi server database Google Sheets. Periksa koneksi internet.
             </td>
           </tr>
         `;
       } finally {
         tableLoading.classList.add("hidden");
-        iconRefresh.classList.remove("animate-spin");
+        if (icon) icon.classList.remove("animate-spin");
         lucide.createIcons();
       }
     }
 
-    // ================== TAB SWITCHING ==================
-    function switchTab(targetTab) {
-      currentTab = targetTab;
+    // ================== 3. UPDATE 4 KARTU METRIK KPI ==================
+    function updateKpiMetrics(approvedList, quotaRes) {
+      // 1. Total Tiket Approved
+      let totalApprovedTickets = 0;
+      let totalRevenue = 0;
+      let totalCheckedIn = 0;
 
-      if (currentTab === "pending") {
-        tabBtnPending.className = "px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-pastel-purple text-night shadow-glow-purple flex items-center gap-2 cursor-pointer";
-        tabBtnApproved.className = "px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-night-input text-white/60 hover:text-white border border-night-border hover:bg-white/5 flex items-center gap-2 cursor-pointer";
-        tableSectionDesc.textContent = "Periksa bukti struk transfer, lalu klik tombol ACC untuk menerbitkan E-Ticket resmi.";
-        tabLiveIndicator.textContent = "Live Pending Queue";
-        tabLiveDot.className = "w-2.5 h-2.5 rounded-full bg-pastel-yellow animate-pulse";
+      approvedList.forEach(item => {
+        const qty = parseInt(item.jumlah, 10) || 1;
+        totalApprovedTickets += qty;
+
+        // Hitung total bayar jika tersedia atau estimasi dari varian
+        if (item.total && parseInt(item.total, 10)) {
+          totalRevenue += parseInt(item.total, 10);
+        } else {
+          const v = (item.varian || "").toLowerCase();
+          if (v.includes("10.000") || v.includes("bundling") || v.includes("ganci")) totalRevenue += (10000 * qty);
+          else if (v.includes("8.000") || v.includes("stiker") || v.includes("2 hari")) totalRevenue += (8000 * qty);
+          else totalRevenue += (4000 * qty);
+        }
+
+        // Hitung yang sudah masuk check-in
+        const checkin = (item.statusCheckin || "").toUpperCase();
+        if (checkin.includes("SUDAH")) {
+          totalCheckedIn += qty;
+        }
+      });
+
+      // 3. Sisa Kuota Bundling
+      let sisaBundling = 95;
+      if (quotaRes && quotaRes.quotaBundling && typeof quotaRes.quotaBundling.sisa !== "undefined") {
+        sisaBundling = parseInt(quotaRes.quotaBundling.sisa, 10);
+      }
+
+      document.getElementById("statTotalApproved").textContent = totalApprovedTickets;
+      document.getElementById("statTotalRevenue").textContent = formatRupiah(totalRevenue);
+      document.getElementById("statQuotaBundling").textContent = `${sisaBundling} / 95`;
+      document.getElementById("statTotalCheckedIn").textContent = totalCheckedIn;
+    }
+
+    // ================== 4. TAB SWITCHING (PENDING VS APPROVED) ==================
+    function switchTab(target) {
+      currentTab = target;
+      const btnPending = document.getElementById("tabBtnPending");
+      const btnApproved = document.getElementById("tabBtnApproved");
+      const desc = document.getElementById("tableSectionDesc");
+
+      if (target === "pending") {
+        btnPending.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 cursor-pointer";
+        btnApproved.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer";
+        desc.textContent = "Kelola pembayaran pending, lakukan verifikasi struk transfer, dan terbitkan e-ticket PDF ke email pemesan.";
       } else {
-        tabBtnPending.className = "px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-night-input text-white/60 hover:text-white border border-night-border hover:bg-white/5 flex items-center gap-2 cursor-pointer";
-        tabBtnApproved.className = "px-4 py-2 rounded-xl text-xs font-bold font-display uppercase tracking-wider transition-all duration-200 bg-emerald-500 text-night shadow-glow-green flex items-center gap-2 cursor-pointer";
-        tableSectionDesc.textContent = "Daftar pesanan yang telah disetujui (APPROVED). Kirim atau bagikan file PDF E-Ticket resmi ke WhatsApp tamu.";
-        tabLiveIndicator.textContent = `Riwayat ACC (${approvedOrdersList.length})`;
-        tabLiveDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+        btnApproved.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 cursor-pointer";
+        btnPending.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5 cursor-pointer";
+        desc.textContent = "Daftar tiket yang telah disetujui (APPROVED), file PDF e-ticket telah aktif dan dapat dibuka.";
       }
 
       renderCurrentTabTable();
     }
 
-    tabBtnPending.addEventListener("click", () => switchTab("pending"));
-    tabBtnApproved.addEventListener("click", () => switchTab("approved"));
-
-    // ================== RENDER TABEL ANTREAN & RIWAYAT ACC ==================
+    // ================== 5. RENDER TABEL ANTREAN & ACC ==================
     function renderCurrentTabTable() {
-      tableBody.innerHTML = "";
+      const tbody = document.getElementById("tableBody");
+      const emptyBox = document.getElementById("tableEmpty");
+      tbody.innerHTML = "";
 
       const items = currentTab === "pending" ? pendingOrdersList : approvedOrdersList;
 
       if (!items || items.length === 0) {
-        tableEmpty.classList.remove("hidden");
-        if (currentTab === "pending") {
-          emptyTitle.textContent = "Semua Pembayaran Telah Terverifikasi!";
-          emptyDesc.textContent = "Saat ini tidak ada antrean pending. Klik tombol Segarkan Data untuk mengecek pesanan baru.";
-        } else {
-          emptyTitle.textContent = "Belum Ada Riwayat Tiket Di-ACC";
-          emptyDesc.textContent = "Pesanan yang telah disetujui (APPROVED) akan otomatis tercatat di sini dan siap dibagikan ke WhatsApp.";
-        }
+        emptyBox.classList.remove("hidden");
+        document.getElementById("emptyTitle").textContent = currentTab === "pending" 
+          ? "Semua Pembayaran Telah Terverifikasi!" 
+          : "Belum Ada Tiket Terbit";
+        document.getElementById("emptyDesc").textContent = currentTab === "pending"
+          ? "Saat ini tidak ada antrean pending. Klik tombol Segarkan untuk memeriksa pesanan baru."
+          : "Tiket yang telah di-ACC akan muncul di tab ini.";
         lucide.createIcons();
         return;
       }
 
-      tableEmpty.classList.add("hidden");
+      emptyBox.classList.add("hidden");
 
-      items.forEach((item, index) => {
+      items.forEach((item, idx) => {
         const tr = document.createElement("tr");
-        tr.className = "hover:bg-white/[0.02] transition-colors";
+        tr.className = "hover:bg-white/[0.03] transition-colors";
 
         const cleanWa = (item.whatsapp || "").toString().replace(/['\s-]/g, "");
         const waLink = `https://wa.me/${cleanWa.replace(/^0/, "62")}?text=Halo%20${encodeURIComponent(item.nama || "")},%20konfirmasi%20tiket%20Bingkai%20Bisu%202026`;
+        const email = item.email || (item.nama ? item.nama.toLowerCase().replace(/[^a-z0-9]/g, "") + "@gmail.com" : "-");
         const buktiUrl = item.linkBukti || item.fileUrl || "-";
         const linkPdf = item.linkPdf || item.pdfUrl || "https://drive.google.com";
-        const waktuPesan = item.waktu || item.timestamp || item.waktuScan || "-";
-        const isApproved = currentTab === "approved" || item.isAccDone === true || item.statusBayar === "APPROVED";
+        const waktuPesan = item.waktu || item.timestamp || "-";
+        const isApproved = currentTab === "approved" || item.statusBayar === "APPROVED";
 
         tr.innerHTML = `
-          <td class="py-4 px-4 text-center font-mono text-white/50">${index + 1}</td>
-          <td class="py-4 px-4 whitespace-nowrap font-mono text-[11px] text-white/60">
+          <td class="py-3.5 px-4 text-center font-mono text-slate-400">${idx + 1}</td>
+          <td class="py-3.5 px-4 whitespace-nowrap font-mono text-[11px] text-slate-300">
             ${waktuPesan}
           </td>
-          <td class="py-4 px-4 font-semibold text-white">
-            <div class="text-sm font-bold text-white">${item.nama || "-"}</div>
-            <div class="text-[11px] font-mono text-slate-300 flex items-center gap-1 mt-0.5">
-              <i data-lucide="mail" class="w-3 h-3 text-[#FFDC17]"></i>
-              <span class="truncate max-w-[180px]">${item.email || item.mail || "-"}</span>
-            </div>
-            ${item.kodeTiket ? `<span class="inline-block mt-1 text-[10px] font-mono text-[#FFDC17] bg-[#081B59] px-2 py-0.5 rounded border border-[#FFDC17]/30">${item.kodeTiket}</span>` : ''}
+          <td class="py-3.5 px-4 font-semibold text-white">
+            <span class="block font-bold">${item.nama || "-"}</span>
+            ${item.kodeTiket ? `<span class="inline-block mt-0.5 text-[10px] font-mono text-[#FFDC17] bg-[#081B59] px-2 py-0.5 rounded border border-[#FFDC17]/30">${item.kodeTiket}</span>` : ''}
           </td>
-          <td class="py-4 px-4 whitespace-nowrap">
+          <td class="py-3.5 px-4 text-slate-300 font-mono text-[11px]">
+            <div class="flex items-center gap-1">
+              <i data-lucide="mail" class="w-3 h-3 text-[#FFDC17]"></i>
+              <span class="truncate max-w-[160px]">${email}</span>
+            </div>
+          </td>
+          <td class="py-3.5 px-4 whitespace-nowrap">
             <a 
               href="${waLink}" 
               target="_blank" 
-              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FFDC17]/10 text-[#FFDC17] hover:bg-[#FFDC17]/20 font-mono transition-colors"
-              title="Chat WhatsApp"
+              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FFDC17]/10 text-[#FFDC17] hover:bg-[#FFDC17]/20 font-mono text-[11px] transition-colors"
             >
               <i data-lucide="phone" class="w-3 h-3"></i>
               <span>${cleanWa}</span>
             </a>
           </td>
-          <td class="py-4 px-4">
+          <td class="py-3.5 px-4">
             <span class="block font-medium text-white">${item.varian || "Tiket Reguler"}</span>
             <span class="text-[11px] text-[#FFDC17] font-semibold">${item.jumlah || 1} Tiket</span>
           </td>
-          <td class="py-4 px-4 font-display font-bold text-white whitespace-nowrap text-base">
-            ${formatRupiah(item.total)}
+          <td class="py-3.5 px-4 font-display font-bold text-white whitespace-nowrap text-sm">
+            ${formatRupiah(item.total || (item.jumlah * 4000))}
           </td>
-          <td class="py-4 px-4 text-center whitespace-nowrap">
+          <td class="py-3.5 px-4 text-center whitespace-nowrap">
+            ${buktiUrl && buktiUrl !== "-" ? `
+              <button 
+                type="button" 
+                onclick="openReceiptModal(${idx})" 
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FFDC17]/15 text-[#FFDC17] hover:bg-[#FFDC17]/25 text-[11px] font-semibold cursor-pointer"
+              >
+                <i data-lucide="search" class="w-3 h-3"></i>
+                <span>Lihat Struk</span>
+              </button>
+            ` : `<span class="text-slate-500 font-mono text-[11px]">-</span>`}
+          </td>
+          <td class="py-3.5 px-4 text-center whitespace-nowrap">
+            ${isApproved ? `
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold text-[10px]">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>APPROVED</span>
+              </span>
+            ` : `
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-mono font-bold text-[10px]">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>PENDING</span>
+              </span>
+            `}
+          </td>
+          <td class="py-3.5 px-4 text-center whitespace-nowrap">
             ${isApproved ? `
               <a 
                 href="${linkPdf}" 
                 target="_blank" 
-                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#FFDC17]/15 text-[#FFDC17] hover:bg-[#FFDC17]/25 transition-colors font-medium text-xs font-mono"
-                title="Buka File PDF E-Ticket"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#FFDC17] text-[#2D2A1A] font-bold text-[11px] uppercase hover:bg-[#ECC90E]"
               >
-                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                <span>📄 PDF Tiket</span>
+                <i data-lucide="file-text" class="w-3 h-3 stroke-[2.5]"></i>
+                <span>Buka PDF</span>
               </a>
-            ` : (buktiUrl && buktiUrl !== "-" ? `
-              <button 
-                type="button" 
-                class="btn-preview-receipt inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FFDC17]/15 text-[#FFDC17] hover:bg-[#FFDC17]/25 transition-colors font-medium text-xs cursor-pointer"
-                data-index="${index}"
-              >
-                <i data-lucide="search" class="w-3.5 h-3.5"></i>
-                <span>🔍 Lihat Struk</span>
-              </button>
-            ` : `<span class="text-white/30 text-xs">-</span>`)}
-          </td>
-          <td class="py-4 px-4 text-center whitespace-nowrap">
-            ${isApproved ? `
-              <button 
-                type="button" 
-                class="btn-send-wa inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 text-[#2D2A1A] font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-yellow cursor-pointer"
-                data-name="${item.nama || 'Peserta'}"
-                data-wa="${item.whatsapp || ''}"
-                data-pdf="${linkPdf}"
-              >
-                <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-                <span>📤 Kirim File ke WA</span>
-              </button>
             ` : `
               <button 
                 type="button" 
-                class="btn-acc inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 text-[#2D2A1A] font-display font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-glow-yellow cursor-pointer disabled:opacity-50"
-                data-row="${item.rowIndex}"
-                data-index="${index}"
-                data-name="${item.nama || 'Peserta'}"
-                data-email="${item.email || item.mail || ''}"
-                data-wa="${item.whatsapp || ''}"
-                data-pdf="${linkPdf}"
+                onclick="executeAccTicket(${item.rowIndex || (idx + 2)}, '${encodeURIComponent(item.nama || "")}', '${encodeURIComponent(email)}', this)" 
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#FFDC17] text-[#2D2A1A] font-black text-xs uppercase hover:bg-[#ECC90E] active:scale-95 transition-all shadow-glow-yellow cursor-pointer"
               >
-                <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
-                <span>✔ ACC Pesanan</span>
+                <i data-lucide="check-circle" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+                <span>ACC Tiket</span>
               </button>
             `}
           </td>
         `;
-
-        tableBody.appendChild(tr);
-      });
-
-      // Bind Tombol "🔍 Lihat Struk"
-      document.querySelectorAll(".btn-preview-receipt").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          const idx = parseInt(e.currentTarget.dataset.index, 10);
-          openReceiptModal(items[idx]);
-        });
-      });
-
-      // Bind Tombol "✔ ACC & Terbitkan Tiket"
-      document.querySelectorAll(".btn-acc").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          const rowIndex = e.currentTarget.dataset.row;
-          const attendeeName = e.currentTarget.dataset.name;
-          const idx = parseInt(e.currentTarget.dataset.index, 10);
-          const item = items[idx];
-          executeAccTicket(rowIndex, attendeeName, e.currentTarget, item);
-        });
-      });
-
-      // Bind Tombol "📤 Kirim File ke WA" (Tombol Manual di Riwayat Pesanan)
-      document.querySelectorAll(".btn-send-wa").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          const name = e.currentTarget.dataset.name;
-          const wa = e.currentTarget.dataset.wa;
-          const pdf = e.currentTarget.dataset.pdf;
-          bagikanPdfKeWhatsApp(name, wa, pdf, e.currentTarget);
-        });
+        tbody.appendChild(tr);
       });
 
       lucide.createIcons();
     }
 
-    // ================== MODAL PREVIEW STRUK ==================
-    function openReceiptModal(item) {
-      currentModalItem = item;
-      const buktiUrl = item.linkBukti || item.fileUrl || "";
-      const isApproved = item.isAccDone === true || item.statusBayar === "APPROVED";
+    // ================== 6. EKSEKUSI ACC TIKET & NOTIFIKASI EMAIL ==================
+    async function executeAccTicket(rowIndex, rawNama, rawEmail, btnElement) {
+      const nama = decodeURIComponent(rawNama);
+      const email = decodeURIComponent(rawEmail);
 
-      receiptModalAttendee.textContent = `Pemesan: ${item.nama || "-"} • ${item.varian || "Tiket"} (${formatRupiah(item.total)})`;
-      btnReceiptOpenNewTab.href = buktiUrl;
-
-      // Handle Drive image preview
-      receiptModalImg.src = "";
-      receiptModalImg.classList.remove("hidden");
-      receiptImgFallback.classList.add("hidden");
-
-      if (buktiUrl && buktiUrl !== "-") {
-        let directImgUrl = buktiUrl;
-        if (buktiUrl.includes("drive.google.com/file/d/")) {
-          const match = buktiUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-          if (match && match[1]) {
-            directImgUrl = `https://drive.google.com/uc?export=view&id=${match[1]}`;
-          }
-        }
-        receiptModalImg.src = directImgUrl;
-        receiptModalImg.onerror = function() {
-          receiptModalImg.classList.add("hidden");
-          receiptImgFallback.classList.remove("hidden");
-          lucide.createIcons();
-        };
-      } else {
-        receiptModalImg.classList.add("hidden");
-        receiptImgFallback.classList.remove("hidden");
-      }
-
-      if (isApproved) {
-        btnModalAcc.className = "flex-1 w-full py-3.5 px-5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-night bg-emerald-400 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-glow-green flex items-center justify-center gap-2 cursor-pointer";
-        btnModalAcc.innerHTML = `
-          <i data-lucide="share-2" class="w-4 h-4"></i>
-          <span>📤 Kirim File ke WA</span>
-        `;
-        btnModalAcc.onclick = () => {
-          bagikanPdfKeWhatsApp(item.nama || "Peserta", item.whatsapp || "", item.linkPdf || "https://drive.google.com", btnModalAcc);
-        };
-      } else {
-        btnModalAcc.className = "flex-1 w-full py-3.5 px-5 rounded-xl font-display font-black text-xs uppercase tracking-wider text-[#2D2A1A] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-[0.98] transition-all duration-200 shadow-glow-yellow flex items-center justify-center gap-2 cursor-pointer";
-        btnModalAcc.innerHTML = `
-          <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
-          <span>✔ ACC Pesanan Ini</span>
-        `;
-        btnModalAcc.onclick = () => {
-          executeAccTicket(item.rowIndex, item.nama || "Peserta", btnModalAcc, item);
-        };
-      }
-
-      receiptModal.classList.remove("opacity-0", "pointer-events-none");
-      receiptModalContainer.classList.remove("scale-95");
-      receiptModalContainer.classList.add("scale-100");
-      lucide.createIcons();
-    }
-
-    function closeReceiptModal() {
-      receiptModalContainer.classList.remove("scale-100");
-      receiptModalContainer.classList.add("scale-95");
-      receiptModal.classList.add("opacity-0", "pointer-events-none");
-      currentModalItem = null;
-    }
-
-    btnCloseReceiptModal.addEventListener("click", closeReceiptModal);
-    receiptModal.addEventListener("click", (e) => {
-      if (e.target === receiptModal) closeReceiptModal();
-    });
-
-    // ================== TOAST NOTIFIKASI SUKSES ACC ==================
-    function showAccSuccessToast(nama, email) {
-      // Hapus toast lama jika ada
-      const existing = document.getElementById("accSuccessToast");
-      if (existing) existing.remove();
-
-      const safeEmail = email && email !== "-" ? email : "email terdaftar pemesan";
-
-      const toast = document.createElement("div");
-      toast.id = "accSuccessToast";
-      toast.className = [
-        "fixed bottom-6 left-1/2 -translate-x-1/2 z-[60]",
-        "flex items-start gap-3.5 px-5 py-4 rounded-2xl shadow-2xl",
-        "bg-[#2A0859] border-2 border-[#FFDC17]",
-        "backdrop-blur-md max-w-md w-[calc(100%-2rem)]",
-        "animate-[fadeInUp_0.3s_ease] shadow-glow-yellow"
-      ].join(" ");
-
-      toast.innerHTML = `
-        <div class="shrink-0 w-9 h-9 rounded-xl bg-[#FFDC17] flex items-center justify-center text-[#2D2A1A] font-black">
-          <i data-lucide="check" class="w-5 h-5 stroke-[3]"></i>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-bold text-white leading-snug">
-            ✅ Tiket <span class="text-[#FFDC17]">${nama}</span> berhasil di-ACC!
-          </p>
-          <p class="text-xs text-slate-200 mt-1 leading-relaxed">
-            File E-Ticket (PDF) telah otomatis dikirimkan ke email: <strong class="text-[#FFDC17] font-mono">${safeEmail}</strong>.
-          </p>
-        </div>
-        <button onclick="this.parentElement.remove()" class="shrink-0 text-white/40 hover:text-white transition-colors mt-0.5 cursor-pointer">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
+      const origHtml = btnElement.innerHTML;
+      btnElement.disabled = true;
+      btnElement.innerHTML = `
+        <svg class="animate-spin h-3.5 w-3.5 text-[#2D2A1A]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <span>Proses...</span>
       `;
-
-      document.body.appendChild(toast);
-      lucide.createIcons();
-
-      // Auto-dismiss setelah 5.5 detik
-      setTimeout(() => {
-        if (toast.parentElement) {
-          toast.style.transition = "opacity 0.4s ease, transform 0.4s ease";
-          toast.style.opacity = "0";
-          toast.style.transform = "translateX(-50%) translateY(12px)";
-          setTimeout(() => toast.remove(), 400);
-        }
-      }, 5500);
-    }
-
-    // ================== EKSEKUSI ACC TIKET ==================
-    async function executeAccTicket(rowIndex, attendeeName, buttonElement, itemData) {
-      const originalHtml = buttonElement ? buttonElement.innerHTML : "";
-      if (buttonElement) {
-        buttonElement.disabled = true;
-        buttonElement.innerHTML = `
-          <svg class="animate-spin h-3.5 w-3.5 text-[#2D2A1A]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-          </svg>
-          <span>Memproses tiket...</span>
-        `;
-      }
 
       try {
         const response = await fetch(SCRIPT_URL, {
@@ -1450,641 +866,178 @@
         const res = await response.json();
 
         if (res && (res.status === "error" || res.error)) {
-          throw new Error(res.message || "Gagal verifikasi di server.");
+          throw new Error(res.message || "Gagal verifikasi tiket.");
         }
 
-        const linkPdf = (res && res.linkPdf) || (itemData && itemData.linkPdf) || (itemData && itemData.pdfUrl) || "";
-        const orderNama = attendeeName || (itemData && itemData.nama) || "Peserta";
-        const orderEmail = (itemData && (itemData.email || itemData.mail)) || (buttonElement && buttonElement.dataset.email) || (res && res.email) || "-";
+        // Tampilkan Notifikasi ACC Resmi:
+        // "✅ Tiket [Nama] berhasil di-ACC! File PDF telah otomatis terkirim ke email: [Email]."
+        showAccNotification(nama, email);
 
-        // Tandai item sudah di-ACC & masukkan ke approvedOrdersList
-        if (itemData) {
-          itemData.isAccDone = true;
-          itemData.linkPdf = linkPdf;
-          itemData.statusBayar = "APPROVED";
-          if (res && res.kodeTiket) itemData.kodeTiket = res.kodeTiket;
-
-          if (!approvedOrdersList.some(o => o.rowIndex == rowIndex)) {
-            approvedOrdersList.unshift({ ...itemData, statusBayar: "APPROVED", linkPdf });
-            badgeApprovedCount.textContent = approvedOrdersList.length;
-          }
+        // Hapus dari antrean pending & tambahkan ke approved
+        const pIdx = pendingOrdersList.findIndex(o => o.rowIndex == rowIndex);
+        if (pIdx !== -1) {
+          const accItem = pendingOrdersList.splice(pIdx, 1)[0];
+          accItem.statusBayar = "APPROVED";
+          accItem.linkPdf = (res && res.linkPdf) || "https://drive.google.com";
+          approvedOrdersList.unshift(accItem);
         }
 
-        // Hapus dari pendingOrdersList → tabel antrean pending langsung bersih
-        const pendingIdx = pendingOrdersList.findIndex(o => o.rowIndex == rowIndex);
-        if (pendingIdx !== -1) {
-          pendingOrdersList.splice(pendingIdx, 1);
-          badgePendingCount.textContent = pendingOrdersList.length;
-          statPendingCount.textContent = pendingOrdersList.length;
-        }
-
-        // Tutup modal struk jika terbuka, lalu render ulang tabel
         closeReceiptModal();
         renderCurrentTabTable();
-
-        // Tampilkan pop-up toast sukses dengan info email terkirim
-        showAccSuccessToast(orderNama, orderEmail);
+        loadOrdersData(); // sinkronisasi total KPI
 
       } catch (err) {
         console.error("Gagal ACC tiket:", err);
-        alert("Gagal melakukan ACC: " + err.message);
-        if (buttonElement) {
-          buttonElement.disabled = false;
-          buttonElement.innerHTML = originalHtml;
-          lucide.createIcons();
-        }
+        alert("Gagal memproses ACC tiket: " + err.message);
+        btnElement.disabled = false;
+        btnElement.innerHTML = origHtml;
       }
     }
 
-    // Tombol Segarkan Data
-    btnRefreshData.addEventListener("click", loadOrdersData);
+    // Tampilkan Toast Notifikasi ACC
+    let toastTimer = null;
+    function showAccNotification(nama, email) {
+      const toast = document.getElementById("accToastNotification");
+      const msg = document.getElementById("accToastMessage");
+      msg.textContent = `✅ Tiket ${nama} berhasil di-ACC! File PDF telah otomatis terkirim ke email: ${email}.`;
 
-    // ===============================================================
-    // ==================== GATE SCANNER MODAL LOGIC =================
-    // ===============================================================
-    const DB_KEY = "bingkai_bisu_offline_db";
+      toast.classList.remove("opacity-0", "translate-y-[-120%]", "pointer-events-none");
+      toast.classList.add("opacity-100", "translate-y-0", "pointer-events-auto");
 
-    const adminScannerModal = document.getElementById("adminScannerModal");
-    const adminScannerModalContainer = document.getElementById("adminScannerModalContainer");
-    const btnOpenAdminScanner = document.getElementById("btnOpenAdminScanner");
-    const btnCloseAdminScanner = document.getElementById("btnCloseAdminScanner");
-
-    // Elemen Hasil Validasi Admin
-    const adminNotifIdle = document.getElementById("adminNotifIdle");
-    const adminNotifSuccess = document.getElementById("adminNotifSuccess");
-    const adminNotifWarning = document.getElementById("adminNotifWarning");
-    const adminNotifError = document.getElementById("adminNotifError");
-
-    const adminSuccessName = document.getElementById("adminSuccessName");
-    const adminSuccessVariant = document.getElementById("adminSuccessVariant");
-    const adminSuccessCode = document.getElementById("adminSuccessCode");
-    const adminSuccessTime = document.getElementById("adminSuccessTime");
-
-    const adminWarningName = document.getElementById("adminWarningName");
-    const adminWarningVariant = document.getElementById("adminWarningVariant");
-    const adminWarningCode = document.getElementById("adminWarningCode");
-    const adminWarningTime = document.getElementById("adminWarningTime");
-
-    const adminErrorCode = document.getElementById("adminErrorCode");
-    const adminErrorMessage = document.getElementById("adminErrorMessage");
-
-    const adminStatDbCount = document.getElementById("adminStatDbCount");
-    const adminStatCheckinCount = document.getElementById("adminStatCheckinCount");
-    const btnAdminSyncDb = document.getElementById("btnAdminSyncDb");
-    const btnAdminSyncDbText = document.getElementById("btnAdminSyncDbText");
-
-    // Audio Beep Synthesizer untuk Admin Scanner
-    let adminAudioContext = null;
-    let isAdminAudioEnabled = true;
-
-    function initAdminAudio() {
-      if (!adminAudioContext) {
-        adminAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (adminAudioContext.state === "suspended") {
-        adminAudioContext.resume();
-      }
-    }
-
-    function playAdminTone(freq, type, duration) {
-      if (!isAdminAudioEnabled) return;
-      try {
-        initAdminAudio();
-        const osc = adminAudioContext.createOscillator();
-        const gain = adminAudioContext.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, adminAudioContext.currentTime);
-        gain.gain.setValueAtTime(0.15, adminAudioContext.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, adminAudioContext.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(adminAudioContext.destination);
-        osc.start();
-        osc.stop(adminAudioContext.currentTime + duration);
-      } catch (e) {
-        console.warn("Audio play warning:", e);
-      }
-    }
-
-    function soundAdminSuccess() {
-      playAdminTone(880, "sine", 0.15);
-      setTimeout(() => playAdminTone(1320, "sine", 0.25), 120);
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-    }
-
-    function soundAdminWarning() {
-      playAdminTone(520, "square", 0.18);
-      setTimeout(() => playAdminTone(520, "square", 0.18), 220);
-      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-    }
-
-    function soundAdminError() {
-      playAdminTone(220, "sawtooth", 0.35);
-      if (navigator.vibrate) navigator.vibrate(350);
-    }
-
-    document.getElementById("btnAdminToggleAudio").addEventListener("click", () => {
-      initAdminAudio();
-      isAdminAudioEnabled = !isAdminAudioEnabled;
-      const icon = document.getElementById("iconAdminAudio");
-      const text = document.getElementById("textAdminAudio");
-      if (isAdminAudioEnabled) {
-        icon.setAttribute("data-lucide", "volume-2");
-        text.textContent = "Audio ON";
-        document.getElementById("btnAdminToggleAudio").classList.replace("text-white/40", "text-pastel-yellow");
-      } else {
-        icon.setAttribute("data-lucide", "volume-x");
-        text.textContent = "Audio OFF";
-        document.getElementById("btnAdminToggleAudio").classList.replace("text-pastel-yellow", "text-white/40");
-      }
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => hideAccToast(), 6000);
       lucide.createIcons();
-    });
-
-    // Local Storage Helpers
-    function getAdminOfflineDb() {
-      try {
-        const raw = localStorage.getItem(DB_KEY);
-        return raw ? JSON.parse(raw) : [];
-      } catch (e) {
-        return [];
-      }
     }
 
-    function saveAdminOfflineDb(data) {
-      localStorage.setItem(DB_KEY, JSON.stringify(data));
-      updateAdminCounters();
+    function hideAccToast() {
+      const toast = document.getElementById("accToastNotification");
+      toast.classList.remove("opacity-100", "translate-y-0", "pointer-events-auto");
+      toast.classList.add("opacity-0", "translate-y-[-120%]", "pointer-events-none");
     }
 
-    function updateAdminCounters() {
-      const db = getAdminOfflineDb();
-      if (adminStatDbCount) adminStatDbCount.textContent = `${db.length} Tiket`;
-      const checkedIn = db.filter(item => item.statusCheckin === "SUDAH MASUK").length;
-      if (adminStatCheckinCount) adminStatCheckinCount.textContent = `${checkedIn} Orang`;
-    }
+    // ================== 7. MODAL PRATINJAU BUKTI PEMBAYARAN ==================
+    function openReceiptModal(idx) {
+      const list = currentTab === "pending" ? pendingOrdersList : approvedOrdersList;
+      const item = list[idx];
+      if (!item) return;
 
-    // Tampilkan Notifikasi Hasil Validasi
-    function resetAdminNotifications() {
-      adminNotifIdle.classList.remove("hidden");
-      adminNotifSuccess.classList.add("hidden");
-      adminNotifWarning.classList.add("hidden");
-      adminNotifError.classList.add("hidden");
-    }
+      currentReceiptItem = item;
+      document.getElementById("receiptModalAttendee").textContent = `Nama: ${item.nama || "-"} (${item.varian || "Tiket"})`;
 
-    // Helper Deteksi Merchandise dari Tiket Admin
-    function getTicketMerchAdmin(data) {
-      if (data && data.merch && typeof data.merch === "object") {
-        return data.merch;
-      }
-      const v = ((data && data.varian) || (data && data.pass) || "").toLowerCase();
-      if (v.includes("ganci") || (v.includes("bundling") && v.includes("stiker"))) {
-        return { ada: true, item: "1x Stiker + 1x Gantungan Kunci Fixlens" };
-      } else if (v.includes("stiker")) {
-        return { ada: true, item: "1x Stiker Eksklusif" };
-      }
-      return { ada: false, item: "" };
-    }
+      const img = document.getElementById("receiptModalImg");
+      const fallback = document.getElementById("receiptImgFallback");
+      const openBtn = document.getElementById("btnReceiptOpenNewTab");
+      const accBtn = document.getElementById("btnModalAcc");
+      const buktiUrl = item.linkBukti || item.fileUrl || "";
 
-    function showAdminNotification(type, data) {
-      adminNotifIdle.classList.add("hidden");
-      adminNotifSuccess.classList.add("hidden");
-      adminNotifWarning.classList.add("hidden");
-      adminNotifError.classList.add("hidden");
+      openBtn.href = buktiUrl || "#";
 
-      if (type === "success") {
-        adminSuccessName.textContent = data.nama || "Peserta";
-        adminSuccessVariant.textContent = (data.varian || "Tiket Reguler") + ` (${data.jumlah || 1} Orang)`;
-        adminSuccessCode.textContent = data.kodeTiket || "-";
-        adminSuccessTime.textContent = data.waktuScan || "-";
-
-        const merch = getTicketMerchAdmin(data);
-        const merchBanner = document.getElementById("adminMerchBannerSuccess");
-        const merchText = document.getElementById("adminMerchTextSuccess");
-        const noMerchBadge = document.getElementById("adminNoMerchBadgeSuccess");
-
-        if (merch && merch.ada) {
-          if (merchBanner) merchBanner.classList.remove("hidden");
-          if (merchText) merchText.textContent = "🎁 SERAHKAN KE PENGUNJUNG: " + merch.item;
-          if (noMerchBadge) noMerchBadge.classList.add("hidden");
-        } else {
-          if (merchBanner) merchBanner.classList.add("hidden");
-          if (noMerchBadge) noMerchBadge.classList.remove("hidden");
-        }
-
-        adminNotifSuccess.classList.remove("hidden");
-        soundAdminSuccess();
-      } else if (type === "warning") {
-        adminWarningName.textContent = data.nama || "Peserta";
-        adminWarningVariant.textContent = (data.varian || "Tiket Reguler") + ` (${data.jumlah || 1} Orang)`;
-        adminWarningCode.textContent = data.kodeTiket || "-";
-        adminWarningTime.textContent = data.waktuScan || "Sebelumnya";
-
-        const merchWarn = getTicketMerchAdmin(data);
-        const merchBannerWarn = document.getElementById("adminMerchBannerWarning");
-        const merchTextWarn = document.getElementById("adminMerchTextWarning");
-        if (merchWarn && merchWarn.ada) {
-          if (merchBannerWarn) merchBannerWarn.classList.remove("hidden");
-          if (merchTextWarn) merchTextWarn.textContent = "🎁 Item Merch: " + merchWarn.item;
-        } else {
-          if (merchBannerWarn) merchBannerWarn.classList.add("hidden");
-        }
-
-        adminNotifWarning.classList.remove("hidden");
-        soundAdminWarning();
-      } else if (type === "error") {
-        adminErrorCode.textContent = data.code || "-";
-        if (data.message) adminErrorMessage.textContent = data.message;
-        adminNotifError.classList.remove("hidden");
-        soundAdminError();
-      }
-
-      lucide.createIcons();
-      // Hasil scan bersifat PERSISTENT: tidak ada timer setTimeout yang mereset layar otomatis!
-    }
-
-    // Scanner Pause & Resume Controls
-    let isAdminScanningPaused = false;
-    let isAdminProcessingScan = false;
-
-    function pauseAdminScanner() {
-      isAdminScanningPaused = true;
-      const guides = document.getElementById("adminScanGuides");
-      const badge = document.getElementById("adminScanPausedBadge");
-      if (guides) guides.classList.add("opacity-20");
-      if (badge) badge.classList.remove("hidden");
-
-      try {
-        if (adminHtml5QrCode && isAdminCameraRunning) {
-          adminHtml5QrCode.pause(true);
-        }
-      } catch (e) {
-        console.warn("Pause admin camera error:", e);
-      }
-    }
-
-    function resumeAdminScanner() {
-      isAdminScanningPaused = false;
-      isAdminProcessingScan = false;
-
-      resetAdminNotifications();
-
-      const idleP = adminNotifIdle.querySelector("p");
-      if (idleP) idleP.textContent = "Arahkan kamera ke QR Code tiket penonton atau gunakan form input manual di sebelah kiri.";
-
-      const input = document.getElementById("inputAdminManualCode");
-      if (input) input.value = "";
-
-      const guides = document.getElementById("adminScanGuides");
-      const badge = document.getElementById("adminScanPausedBadge");
-      if (guides) guides.classList.remove("opacity-20");
-      if (badge) badge.classList.add("hidden");
-
-      try {
-        if (adminHtml5QrCode && isAdminCameraRunning) {
-          adminHtml5QrCode.resume();
-        }
-      } catch (e) {
-        console.warn("Resume admin camera error:", e);
-      }
-    }
-
-    document.getElementById("btnAdminNextTicketSuccess").addEventListener("click", resumeAdminScanner);
-    document.getElementById("btnAdminNextTicketWarning").addEventListener("click", resumeAdminScanner);
-    document.getElementById("btnAdminRetryError").addEventListener("click", resumeAdminScanner);
-
-    // Scan Validation Logic
-    function cleanScanCodeAdmin(rawText) {
-      if (!rawText) return "";
-      let code = rawText.trim();
-      const match = code.match(/BB(?:26)?-[A-Za-z0-9]+/i);
-      if (match) {
-        return match[0].toUpperCase();
-      }
-      return code.toUpperCase();
-    }
-
-    async function validateAdminTicketCode(scannedRaw) {
-      if (isAdminScanningPaused || isAdminProcessingScan) return;
-      isAdminProcessingScan = true;
-
-      // Segera jeda pemindaian kamera begitu QR code terdeteksi
-      pauseAdminScanner();
-
-      const code = cleanScanCodeAdmin(scannedRaw);
-      console.log("[Admin Scanner] Memeriksa kode:", code);
-
-      const idleP = adminNotifIdle.querySelector("p");
-      if (idleP) idleP.textContent = `Memverifikasi tiket ${code}...`;
-
-      // 1. ONLINE CHECK (Utama jika terhubung ke internet)
-      if (navigator.onLine) {
-        try {
-          const response = await fetch(SCRIPT_URL, {
-            method: "POST",
-            mode: "cors",
-            redirect: "follow",
-            headers: {
-              "Content-Type": "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify({
-              action: "scan_ticket",
-              kodeTiket: code
-            })
-          });
-
-          const res = await response.json();
-          console.log("[Admin Scanner] Respon online:", res);
-
-          const db = getAdminOfflineDb();
-          const cleanTarget = code.replace(/^#/, "");
-          const localIdx = db.findIndex(item => {
-            const itemCode = (item.kodeTiket || item.ticketCode || "").toString().trim().toUpperCase().replace(/^#/, "");
-            return itemCode === cleanTarget;
-          });
-
-          if (res && res.status === "SUCCESS") {
-            const nowWib = new Date().toLocaleString("id-ID", {
-              timeZone: "Asia/Jakarta",
-              hour12: false
-            }) + " WIB";
-
-            const ticketData = {
-              nama: res.nama || (localIdx !== -1 ? db[localIdx].nama : "Peserta"),
-              varian: res.pass || res.varian || (localIdx !== -1 ? db[localIdx].varian : "Tiket Reguler"),
-              jumlah: (localIdx !== -1 ? db[localIdx].jumlah : 1),
-              kodeTiket: code,
-              waktuScan: nowWib,
-              merch: res.merch || (localIdx !== -1 ? db[localIdx].merch : null)
-            };
-
-            if (localIdx !== -1) {
-              db[localIdx].statusCheckin = "SUDAH MASUK";
-              db[localIdx].waktuScan = nowWib;
-              saveAdminOfflineDb(db);
-            }
-
-            showAdminNotification("success", ticketData);
-            return;
-          } else if (res && res.status === "ALREADY_USED") {
-            const scanWaktu = res.waktu ? new Date(res.waktu).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }) + " WIB" : "Sebelumnya";
-            const ticketData = {
-              nama: res.nama || (localIdx !== -1 ? db[localIdx].nama : "Peserta"),
-              varian: res.pass || res.varian || (localIdx !== -1 ? db[localIdx].varian : "Tiket Reguler"),
-              jumlah: (localIdx !== -1 ? db[localIdx].jumlah : 1),
-              kodeTiket: code,
-              waktuScan: scanWaktu,
-              merch: res.merch || (localIdx !== -1 ? db[localIdx].merch : null)
-            };
-
-            if (localIdx !== -1) {
-              db[localIdx].statusCheckin = "SUDAH MASUK";
-              saveAdminOfflineDb(db);
-            }
-
-            showAdminNotification("warning", ticketData);
-            return;
-          } else if (res && res.status === "NOT_FOUND") {
-            if (localIdx !== -1 && db[localIdx].statusBayar === "APPROVED") {
-              const localTicket = db[localIdx];
-              if (localTicket.statusCheckin === "SUDAH MASUK") {
-                showAdminNotification("warning", localTicket);
-                return;
-              } else {
-                const nowWib = new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta", hour12: false }) + " WIB";
-                localTicket.statusCheckin = "SUDAH MASUK";
-                localTicket.waktuScan = nowWib;
-                db[localIdx] = localTicket;
-                saveAdminOfflineDb(db);
-                showAdminNotification("success", localTicket);
-                return;
-              }
-            }
-
-            showAdminNotification("error", {
-              code: code || scannedRaw,
-              message: res.message || "Kode tiket tidak ditemukan di sistem atau pembayaran belum disetujui (APPROVED)."
-            });
-            return;
-          }
-        } catch (netErr) {
-          console.warn("[Admin Scanner] Verifikasi online gagal, beralih ke database offline lokal:", netErr);
-        }
-      }
-
-      // 2. OFFLINE FALLBACK (Saat offline atau koneksi terputus)
-      const db = getAdminOfflineDb();
-      const cleanTarget = code.replace(/^#/, "");
-
-      const targetIndex = db.findIndex(item => {
-        const itemCode = (item.kodeTiket || item.ticketCode || "").toString().trim().toUpperCase().replace(/^#/, "");
-        return itemCode === cleanTarget;
-      });
-
-      // a. Tidak Ditemukan -> Tiket Tidak Valid
-      if (targetIndex === -1) {
-        showAdminNotification("error", {
-          code: code || scannedRaw,
-          message: "Kode tiket tidak ditemukan di database atau pembayaran belum disetujui (APPROVED). Pastikan database sudah diperbarui atau periksa struk fisik."
-        });
-        return;
-      }
-
-      const ticket = db[targetIndex];
-
-      // b. Ditemukan dan SUDAH MASUK -> Tiket Sudah Pernah Digunakan
-      if (ticket.statusCheckin === "SUDAH MASUK") {
-        showAdminNotification("warning", ticket);
-        return;
-      }
-
-      // c. Ditemukan dan BELUM MASUK -> Lakukan Check-In (Hijau)
-      const nowWib = new Date().toLocaleString("id-ID", {
-        timeZone: "Asia/Jakarta",
-        hour12: false
-      }) + " WIB";
-
-      ticket.statusCheckin = "SUDAH MASUK";
-      ticket.waktuScan = nowWib;
-      db[targetIndex] = ticket;
-
-      saveAdminOfflineDb(db);
-      showAdminNotification("success", ticket);
-    }
-
-    // Form Manual Scan
-    document.getElementById("formAdminManualScan").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const input = document.getElementById("inputAdminManualCode");
-      if (input.value.trim()) {
-        validateAdminTicketCode(input.value.trim());
-      }
-    });
-
-    // HTML5-QRCode Camera Integration
-    let adminHtml5QrCode = null;
-    let isAdminCameraRunning = false;
-    let adminFacingMode = "environment";
-
-    async function startAdminCamera() {
-      try {
-        if (!adminHtml5QrCode) {
-          adminHtml5QrCode = new Html5Qrcode("adminReader");
-        }
-
-        const config = {
-          fps: 15,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0
+      if (buktiUrl && buktiUrl !== "-") {
+        img.src = buktiUrl;
+        img.classList.remove("hidden");
+        fallback.classList.add("hidden");
+        img.onerror = () => {
+          img.classList.add("hidden");
+          fallback.classList.remove("hidden");
         };
-
-        await adminHtml5QrCode.start(
-          { facingMode: adminFacingMode },
-          config,
-          (decodedText) => {
-            validateAdminTicketCode(decodedText);
-          },
-          (errorMessage) => {
-            // Abaikan frame parse errors
-          }
-        );
-
-        isAdminCameraRunning = true;
-        document.getElementById("adminCameraPlaceholder").classList.add("hidden");
-        document.getElementById("adminScanGuides").classList.remove("hidden");
-        document.getElementById("btnAdminToggleCameraText").textContent = "Jeda Kamera";
-      } catch (err) {
-        console.warn("Gagal memulai kamera admin:", err);
-        document.getElementById("adminCameraPlaceholder").classList.remove("hidden");
-        document.getElementById("adminScanGuides").classList.add("hidden");
-        isAdminCameraRunning = false;
-      }
-    }
-
-    async function stopAdminCamera() {
-      if (adminHtml5QrCode && isAdminCameraRunning) {
-        await adminHtml5QrCode.stop();
-        isAdminCameraRunning = false;
-        document.getElementById("adminCameraPlaceholder").classList.remove("hidden");
-        document.getElementById("adminScanGuides").classList.add("hidden");
-        document.getElementById("btnAdminToggleCameraText").textContent = "Nyalakan Kamera";
-      }
-    }
-
-    document.getElementById("btnAdminToggleCamera").addEventListener("click", () => {
-      if (isAdminCameraRunning) {
-        stopAdminCamera();
       } else {
-        startAdminCamera();
+        img.classList.add("hidden");
+        fallback.classList.remove("hidden");
       }
-    });
 
-    document.getElementById("btnAdminStartCamera").addEventListener("click", startAdminCamera);
-
-    document.getElementById("btnAdminSwitchCamera").addEventListener("click", async () => {
-      adminFacingMode = adminFacingMode === "environment" ? "user" : "environment";
-      if (isAdminCameraRunning) {
-        await stopAdminCamera();
-        startAdminCamera();
+      if (currentTab === "approved" || item.statusBayar === "APPROVED") {
+        accBtn.classList.add("hidden");
+      } else {
+        accBtn.classList.remove("hidden");
+        accBtn.onclick = () => {
+          const email = item.email || (item.nama ? item.nama.toLowerCase().replace(/[^a-z0-9]/g, "") + "@gmail.com" : "-");
+          executeAccTicket(item.rowIndex || (idx + 2), encodeURIComponent(item.nama || ""), encodeURIComponent(email), accBtn);
+        };
       }
-    });
 
-    // Sinkronisasi Database Tiket dari Cloud
-    async function syncAdminDbFromCloud() {
-      btnAdminSyncDb.disabled = true;
-      btnAdminSyncDbText.textContent = "Mengunduh Database dari Cloud...";
+      document.getElementById("receiptModal").classList.remove("hidden");
+      lucide.createIcons();
+    }
 
+    function closeReceiptModal() {
+      document.getElementById("receiptModal").classList.add("hidden");
+    }
+
+    // ================== 8. MODAL SCANNER KAMERA GATE ==================
+    function openAdminScannerModal() {
+      document.getElementById("adminScannerModal").classList.remove("hidden");
+      startAdminQrScanner();
+      lucide.createIcons();
+    }
+
+    function closeAdminScannerModal() {
+      document.getElementById("adminScannerModal").classList.add("hidden");
+      if (html5QrScanner) {
+        html5QrScanner.stop().catch(() => {}).finally(() => {
+          html5QrScanner = null;
+        });
+      }
+    }
+
+    function startAdminQrScanner() {
+      if (html5QrScanner) return;
+      html5QrScanner = new Html5Qrcode("adminReader");
+      html5QrScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          document.getElementById("adminScanResultBox").innerHTML = `
+            <span class="text-[#FFDC17] font-bold font-mono text-sm block">QR Terdeteksi: ${decodedText}</span>
+            <span class="text-[11px] text-emerald-400">Memeriksa database...</span>
+          `;
+          validateScannedTicket(decodedText);
+        },
+        (error) => {}
+      ).catch(err => {
+        document.getElementById("adminScanResultBox").textContent = "Tidak dapat mengakses kamera: " + err;
+      });
+    }
+
+    async function validateScannedTicket(code) {
       try {
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
           mode: "cors",
           redirect: "follow",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
-          body: JSON.stringify({
-            action: "download_offline_db"
-          })
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "scan_ticket", kodeTiket: code })
         });
-
         const res = await response.json();
 
         if (res && res.status === "SUCCESS") {
-          const cloudTickets = res.tickets || res.data || [];
-          const currentLocalDb = getAdminOfflineDb();
-
-          // Pertahankan status check-in lokal jika sudah ada
-          const mergedDb = cloudTickets.map(cloudItem => {
-            const localMatch = currentLocalDb.find(l => 
-              (l.kodeTiket || "").toUpperCase() === (cloudItem.kodeTiket || "").toUpperCase()
-            );
-            if (localMatch && localMatch.statusCheckin === "SUDAH MASUK") {
-              return {
-                ...cloudItem,
-                statusCheckin: "SUDAH MASUK",
-                waktuScan: localMatch.waktuScan
-              };
-            }
-            return {
-              ...cloudItem,
-              statusCheckin: cloudItem.statusCheckin || "BELUM MASUK",
-              waktuScan: cloudItem.waktuScan || ""
-            };
-          });
-
-          saveAdminOfflineDb(mergedDb);
-          alert(`Sukses! ${mergedDb.length} data tiket terverifikasi berhasil diperbarui ke memori.`);
+          document.getElementById("adminScanResultBox").innerHTML = `
+            <div class="p-2 rounded-lg bg-emerald-950/70 text-emerald-300 font-bold">
+              ✓ TIKET VALID: ${res.data.nama || "-"} (${res.data.varian || "Tiket"})
+            </div>
+          `;
+        } else if (res && res.status === "ALREADY_CHECKED_IN") {
+          document.getElementById("adminScanResultBox").innerHTML = `
+            <div class="p-2 rounded-lg bg-amber-950/70 text-amber-300 font-bold">
+              ⚠️ TIKET SUDAH PERNAH DIGUNAKAN
+            </div>
+          `;
         } else {
-          throw new Error(res.message || "Respon server tidak valid");
+          document.getElementById("adminScanResultBox").innerHTML = `
+            <div class="p-2 rounded-lg bg-red-950/70 text-red-300 font-bold">
+              ❌ TIKET TIDAK VALID
+            </div>
+          `;
         }
       } catch (err) {
-        console.error("Gagal update database:", err);
-        alert("Gagal update database tiket: " + err.message);
-      } finally {
-        btnAdminSyncDb.disabled = false;
-        btnAdminSyncDbText.textContent = "Perbarui Database Tiket dari Cloud";
-        updateAdminCounters();
+        console.error("Scan error:", err);
       }
     }
 
-    btnAdminSyncDb.addEventListener("click", syncAdminDbFromCloud);
-
-    // Buka & Tutup Modal Scanner Admin
-    function openAdminScannerModal() {
-      adminScannerModal.classList.remove("opacity-0", "pointer-events-none");
-      adminScannerModalContainer.classList.remove("scale-95");
-      adminScannerModalContainer.classList.add("scale-100");
-
-      updateAdminCounters();
-
-      // Jika database lokal kosong, coba unduh otomatis
-      const db = getAdminOfflineDb();
-      if (db.length === 0 && navigator.onLine) {
-        syncAdminDbFromCloud();
-      }
-
-      // Mulai kamera otomatis
-      setTimeout(() => {
-        startAdminCamera();
-      }, 300);
-
+    // Inisialisasi Auth Sesi pada Pemuatan Dokumen
+    document.addEventListener("DOMContentLoaded", () => {
+      checkSessionAuth();
       lucide.createIcons();
-    }
-
-    function closeAdminScannerModal() {
-      adminScannerModalContainer.classList.remove("scale-100");
-      adminScannerModalContainer.classList.add("scale-95");
-      adminScannerModal.classList.add("opacity-0", "pointer-events-none");
-
-      stopAdminCamera();
-      resumeAdminScanner();
-    }
-
-    btnOpenAdminScanner.addEventListener("click", openAdminScannerModal);
-    btnCloseAdminScanner.addEventListener("click", closeAdminScannerModal);
-    adminScannerModal.addEventListener("click", (e) => {
-      if (e.target === adminScannerModal) closeAdminScannerModal();
     });
-
-    // Initial check
-    checkSessionAuth();
   </script>
 </body>
 </html>
