@@ -1,7 +1,7 @@
 /**
  * app.js — Logika Frontend Portal Tiket Publik
  * Bingkai Bisu • Fixlens Festival 2026
- * Mencakup: seleksi varian tiket, submit pemesanan QRIS,
+ * Mencakup: seleksi varian tiket resmi, submit pemesanan QRIS,
  *            cek status pesanan, stealth admin PIN mode.
  */
 
@@ -11,9 +11,22 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRMLG227dO9VkqJh__-Prb6HGw_t1JMY14FLLeQHO6kMwq5jlClzXlkMTfMYOh31zw/exec";
 
 // ============================================================
-// DATA 4 KATEGORI TIKET RESMI
+// HELPER: SANITASI XSS (DOM-BASED)
 // ============================================================
-const VARIANTS = {
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// ============================================================
+// DATA 4 KATEGORI TIKET RESMI (TERKUNCI)
+// ============================================================
+const VARIANTS = Object.freeze({
   tiket_1hari: {
     key: "tiket_1hari",
     name: "Tiket 1 Hari",
@@ -46,7 +59,7 @@ const VARIANTS = {
     img: "assets/tiket_2hari_stikerganci.webp",
     isPresale: true
   }
-};
+});
 
 // ============================================================
 // STATE APLIKASI
@@ -92,36 +105,45 @@ function switchMainTab(targetTab) {
   const btn04 = document.getElementById("tabBtn04");
 
   // Sembunyikan semua tab
-  tab01.classList.add("hidden");
-  tab02.classList.add("hidden");
-  tab03.classList.add("hidden");
-  tab04.classList.add("hidden");
+  if (tab01) tab01.classList.add("hidden");
+  if (tab02) tab02.classList.add("hidden");
+  if (tab03) tab03.classList.add("hidden");
+  if (tab04) tab04.classList.add("hidden");
 
   // Reset tombol
   [btn01, btn02, btn03, btn04].forEach(btn => {
+    if (!btn) return;
     btn.classList.remove("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
     btn.classList.add("border-transparent", "text-slate-400", "font-semibold");
   });
 
   if (targetTab === "tiket") {
-    tab01.classList.remove("hidden");
-    btn01.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
-    btn01.classList.remove("border-transparent", "text-slate-400");
+    if (tab01) tab01.classList.remove("hidden");
+    if (btn01) {
+      btn01.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
+      btn01.classList.remove("border-transparent", "text-slate-400");
+    }
   } else if (targetTab === "deskripsi") {
-    tab02.classList.remove("hidden");
-    btn02.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
-    btn02.classList.remove("border-transparent", "text-slate-400");
+    if (tab02) tab02.classList.remove("hidden");
+    if (btn02) {
+      btn02.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
+      btn02.classList.remove("border-transparent", "text-slate-400");
+    }
   } else if (targetTab === "snk") {
-    tab03.classList.remove("hidden");
-    btn03.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
-    btn03.classList.remove("border-transparent", "text-slate-400");
+    if (tab03) tab03.classList.remove("hidden");
+    if (btn03) {
+      btn03.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
+      btn03.classList.remove("border-transparent", "text-slate-400");
+    }
   } else if (targetTab === "cek") {
-    tab04.classList.remove("hidden");
-    btn04.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
-    btn04.classList.remove("border-transparent", "text-slate-400");
+    if (tab04) tab04.classList.remove("hidden");
+    if (btn04) {
+      btn04.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
+      btn04.classList.remove("border-transparent", "text-slate-400");
+    }
   }
 
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 }
 
 function scrollToTicketsSection() {
@@ -158,16 +180,20 @@ async function refreshTicketStock(isManualClick = false) {
       const btnSelect4 = document.getElementById("btnSelect4");
 
       if (currentPresaleQuotaRemaining <= 0) {
-        badge.textContent = "[ SOLD OUT ]";
-        badge.className = "px-2.5 py-0.5 rounded-full bg-red-600/30 text-[10px] font-mono font-bold text-red-400 border border-red-500/50";
+        if (badge) {
+          badge.textContent = "[ SOLD OUT ]";
+          badge.className = "px-2.5 py-0.5 rounded-full bg-red-600/30 text-[10px] font-mono font-bold text-red-400 border border-red-500/50";
+        }
         if (cardPresale) cardPresale.classList.add("opacity-60");
         if (btnSelect4) {
           btnSelect4.disabled = true;
           btnSelect4.classList.add("opacity-50", "cursor-not-allowed");
         }
       } else {
-        badge.textContent = `[ Sisa ${currentPresaleQuotaRemaining} / 100 Pcs ]`;
-        badge.className = "px-2.5 py-0.5 rounded-full bg-[#FFDC17]/20 text-[10px] font-mono font-bold text-[#FFDC17] border border-[#FFDC17]/40";
+        if (badge) {
+          badge.textContent = `[ Sisa ${currentPresaleQuotaRemaining} / 100 Pcs ]`;
+          badge.className = "px-2.5 py-0.5 rounded-full bg-[#FFDC17]/20 text-[10px] font-mono font-bold text-[#FFDC17] border border-[#FFDC17]/40";
+        }
         if (cardPresale) cardPresale.classList.remove("opacity-60");
         if (btnSelect4) {
           btnSelect4.disabled = false;
@@ -188,10 +214,14 @@ async function refreshTicketStock(isManualClick = false) {
 }
 
 // ============================================================
-// 3. SELEKSI VARIAN TIKET
+// 3. SELEKSI VARIAN TIKET & INTEGRITAS DATA CHECKOUT
 // ============================================================
 function selectTicketVariant(variantKey) {
-  if (!VARIANTS[variantKey]) return;
+  // Integritas: Validasi bahwa variantKey ada di dalam objek VARIANTS resmi
+  if (!VARIANTS[variantKey]) {
+    console.warn("Varian tiket tidak sah:", variantKey);
+    return;
+  }
 
   if (variantKey === "tiket_presale" && currentPresaleQuotaRemaining <= 0) {
     showFloatingToast("Paket Presale telah habis (SOLD OUT)!");
@@ -200,16 +230,11 @@ function selectTicketVariant(variantKey) {
 
   currentSelectedVariant = variantKey;
 
-  const card1 = document.getElementById("cardVariant1");
-  const card2 = document.getElementById("cardVariant2");
-  const card3 = document.getElementById("cardVariant3");
-  const card4 = document.getElementById("cardVariant4");
-
   const cards = {
-    tiket_1hari: card1,
-    tiket_2hari_biasa: card2,
-    tiket_2hari_stiker: card3,
-    tiket_presale: card4
+    tiket_1hari: document.getElementById("cardVariant1"),
+    tiket_2hari_biasa: document.getElementById("cardVariant2"),
+    tiket_2hari_stiker: document.getElementById("cardVariant3"),
+    tiket_presale: document.getElementById("cardVariant4")
   };
 
   Object.keys(cards).forEach(key => {
@@ -224,12 +249,18 @@ function selectTicketVariant(variantKey) {
     }
   });
 
-  document.getElementById("btnSelectText1").textContent = variantKey === "tiket_1hari" ? "✓ Terpilih" : "Pilih Tiket ⌵";
-  document.getElementById("btnSelectText2").textContent = variantKey === "tiket_2hari_biasa" ? "✓ Terpilih" : "Pilih Tiket ⌵";
-  document.getElementById("btnSelectText3").textContent = variantKey === "tiket_2hari_stiker" ? "✓ Terpilih" : "Pilih Tiket ⌵";
-  document.getElementById("btnSelectText4").textContent = variantKey === "tiket_presale" ? "✓ Terpilih" : "Pilih Tiket ⌵";
+  const b1 = document.getElementById("btnSelectText1");
+  const b2 = document.getElementById("btnSelectText2");
+  const b3 = document.getElementById("btnSelectText3");
+  const b4 = document.getElementById("btnSelectText4");
 
-  document.getElementById("checkoutSelectedBadge").textContent = VARIANTS[variantKey].badgeText;
+  if (b1) b1.textContent = variantKey === "tiket_1hari" ? "✓ Terpilih" : "Pilih Tiket ⌵";
+  if (b2) b2.textContent = variantKey === "tiket_2hari_biasa" ? "✓ Terpilih" : "Pilih Tiket ⌵";
+  if (b3) b3.textContent = variantKey === "tiket_2hari_stiker" ? "✓ Terpilih" : "Pilih Tiket ⌵";
+  if (b4) b4.textContent = variantKey === "tiket_presale" ? "✓ Terpilih" : "Pilih Tiket ⌵";
+
+  const badgeEl = document.getElementById("checkoutSelectedBadge");
+  if (badgeEl) badgeEl.textContent = VARIANTS[variantKey].badgeText;
 
   validateQuotaAndCalculateTotal();
 
@@ -241,16 +272,19 @@ function selectTicketVariant(variantKey) {
 
 function adjustQuantity(delta) {
   const qtyInput = document.getElementById("ticketQty");
+  if (!qtyInput) return;
   let val = parseInt(qtyInput.value, 10) || 1;
-  val = Math.max(1, val + delta);
+  val = Math.max(1, Math.min(10, val + delta));
   qtyInput.value = val;
   handleQuantityChange();
 }
 
 function handleQuantityChange() {
   const qtyInput = document.getElementById("ticketQty");
+  if (!qtyInput) return;
   let val = parseInt(qtyInput.value, 10);
   if (isNaN(val) || val < 1) val = 1;
+  if (val > 10) val = 10;
   currentQuantity = val;
   qtyInput.value = val;
   validateQuotaAndCalculateTotal();
@@ -258,13 +292,21 @@ function handleQuantityChange() {
 
 function validateQuotaAndCalculateTotal() {
   const qtyInput = document.getElementById("ticketQty");
-  let qty = parseInt(qtyInput.value, 10) || 1;
-  const variant = VARIANTS[currentSelectedVariant];
+  let qty = parseInt(qtyInput ? qtyInput.value : 1, 10) || 1;
+  if (qty < 1) qty = 1;
+  if (qty > 10) qty = 10;
+
+  // Integritas: Kunci data varian dari VARIANTS resmi
+  const safeVariantKey = VARIANTS[currentSelectedVariant] ? currentSelectedVariant : "tiket_1hari";
+  const variant = VARIANTS[safeVariantKey];
+
+  // Kalkulasi total terkunci dari variant.price resmi
   const totalPrice = variant.price * qty;
   const formattedTotal = "Rp " + totalPrice.toLocaleString("id-ID");
 
-  document.getElementById("calculatedTotalDisplay").textContent = formattedTotal;
+  const calcDisplay = document.getElementById("calculatedTotalDisplay");
   const qrisTotalEl = document.getElementById("qrisTotalAmount");
+  if (calcDisplay) calcDisplay.textContent = formattedTotal;
   if (qrisTotalEl) qrisTotalEl.textContent = formattedTotal;
 
   const warningBox = document.getElementById("quotaWarningBox");
@@ -274,20 +316,20 @@ function validateQuotaAndCalculateTotal() {
   // Logika Kuota Ketat Presale
   if (variant.isPresale) {
     if (currentPresaleQuotaRemaining <= 0) {
-      warningBox.classList.remove("hidden");
-      warningText.textContent = "⚠️ Maaf, kuota Presale (100 tiket) telah habis terjual (SOLD OUT).";
-      submitBtn.disabled = true;
+      if (warningBox) warningBox.classList.remove("hidden");
+      if (warningText) warningText.textContent = "⚠️ Maaf, kuota Presale (100 tiket) telah habis terjual (SOLD OUT).";
+      if (submitBtn) submitBtn.disabled = true;
       return;
     } else if (qty > currentPresaleQuotaRemaining) {
-      warningBox.classList.remove("hidden");
-      warningText.textContent = `⚠️ Pesanan melebihi sisa kuota! Maksimal pemesanan paket ini adalah ${currentPresaleQuotaRemaining} tiket.`;
-      submitBtn.disabled = true;
+      if (warningBox) warningBox.classList.remove("hidden");
+      if (warningText) warningText.textContent = `⚠️ Pesanan melebihi sisa kuota! Maksimal pemesanan paket ini adalah ${currentPresaleQuotaRemaining} tiket.`;
+      if (submitBtn) submitBtn.disabled = true;
       return;
     }
   }
 
-  warningBox.classList.add("hidden");
-  submitBtn.disabled = false;
+  if (warningBox) warningBox.classList.add("hidden");
+  if (submitBtn) submitBtn.disabled = false;
 }
 
 // ============================================================
@@ -298,8 +340,10 @@ function handleProofFileSelected(event) {
   if (!file) return;
 
   selectedProofFileName = file.name || "bukti_qris.jpg";
-  document.getElementById("proofFileName").textContent = selectedProofFileName;
-  document.getElementById("proofFileSize").textContent = (file.size / 1024).toFixed(1) + " KB";
+  const nameEl = document.getElementById("proofFileName");
+  const sizeEl = document.getElementById("proofFileSize");
+  if (nameEl) nameEl.textContent = selectedProofFileName;
+  if (sizeEl) sizeEl.textContent = (file.size / 1024).toFixed(1) + " KB";
 
   const reader = new FileReader();
   reader.onload = function(e) {
@@ -333,9 +377,11 @@ function handleProofFileSelected(event) {
       selectedProofBase64 = compressedDataUrl.replace(/^data:image\/\w+;base64,/, "");
 
       const previewImg = document.getElementById("proofPreviewImg");
-      previewImg.src = compressedDataUrl;
-      document.getElementById("dropZoneContent").classList.add("hidden");
-      document.getElementById("proofPreviewBox").classList.remove("hidden");
+      if (previewImg) previewImg.src = compressedDataUrl;
+      const dropContent = document.getElementById("dropZoneContent");
+      const previewBox = document.getElementById("proofPreviewBox");
+      if (dropContent) dropContent.classList.add("hidden");
+      if (previewBox) previewBox.classList.remove("hidden");
     };
     img.src = e.target.result;
   };
@@ -343,7 +389,7 @@ function handleProofFileSelected(event) {
 }
 
 // ============================================================
-// 5. SUBMIT PEMESANAN (MURNI PENDING)
+// 5. SUBMIT PEMESANAN (MURNI PENDING DENGAN INTEGRITAS HARGA)
 // ============================================================
 async function handleOrderSubmit(e) {
   e.preventDefault();
@@ -351,8 +397,12 @@ async function handleOrderSubmit(e) {
   const nama = document.getElementById("inputName").value.trim();
   const email = document.getElementById("inputEmail").value.trim();
   const whatsapp = document.getElementById("inputWa").value.trim();
-  const qty = parseInt(document.getElementById("ticketQty").value, 10) || 1;
-  const variant = VARIANTS[currentSelectedVariant];
+  const rawQty = parseInt(document.getElementById("ticketQty").value, 10) || 1;
+  const qty = Math.max(1, Math.min(10, rawQty));
+
+  // Integritas: Kunci varian dan harga dari objek VARIANTS resmi
+  const safeVariantKey = VARIANTS[currentSelectedVariant] ? currentSelectedVariant : "tiket_1hari";
+  const variant = VARIANTS[safeVariantKey];
   const total = variant.price * qty;
 
   if (!nama || !email || !whatsapp) {
@@ -362,7 +412,8 @@ async function handleOrderSubmit(e) {
 
   if (!selectedProofBase64) {
     alert("Harap unggah tangkapan layar bukti pembayaran QRIS Anda terlebih dahulu!");
-    document.getElementById("dropZoneProof").scrollIntoView({ behavior: 'smooth' });
+    const dropZone = document.getElementById("dropZoneProof");
+    if (dropZone) dropZone.scrollIntoView({ behavior: 'smooth' });
     return;
   }
 
@@ -375,9 +426,9 @@ async function handleOrderSubmit(e) {
   const text = document.getElementById("btnSubmitText");
   const spinner = document.getElementById("btnSubmitSpinner");
 
-  btn.disabled = true;
-  text.classList.add("hidden");
-  spinner.classList.remove("hidden");
+  if (btn) btn.disabled = true;
+  if (text) text.classList.add("hidden");
+  if (spinner) spinner.classList.remove("hidden");
 
   const payload = {
     action: "submit_order",
@@ -403,17 +454,26 @@ async function handleOrderSubmit(e) {
     const res = await response.json();
 
     if (res && (res.status === "SUCCESS" || res.status === "success" || res.ticketCode)) {
-      // Tampilkan modal status PENDING (dilarang auto-ACC)
-      document.getElementById("pendingNameText").textContent = nama;
-      document.getElementById("pendingEmailText").textContent = email;
-      document.getElementById("pendingTicketCode").textContent = res.ticketCode || "#BB26-PENDING";
-      document.getElementById("orderPendingModal").classList.remove("hidden");
+      // Tampilkan modal status PENDING dengan data yang aman
+      const elName = document.getElementById("pendingNameText");
+      const elEmail = document.getElementById("pendingEmailText");
+      const elCode = document.getElementById("pendingTicketCode");
+      const modal = document.getElementById("orderPendingModal");
+
+      if (elName) elName.textContent = nama;
+      if (elEmail) elEmail.textContent = email;
+      if (elCode) elCode.textContent = res.ticketCode || "#BB26-PENDING";
+      if (modal) modal.classList.remove("hidden");
 
       // Reset formulir
-      document.getElementById("orderForm").reset();
+      const form = document.getElementById("orderForm");
+      if (form) form.reset();
       selectedProofBase64 = null;
-      document.getElementById("dropZoneContent").classList.remove("hidden");
-      document.getElementById("proofPreviewBox").classList.add("hidden");
+      const dropContent = document.getElementById("dropZoneContent");
+      const previewBox = document.getElementById("proofPreviewBox");
+      if (dropContent) dropContent.classList.remove("hidden");
+      if (previewBox) previewBox.classList.add("hidden");
+
       selectTicketVariant("tiket_1hari");
       refreshTicketStock();
     } else {
@@ -424,19 +484,20 @@ async function handleOrderSubmit(e) {
     console.error("Gagal submit order:", err);
     alert("Gagal mengirimkan pemesanan. Pastikan koneksi internet stabil lalu coba kembali.");
   } finally {
-    btn.disabled = false;
-    text.classList.remove("hidden");
-    spinner.classList.add("hidden");
-    lucide.createIcons();
+    if (btn) btn.disabled = false;
+    if (text) text.classList.remove("hidden");
+    if (spinner) spinner.classList.add("hidden");
+    if (window.lucide) lucide.createIcons();
   }
 }
 
 function closeOrderPendingModal() {
-  document.getElementById("orderPendingModal").classList.add("hidden");
+  const modal = document.getElementById("orderPendingModal");
+  if (modal) modal.classList.add("hidden");
 }
 
 // ============================================================
-// 6. TAB 04: CEK STATUS PESANAN (action: check_status)
+// 6. TAB 04: CEK STATUS PESANAN (DENGAN SANITASI XSS DOM-BASED)
 // ============================================================
 async function handleCheckStatusSubmit(e) {
   if (e && e.preventDefault) e.preventDefault();
@@ -470,7 +531,7 @@ async function handleCheckStatusSubmit(e) {
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
         action: "check_status",
-        query: inputNilai.trim()
+        query: query
       })
     });
 
@@ -482,10 +543,12 @@ async function handleCheckStatusSubmit(e) {
 
       res.data.forEach((item) => {
         const isApproved = (item.status || "").toUpperCase() === "APPROVED";
-        const namaPemesan = item.nama || "-";
-        const kategoriTiket = item.varian || item.kategori || "Tiket Festival";
-        const jumlahTiket = item.jumlah || 1;
-        const kodeTiket = item.kodeTiket || item.ticketCode || "-";
+        // Sanitasi seluruh data database/input sebelum dimasukkan ke innerHTML
+        const namaPemesan = escapeHtml(item.nama || "-");
+        const kategoriTiket = escapeHtml(item.varian || item.kategori || "Tiket Festival");
+        const jumlahTiket = escapeHtml(item.jumlah || 1);
+        const kodeTiket = escapeHtml(item.kodeTiket || item.ticketCode || "-");
+        const safeLinkPdf = escapeHtml(item.linkPdf || "#");
 
         const card = document.createElement("div");
         card.className = isApproved
@@ -535,7 +598,7 @@ async function handleCheckStatusSubmit(e) {
           ${isApproved ? `
             <div class="pt-2">
               <a
-                href="${item.linkPdf}"
+                href="${safeLinkPdf}"
                 target="_blank"
                 class="inline-flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none text-[#240638] font-bold text-xs uppercase tracking-wider shadow-md"
               >
@@ -636,7 +699,7 @@ function copyPageUrl(btn) {
   navigator.clipboard.writeText(window.location.href).then(() => {
     const orig = btn.innerHTML;
     btn.innerHTML = `<span class="text-[#FFDC17] font-bold text-[10px]">Tersalin!</span>`;
-    setTimeout(() => { btn.innerHTML = orig; lucide.createIcons(); }, 1800);
+    setTimeout(() => { btn.innerHTML = orig; if (window.lucide) lucide.createIcons(); }, 1800);
   }).catch(() => {
     alert("Link halaman: " + window.location.href);
   });
@@ -656,5 +719,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   selectTicketVariant("tiket_1hari");
   refreshTicketStock(false);
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 });

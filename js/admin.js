@@ -1,15 +1,27 @@
 /**
  * admin.js — Logika Frontend Dashboard Admin
  * Bingkai Bisu • Fixlens Festival 2026
- * Mencakup: validasi PIN, pemuatan antrean pending,
+ * Mencakup: validasi PIN dinamis, pemuatan antrean pending,
  *            fungsi ACC tiket, preview struk, scanner gate.
  */
 
 // ============================================================
-// KONFIGURASI ENDPOINT & KONSTANTA
+// KONFIGURASI ENDPOINT
 // ============================================================
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRMLG227dO9VkqJh__-Prb6HGw_t1JMY14FLLeQHO6kMwq5jlClzXlkMTfMYOh31zw/exec";
-const PIN_KEY = "2026";
+
+// ============================================================
+// HELPER: SANITASI XSS (DOM-BASED)
+// ============================================================
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 // ============================================================
 // STATE APLIKASI ADMIN
@@ -30,24 +42,27 @@ function formatRupiah(amount) {
 }
 
 // ============================================================
-// 1. VALIDASI SESI MASUK PIN
+// 1. VALIDASI SESI MASUK PIN (DINAMIS DARI SESSION STORAGE)
 // ============================================================
 function checkSessionAuth() {
-  const savedPin = sessionStorage.getItem("adminPin");
-  const isAuth = !!savedPin || sessionStorage.getItem("adminAuth") === "true" || sessionStorage.getItem("admin_authenticated") === "true";
+  const savedPin = sessionStorage.getItem("adminPin") || "";
+  const isAuth = !!savedPin && (sessionStorage.getItem("adminAuth") === "true" || sessionStorage.getItem("admin_authenticated") === "true");
   const pinModal = document.getElementById("pinAuthModal");
   const dashboard = document.getElementById("mainDashboard");
 
   if (isAuth) {
-    pinModal.classList.add("hidden");
-    dashboard.classList.remove("hidden");
+    if (pinModal) pinModal.classList.add("hidden");
+    if (dashboard) dashboard.classList.remove("hidden");
     loadOrdersData();
   } else {
-    pinModal.classList.remove("hidden");
-    dashboard.classList.add("hidden");
-    setTimeout(() => document.getElementById("inputPin").focus(), 150);
+    if (pinModal) pinModal.classList.remove("hidden");
+    if (dashboard) dashboard.classList.add("hidden");
+    setTimeout(() => {
+      const input = document.getElementById("inputPin");
+      if (input) input.focus();
+    }, 150);
   }
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 }
 
 function handlePinLogin(e) {
@@ -61,7 +76,7 @@ function handlePinLogin(e) {
     sessionStorage.setItem("adminPin", enteredPin);
     sessionStorage.setItem("adminAuth", "true");
     sessionStorage.setItem("admin_authenticated", "true");
-    err.classList.add("hidden");
+    if (err) err.classList.add("hidden");
     input.value = "";
     checkSessionAuth();
   } else {
@@ -70,7 +85,7 @@ function handlePinLogin(e) {
       void container.offsetWidth;
       container.classList.add("animate-shake");
     }
-    err.classList.remove("hidden");
+    if (err) err.classList.remove("hidden");
     input.value = "";
     input.focus();
   }
@@ -78,9 +93,7 @@ function handlePinLogin(e) {
 
 function handleLogout() {
   if (confirm("Kunci kembali dashboard admin?")) {
-    sessionStorage.removeItem("adminPin");
-    sessionStorage.removeItem("adminAuth");
-    sessionStorage.removeItem("admin_authenticated");
+    sessionStorage.clear();
     checkSessionAuth();
   }
 }
@@ -94,7 +107,7 @@ async function loadOrdersData(isManual = false) {
   const savedPin = sessionStorage.getItem("adminPin") || "";
 
   if (icon) icon.classList.add("animate-spin");
-  tableLoading.classList.remove("hidden");
+  if (tableLoading) tableLoading.classList.remove("hidden");
 
   try {
     const pendingPromise = fetch(SCRIPT_URL, {
@@ -123,11 +136,9 @@ async function loadOrdersData(isManual = false) {
 
     const [resPending, resApproved, resQuota] = await Promise.all([pendingPromise, approvedPromise, quotaPromise]);
 
-    if (resPending && resPending.status === "UNAUTHORIZED") {
-      sessionStorage.removeItem("adminPin");
-      sessionStorage.removeItem("adminAuth");
-      sessionStorage.removeItem("admin_authenticated");
-      alert("PIN Salah! Akses ditolak.");
+    if ((resPending && resPending.status === "UNAUTHORIZED") || (resApproved && resApproved.status === "UNAUTHORIZED")) {
+      sessionStorage.clear();
+      alert("Akses ditolak: PIN salah atau sesi kadaluarsa (UNAUTHORIZED).");
       window.location.href = "index.html";
       return;
     }
@@ -139,8 +150,10 @@ async function loadOrdersData(isManual = false) {
     updateKpiMetrics(approvedOrdersList, resQuota);
 
     // Update Badge Tabs
-    document.getElementById("badgePendingCount").textContent = pendingOrdersList.length;
-    document.getElementById("badgeApprovedCount").textContent = approvedOrdersList.length;
+    const badgePending = document.getElementById("badgePendingCount");
+    const badgeApproved = document.getElementById("badgeApprovedCount");
+    if (badgePending) badgePending.textContent = pendingOrdersList.length;
+    if (badgeApproved) badgeApproved.textContent = approvedOrdersList.length;
 
     // Render Tabel
     renderCurrentTabTable();
@@ -151,17 +164,20 @@ async function loadOrdersData(isManual = false) {
 
   } catch (err) {
     console.error("Gagal load data orders:", err);
-    document.getElementById("tableBody").innerHTML = `
-      <tr>
-        <td colspan="10" class="py-8 text-center text-red-400">
-          Gagal menghubungi server database Google Sheets. Periksa koneksi internet.
-        </td>
-      </tr>
-    `;
+    const tbody = document.getElementById("tableBody");
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="10" class="py-8 text-center text-red-400">
+            Gagal menghubungi server database Google Sheets. Periksa koneksi internet.
+          </td>
+        </tr>
+      `;
+    }
   } finally {
-    tableLoading.classList.add("hidden");
+    if (tableLoading) tableLoading.classList.add("hidden");
     if (icon) icon.classList.remove("animate-spin");
-    lucide.createIcons();
+    if (window.lucide) lucide.createIcons();
   }
 }
 
@@ -205,10 +221,15 @@ function updateKpiMetrics(approvedList, quotaRes) {
     sisaBundling = parseInt(quotaRes.quotaBundling.sisa, 10);
   }
 
-  document.getElementById("statTotalApproved").textContent = totalApprovedTickets;
-  document.getElementById("statTotalRevenue").textContent = formatRupiah(totalRevenue);
-  document.getElementById("statQuotaBundling").textContent = `${sisaBundling} / 95`;
-  document.getElementById("statTotalCheckedIn").textContent = totalCheckedIn;
+  const elApproved = document.getElementById("statTotalApproved");
+  const elRevenue = document.getElementById("statTotalRevenue");
+  const elQuota = document.getElementById("statQuotaBundling");
+  const elCheckin = document.getElementById("statTotalCheckedIn");
+
+  if (elApproved) elApproved.textContent = totalApprovedTickets;
+  if (elRevenue) elRevenue.textContent = formatRupiah(totalRevenue);
+  if (elQuota) elQuota.textContent = `${sisaBundling} / 95`;
+  if (elCheckin) elCheckin.textContent = totalCheckedIn;
 }
 
 // ============================================================
@@ -221,37 +242,44 @@ function switchTab(target) {
   const desc = document.getElementById("tableSectionDesc");
 
   if (target === "pending") {
-    btnPending.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
-    btnApproved.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
-    desc.textContent = "Kelola pembayaran pending, lakukan verifikasi struk transfer QRIS, dan terbitkan e-ticket PDF ke email pemesan.";
+    if (btnPending) btnPending.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
+    if (btnApproved) btnApproved.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
+    if (desc) desc.textContent = "Kelola pembayaran pending, lakukan verifikasi struk transfer QRIS, dan terbitkan e-ticket PDF ke email pemesan.";
   } else {
-    btnApproved.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
-    btnPending.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
-    desc.textContent = "Daftar tiket yang telah disetujui (APPROVED), file PDF e-ticket telah aktif dan dapat dibuka.";
+    if (btnApproved) btnApproved.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] shadow-sm flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
+    if (btnPending) btnPending.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer";
+    if (desc) desc.textContent = "Daftar tiket yang telah disetujui (APPROVED), file PDF e-ticket telah aktif dan dapat dibuka.";
   }
 
   renderCurrentTabTable();
 }
 
 // ============================================================
-// 5. RENDER TABEL ANTREAN & ACC
+// 5. RENDER TABEL ANTREAN & ACC (DENGAN SANITASI XSS)
 // ============================================================
 function renderCurrentTabTable() {
   const tbody = document.getElementById("tableBody");
   const emptyBox = document.getElementById("tableEmpty");
-  tbody.innerHTML = "";
+  if (!tbody || !emptyBox) return;
 
+  tbody.innerHTML = "";
   const items = currentTab === "pending" ? pendingOrdersList : approvedOrdersList;
 
   if (!items || items.length === 0) {
     emptyBox.classList.remove("hidden");
-    document.getElementById("emptyTitle").textContent = currentTab === "pending"
-      ? "Semua Pembayaran Telah Terverifikasi!"
-      : "Belum Ada Tiket Terbit";
-    document.getElementById("emptyDesc").textContent = currentTab === "pending"
-      ? "Saat ini tidak ada antrean pending. Klik tombol Segarkan untuk memeriksa pesanan baru."
-      : "Tiket yang telah di-ACC akan muncul di tab ini.";
-    lucide.createIcons();
+    const emptyTitle = document.getElementById("emptyTitle");
+    const emptyDesc = document.getElementById("emptyDesc");
+    if (emptyTitle) {
+      emptyTitle.textContent = currentTab === "pending"
+        ? "Semua Pembayaran Telah Terverifikasi!"
+        : "Belum Ada Tiket Terbit";
+    }
+    if (emptyDesc) {
+      emptyDesc.textContent = currentTab === "pending"
+        ? "Saat ini tidak ada antrean pending. Klik tombol Segarkan untuk memeriksa pesanan baru."
+        : "Tiket yang telah di-ACC akan muncul di tab ini.";
+    }
+    if (window.lucide) lucide.createIcons();
     return;
   }
 
@@ -262,47 +290,55 @@ function renderCurrentTabTable() {
     tr.className = "hover:bg-white/[0.03] transition-colors";
 
     const cleanWa = (item.whatsapp || "").toString().replace(/['\s-]/g, "");
+    const safeNama = escapeHtml(item.nama || "-");
+    const emailRaw = item.email || (item.nama ? item.nama.toLowerCase().replace(/[^a-z0-9]/g, "") + "@gmail.com" : "-");
+    const safeEmail = escapeHtml(emailRaw);
+    const safeKodeTiket = escapeHtml(item.kodeTiket || item.ticketCode || "");
+    const safeVarian = escapeHtml(item.varian || "Tiket Reguler");
+    const safeJumlah = escapeHtml(item.jumlah || 1);
+    const safeWaktu = escapeHtml(item.waktu || item.timestamp || "-");
+    const safeCleanWa = escapeHtml(cleanWa);
     const waLink = `https://wa.me/${cleanWa.replace(/^0/, "62")}?text=Halo%20${encodeURIComponent(item.nama || "")},%20konfirmasi%20tiket%20Bingkai%20Bisu%202026`;
-    const email = item.email || (item.nama ? item.nama.toLowerCase().replace(/[^a-z0-9]/g, "") + "@gmail.com" : "-");
-    const buktiUrl = item.linkBukti || item.fileUrl || "-";
-    const linkPdf = item.linkPdf || item.pdfUrl || "https://drive.google.com";
-    const waktuPesan = item.waktu || item.timestamp || "-";
-    const isApproved = currentTab === "approved" || item.statusBayar === "APPROVED";
+    const safeWaLink = escapeHtml(waLink);
+    const rawBukti = item.linkBukti || item.fileUrl || "";
+    const rawPdf = item.linkPdf || item.pdfUrl || "https://drive.google.com";
+    const safePdf = escapeHtml(rawPdf);
+    const isApproved = currentTab === "approved" || (item.statusBayar || "").toUpperCase() === "APPROVED";
 
     tr.innerHTML = `
       <td class="py-3.5 px-4 text-center font-mono text-slate-400">${idx + 1}</td>
       <td class="py-3.5 px-4 whitespace-nowrap font-mono text-[11px] text-slate-300">
-        ${waktuPesan}
+        ${safeWaktu}
       </td>
       <td class="py-3.5 px-4 font-semibold text-white">
-        <span class="block font-bold">${item.nama || "-"}</span>
-        ${item.kodeTiket ? `<span class="inline-block mt-0.5 text-[10px] font-mono text-[#FFDC17] bg-[#081B59] px-2 py-0.5 rounded border border-[#FFDC17]/30">${item.kodeTiket}</span>` : ''}
+        <span class="block font-bold">${safeNama}</span>
+        ${safeKodeTiket ? `<span class="inline-block mt-0.5 text-[10px] font-mono text-[#FFDC17] bg-[#081B59] px-2 py-0.5 rounded border border-[#FFDC17]/30">${safeKodeTiket}</span>` : ''}
       </td>
       <td class="py-3.5 px-4 text-slate-300 font-mono text-[11px]">
         <div class="flex items-center gap-1">
           <i data-lucide="mail" class="w-3 h-3 text-[#FFDC17]"></i>
-          <span class="truncate max-w-[160px]">${email}</span>
+          <span class="truncate max-w-[160px]">${safeEmail}</span>
         </div>
       </td>
       <td class="py-3.5 px-4 whitespace-nowrap">
         <a
-          href="${waLink}"
+          href="${safeWaLink}"
           target="_blank"
           class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FFDC17]/10 text-[#FFDC17] hover:bg-[#FFDC17]/20 font-mono text-[11px] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
         >
           <i data-lucide="phone" class="w-3 h-3"></i>
-          <span>${cleanWa}</span>
+          <span>${safeCleanWa}</span>
         </a>
       </td>
       <td class="py-3.5 px-4">
-        <span class="block font-medium text-white">${item.varian || "Tiket Reguler"}</span>
-        <span class="text-[11px] text-[#FFDC17] font-semibold">${item.jumlah || 1} Tiket</span>
+        <span class="block font-medium text-white">${safeVarian}</span>
+        <span class="text-[11px] text-[#FFDC17] font-semibold">${safeJumlah} Tiket</span>
       </td>
       <td class="py-3.5 px-4 font-display font-bold text-white whitespace-nowrap text-sm">
         ${formatRupiah(item.total || (item.jumlah * 4000))}
       </td>
       <td class="py-3.5 px-4 text-center whitespace-nowrap">
-        ${buktiUrl && buktiUrl !== "-" ? `
+        ${rawBukti && rawBukti !== "-" ? `
           <button
             type="button"
             onclick="openReceiptModal(${idx})"
@@ -329,7 +365,7 @@ function renderCurrentTabTable() {
       <td class="py-3.5 px-4 text-center whitespace-nowrap">
         ${isApproved ? `
           <a
-            href="${linkPdf}"
+            href="${safePdf}"
             target="_blank"
             class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#FFDC17] text-[#2D2A1A] font-bold text-[11px] uppercase hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
           >
@@ -351,7 +387,7 @@ function renderCurrentTabTable() {
     tbody.appendChild(tr);
   });
 
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 }
 
 // ============================================================
@@ -399,6 +435,8 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
   }
 
   try {
+    const savedPin = sessionStorage.getItem("adminPin") || "";
+
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
       mode: "cors",
@@ -407,14 +445,21 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
       body: JSON.stringify({
         action: "admin_acc",
         rowIndex: item.rowIndex,
-        pin: typeof PIN_KEY !== 'undefined' ? PIN_KEY : "2026"
+        pin: savedPin
       })
     });
 
     const result = await response.json();
 
+    if (result && result.status === "UNAUTHORIZED") {
+      sessionStorage.clear();
+      alert("Akses ditolak: PIN tidak valid atau sesi berakhir (UNAUTHORIZED).");
+      window.location.href = "index.html";
+      return;
+    }
+
     if (result && result.status === "SUCCESS") {
-      showAccToast(`Tiket ${result.kodeTiket} (${item.nama}) berhasil di-ACC! File PDF telah otomatis terkirim ke email: ${result.targetEmail}`, "success");
+      showAccToast(`Tiket ${result.kodeTiket || ""} (${item.nama || ""}) berhasil di-ACC! File PDF telah otomatis terkirim ke email: ${result.targetEmail || item.email || "-"}`, "success");
       closeReceiptModal();
       loadOrdersData();
     } else {
@@ -448,15 +493,15 @@ function showAccToast(message, type = "success") {
 
   if (toast) {
     if (type === "success") {
-      toast.className = "fixed top-6 right-6 z-50 max-w-md w-full bg-[#2A0859] border-2 border-emerald-400 rounded-2xl p-4 shadow-lg transform translate-y-0 opacity-100 transition-all duration-400 pointer-events-auto";
-      if (title) title.textContent = "Tiket Berhasil Disetujui!";
+      if (title) title.textContent = "ACC Berhasil & Email Terkirim!";
+      toast.className = "fixed top-6 right-6 z-50 max-w-md w-full bg-[#2A0859] border-2 border-[#FFDC17] rounded-2xl p-4 shadow-glow-yellow transform translate-y-0 opacity-100 transition-all duration-400 pointer-events-auto";
       if (icon) {
-        icon.className = "w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 shadow-md";
+        icon.className = "w-10 h-10 rounded-xl bg-[#FFDC17] text-[#2D2A1A] flex items-center justify-center flex-shrink-0 shadow-md";
         icon.innerHTML = `<i data-lucide="check" class="w-6 h-6 stroke-[3]"></i>`;
       }
     } else {
+      if (title) title.textContent = "Terjadi Kesalahan";
       toast.className = "fixed top-6 right-6 z-50 max-w-md w-full bg-[#2A0859] border-2 border-red-500 rounded-2xl p-4 shadow-lg transform translate-y-0 opacity-100 transition-all duration-400 pointer-events-auto";
-      if (title) title.textContent = "Verifikasi Gagal";
       if (icon) {
         icon.className = "w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center flex-shrink-0 shadow-md";
         icon.innerHTML = `<i data-lucide="alert-circle" class="w-6 h-6 stroke-[2.5]"></i>`;
@@ -490,7 +535,8 @@ function openReceiptModal(idx) {
   if (!item) return;
 
   currentReceiptItem = item;
-  document.getElementById("receiptModalAttendee").textContent = `Nama: ${item.nama || "-"} (${item.varian || "Tiket"})`;
+  const attendeeEl = document.getElementById("receiptModalAttendee");
+  if (attendeeEl) attendeeEl.textContent = `Nama: ${item.nama || "-"} (${item.varian || "Tiket"})`;
 
   const img = document.getElementById("receiptModalImg");
   const fallback = document.getElementById("receiptImgFallback");
@@ -498,49 +544,57 @@ function openReceiptModal(idx) {
   const accBtn = document.getElementById("btnModalAcc");
   const buktiUrl = item.linkBukti || item.fileUrl || "";
 
-  openBtn.href = buktiUrl || "#";
+  if (openBtn) openBtn.href = buktiUrl || "#";
 
-  if (buktiUrl && buktiUrl !== "-") {
-    img.src = buktiUrl;
-    img.classList.remove("hidden");
-    fallback.classList.add("hidden");
-    img.onerror = () => {
+  if (img && fallback) {
+    if (buktiUrl && buktiUrl !== "-") {
+      img.src = buktiUrl;
+      img.classList.remove("hidden");
+      fallback.classList.add("hidden");
+      img.onerror = () => {
+        img.classList.add("hidden");
+        fallback.classList.remove("hidden");
+      };
+    } else {
       img.classList.add("hidden");
       fallback.classList.remove("hidden");
-    };
-  } else {
-    img.classList.add("hidden");
-    fallback.classList.remove("hidden");
+    }
   }
 
-  if (currentTab === "approved" || item.statusBayar === "APPROVED") {
-    accBtn.classList.add("hidden");
-  } else {
-    accBtn.classList.remove("hidden");
-    accBtn.onclick = () => {
-      executeAccTicket(item, accBtn);
-    };
+  if (accBtn) {
+    if (currentTab === "approved" || (item.statusBayar || "").toUpperCase() === "APPROVED") {
+      accBtn.classList.add("hidden");
+    } else {
+      accBtn.classList.remove("hidden");
+      accBtn.onclick = () => {
+        executeAccTicket(item, accBtn);
+      };
+    }
   }
 
-  document.getElementById("receiptModal").classList.remove("hidden");
-  lucide.createIcons();
+  const modal = document.getElementById("receiptModal");
+  if (modal) modal.classList.remove("hidden");
+  if (window.lucide) lucide.createIcons();
 }
 
 function closeReceiptModal() {
-  document.getElementById("receiptModal").classList.add("hidden");
+  const modal = document.getElementById("receiptModal");
+  if (modal) modal.classList.add("hidden");
 }
 
 // ============================================================
 // 9. MODAL SCANNER KAMERA GATE
 // ============================================================
 function openAdminScannerModal() {
-  document.getElementById("adminScannerModal").classList.remove("hidden");
+  const modal = document.getElementById("adminScannerModal");
+  if (modal) modal.classList.remove("hidden");
   startAdminQrScanner();
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 }
 
 function closeAdminScannerModal() {
-  document.getElementById("adminScannerModal").classList.add("hidden");
+  const modal = document.getElementById("adminScannerModal");
+  if (modal) modal.classList.add("hidden");
   if (html5QrScanner) {
     html5QrScanner.stop().catch(() => {}).finally(() => {
       html5QrScanner = null;
@@ -555,15 +609,19 @@ function startAdminQrScanner() {
     { facingMode: "environment" },
     { fps: 10, qrbox: { width: 250, height: 250 } },
     (decodedText) => {
-      document.getElementById("adminScanResultBox").innerHTML = `
-        <span class="text-[#FFDC17] font-bold font-mono text-sm block">QR Terdeteksi: ${decodedText}</span>
-        <span class="text-[11px] text-emerald-400">Memeriksa database...</span>
-      `;
+      const box = document.getElementById("adminScanResultBox");
+      if (box) {
+        box.innerHTML = `
+          <span class="text-[#FFDC17] font-bold font-mono text-sm block">QR Terdeteksi: ${escapeHtml(decodedText)}</span>
+          <span class="text-[11px] text-emerald-400">Memeriksa database...</span>
+        `;
+      }
       validateScannedTicket(decodedText);
     },
     (error) => {}
   ).catch(err => {
-    document.getElementById("adminScanResultBox").textContent = "Tidak dapat mengakses kamera: " + err;
+    const box = document.getElementById("adminScanResultBox");
+    if (box) box.textContent = "Tidak dapat mengakses kamera: " + err;
   });
 }
 
@@ -577,21 +635,25 @@ async function validateScannedTicket(code) {
       body: JSON.stringify({ action: "scan_ticket", kodeTiket: code })
     });
     const res = await response.json();
+    const box = document.getElementById("adminScanResultBox");
+    if (!box) return;
 
     if (res && res.status === "SUCCESS") {
-      document.getElementById("adminScanResultBox").innerHTML = `
+      const scannedNama = escapeHtml(res.data ? (res.data.nama || "-") : "-");
+      const scannedVarian = escapeHtml(res.data ? (res.data.varian || "Tiket") : "Tiket");
+      box.innerHTML = `
         <div class="p-2 rounded-lg bg-emerald-950/70 text-emerald-300 font-bold">
-          ✓ TIKET VALID: ${res.data ? (res.data.nama || "-") : "-"} (${res.data ? (res.data.varian || "Tiket") : "Tiket"})
+          ✓ TIKET VALID: ${scannedNama} (${scannedVarian})
         </div>
       `;
     } else if (res && res.status === "ALREADY_CHECKED_IN") {
-      document.getElementById("adminScanResultBox").innerHTML = `
+      box.innerHTML = `
         <div class="p-2 rounded-lg bg-amber-950/70 text-amber-300 font-bold">
           ⚠️ TIKET SUDAH PERNAH DIGUNAKAN
         </div>
       `;
     } else {
-      document.getElementById("adminScanResultBox").innerHTML = `
+      box.innerHTML = `
         <div class="p-2 rounded-lg bg-red-950/70 text-red-300 font-bold">
           ❌ TIKET TIDAK VALID
         </div>
@@ -607,5 +669,5 @@ async function validateScannedTicket(code) {
 // ============================================================
 document.addEventListener("DOMContentLoaded", () => {
   checkSessionAuth();
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 });
