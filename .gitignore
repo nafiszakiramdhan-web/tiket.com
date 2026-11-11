@@ -1,0 +1,23 @@
+# Jangan push file kode backend Apps Script (karena sudah ada di script.google.com)
+Code.gs
+Kode.gs
+
+# Jangan push file konfigurasi environment lokal
+.env
+*.env
+config.local.js
+
+# Jangan push file konfigurasi editor VS Code pribadi
+.vscode/
+
+# Jangan push file arsip ZIP atau file backup data
+*.zip
+*.rar
+*.tar.gz
+*.backup
+*.csv
+*.xlsx
+
+# Jangan push file sistem operasi
+.DS_Store
+Thumbs.db
