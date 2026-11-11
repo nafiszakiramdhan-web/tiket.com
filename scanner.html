@@ -246,7 +246,7 @@
         <div class="flex items-center justify-between">
           <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-400 text-night font-display font-black text-xs tracking-wider uppercase shadow-md">
             <i data-lucide="check-circle-2" class="w-4 h-4 stroke-[3]"></i>
-            <span>CHECK-IN BERHASIL</span>
+            <span id="successTitleBadge">CHECK-IN BERHASIL</span>
           </div>
           <span class="text-[10px] uppercase font-mono tracking-widest text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-400/20">
             VALID • ALL ACCESS
@@ -312,7 +312,7 @@
         <div class="flex items-center justify-between">
           <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-400 text-night font-display font-black text-xs tracking-wider uppercase shadow-md">
             <i data-lucide="alert-triangle" class="w-4 h-4 stroke-[3]"></i>
-            <span>TIKET SUDAH PERNAH DIGUNAKAN</span>
+            <span id="warningTitleBadge">TIKET SUDAH DIGUNAKAN</span>
           </div>
           <span class="text-[10px] uppercase font-mono tracking-widest text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-400/20">
             DUPLIKASI SCAN
@@ -368,7 +368,7 @@
         <div class="flex items-center justify-between">
           <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500 text-white font-display font-black text-xs tracking-wider uppercase shadow-md">
             <i data-lucide="x-circle" class="w-4 h-4 stroke-[3]"></i>
-            <span>TIKET TIDAK VALID</span>
+            <span id="errorTitleBadge">TIKET TIDAK VALID</span>
           </div>
           <span class="text-[10px] uppercase font-mono tracking-widest text-red-400 font-bold bg-red-500/10 px-2.5 py-1 rounded-md border border-red-500/20">
             DITOLAK
@@ -715,6 +715,10 @@
       notifError.classList.add("hidden");
 
       if (type === "success") {
+        const badgeTitle = document.getElementById("successTitleBadge");
+        if (badgeTitle) {
+          badgeTitle.textContent = data.statusTitle || ("CHECK-IN BERHASIL (" + (data.nama || "Peserta") + ")");
+        }
         successName.textContent = data.nama || "Peserta";
         successVariant.textContent = (data.varian || "Tiket Reguler") + ` (${data.jumlah || 1} Orang)`;
         successCode.textContent = data.kodeTiket || "-";
@@ -741,6 +745,8 @@
         notifSuccess.classList.remove("hidden");
         soundSuccess();
       } else if (type === "warning") {
+        const badgeWarn = document.getElementById("warningTitleBadge");
+        if (badgeWarn) badgeWarn.textContent = data.statusTitle || "TIKET SUDAH DIGUNAKAN";
         warningName.textContent = data.nama || "Peserta";
         warningVariant.textContent = (data.varian || "Tiket Reguler") + ` (${data.jumlah || 1} Orang)`;
         warningCode.textContent = data.kodeTiket || "-";
@@ -880,14 +886,57 @@
       // Segera jeda scanner agar tidak membaca frame beruntun (multi-scan)
       pauseScanner();
 
-      const code = cleanScanCode(scannedRaw);
-      console.log("[Scanner] Memeriksa kode:", code);
+      // Bersihkan input string: cleanCode = qrText.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const cleanCode = (scannedRaw || "").toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+      console.log("[Scanner] Memeriksa cleanCode:", cleanCode);
 
       const idleTitle = notifIdle.querySelector("p.font-semibold");
-      if (idleTitle) idleTitle.textContent = `Memverifikasi tiket ${code}...`;
+      if (idleTitle) idleTitle.textContent = `Memverifikasi tiket ${cleanCode}...`;
 
-      // 1. CEK APAKAH ADA KONEKSI INTERNET
-      // Jika mode online, verifikasi ke backend terlebih dahulu
+      // 1. CARI DI DATABASE LOKAL
+      const offlineTickets = getOfflineDb();
+      const target = offlineTickets.find(t => {
+        const tCode = (t.kodeTiket || t.ticketCode || "").toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+        return tCode === cleanCode;
+      });
+
+      // 2. JIKA TARGET DITEMUKAN DI OFFLINE TICKETS
+      if (target) {
+        const checkinVal = ((target.checkin || target.statusCheckin || "")).toString().toUpperCase().trim();
+        
+        // Evaluasi: Jika target.checkin.includes("MASUK") || target.checkin.includes("SUDAH")
+        if (checkinVal.includes("MASUK") || checkinVal.includes("SUDAH")) {
+          // Tampilkan alarm / notifikasi: "TIKET SUDAH DIGUNAKAN"
+          showNotification("warning", {
+            ...target,
+            statusTitle: "TIKET SUDAH DIGUNAKAN"
+          });
+          return;
+        }
+
+        // Jika belum masuk, tandai target.checkin = "SUDAH MASUK", simpan ke storage, dan tampilkan layar hijau
+        const nowWib = new Date().toLocaleString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          hour12: false
+        }) + " WIB";
+
+        target.checkin = "SUDAH MASUK";
+        target.statusCheckin = "SUDAH MASUK";
+        target.waktuScan = nowWib;
+
+        saveOfflineDb(offlineTickets);
+        updateCounters();
+
+        // Tampilkan layar hijau: "CHECK-IN BERHASIL (" + target.nama + ")"
+        showNotification("success", {
+          ...target,
+          statusTitle: "CHECK-IN BERHASIL (" + (target.nama || "Peserta") + ")"
+        });
+        return;
+      }
+
+      // 3. JIKA TARGET TIDAK DITEMUKAN DI OFFLINETICKETS -> COBA FALLBACK REQUEST ONLINE
+      let onlineSuccess = false;
       if (navigator.onLine) {
         try {
           const response = await fetch(SCRIPT_URL, {
@@ -899,108 +948,63 @@
             },
             body: JSON.stringify({
               action: "scan_ticket",
-              kodeTiket: code
+              kodeTiket: cleanCode
             })
           });
 
           const res = await response.json();
-          console.log("[Scanner] Respon online:", res);
-
-          const db = getOfflineDb();
-          const cleanTarget = code.replace(/^#/, "");
-          const localIdx = db.findIndex(item => {
-            const itemCode = (item.kodeTiket || item.ticketCode || "").toString().trim().toUpperCase().replace(/^#/, "");
-            return itemCode === cleanTarget;
-          });
+          console.log("[Scanner] Respon fallback online:", res);
 
           if (res && res.status === "SUCCESS") {
+            onlineSuccess = true;
             const nowWib = new Date().toLocaleString("id-ID", {
               timeZone: "Asia/Jakarta",
               hour12: false
             }) + " WIB";
 
-            const ticketData = {
-              nama: res.nama || (localIdx !== -1 ? db[localIdx].nama : "Peserta"),
-              varian: res.pass || res.varian || (localIdx !== -1 ? db[localIdx].varian : "Tiket Reguler"),
-              jumlah: (localIdx !== -1 ? db[localIdx].jumlah : 1),
-              kodeTiket: code,
+            const newTicket = {
+              kodeTiket: cleanCode,
+              nama: res.nama || "Peserta",
+              varian: res.pass || res.varian || "Tiket Reguler",
+              jumlah: 1,
               waktuScan: nowWib,
-              merch: res.merch || (localIdx !== -1 ? db[localIdx].merch : null)
+              merch: res.merch || null,
+              checkin: "SUDAH MASUK",
+              statusCheckin: "SUDAH MASUK"
             };
 
-            if (localIdx !== -1) {
-              db[localIdx].statusCheckin = "MASUK";
-              db[localIdx].waktuScan = nowWib;
-              saveOfflineDb(db);
-            }
+            // Tambahkan ke database lokal agar terekam
+            offlineTickets.push(newTicket);
+            saveOfflineDb(offlineTickets);
+            updateCounters();
 
-            showNotification("success", ticketData);
+            showNotification("success", {
+              ...newTicket,
+              statusTitle: "CHECK-IN BERHASIL (" + newTicket.nama + ")"
+            });
             return;
           } else if (res && (res.status === "ALREADY_USED" || res.status === "ALREADY_CHECKED_IN")) {
-            const scanWaktu = res.waktu ? new Date(res.waktu).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }) + " WIB" : "Sebelumnya";
-            const ticketData = {
-              nama: res.nama || (localIdx !== -1 ? db[localIdx].nama : "Peserta"),
-              varian: res.pass || res.varian || (localIdx !== -1 ? db[localIdx].varian : "Tiket Reguler"),
-              jumlah: (localIdx !== -1 ? db[localIdx].jumlah : 1),
-              kodeTiket: code,
-              waktuScan: scanWaktu,
-              merch: res.merch || (localIdx !== -1 ? db[localIdx].merch : null)
-            };
-
-            if (localIdx !== -1) {
-              db[localIdx].statusCheckin = "SUDAH MASUK";
-              saveOfflineDb(db);
-            }
-
-            showNotification("warning", ticketData);
+            onlineSuccess = true;
+            showNotification("warning", {
+              kodeTiket: cleanCode,
+              nama: res.nama || "Peserta",
+              varian: res.pass || res.varian || "Tiket Reguler",
+              jumlah: 1,
+              waktuScan: res.waktu ? new Date(res.waktu).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }) + " WIB" : "Sebelumnya",
+              statusTitle: "TIKET SUDAH DIGUNAKAN"
+            });
             return;
           }
         } catch (netErr) {
-          console.warn("[Scanner] Verifikasi online gagal, beralih ke database offline lokal:", netErr);
+          console.warn("[Scanner] Fallback online scan gagal:", netErr);
         }
       }
 
-      // 2. LOGIKA VALIDASI SCAN OFFLINE
-      // Jika tidak ada koneksi / mode offline (atau gagal online), cari langsung di array data offline yang tersimpan di localStorage ('offline_tickets')
-      const db = getOfflineDb();
-      const cleanTarget = code.replace(/^#/, "");
-
-      // Cari tiket berdasarkan kodeTiket
-      const targetIndex = db.findIndex(item => {
-        const itemCode = (item.kodeTiket || item.ticketCode || "").toString().trim().toUpperCase().replace(/^#/, "");
-        return itemCode === cleanTarget;
+      // 4. JIKA ONLINE PUN TIDAK ADA, BARU TAMPILKAN LAYAR MERAH: "TIKET TIDAK VALID"
+      showNotification("error", {
+        code: cleanCode || scannedRaw,
+        message: "TIKET TIDAK VALID: Kode tiket tidak terdaftar di sistem."
       });
-
-      // a. Tidak ditemukan -> Tiket Tidak Valid
-      if (targetIndex === -1) {
-        showNotification("error", {
-          code: code || scannedRaw,
-          message: "Kode tiket tidak ditemukan di database offline. Pastikan database tiket sudah diunduh ke perangkat saat online."
-        });
-        return;
-      }
-
-      const ticket = db[targetIndex];
-      const checkinStatus = (ticket.statusCheckin || "").toString().toUpperCase().trim();
-
-      // b. Evaluasi status checkin tiket: jika "SUDAH MASUK" atau "SELESAI (HARI 2)", beri alarm "TIKET SUDAH PERNAH DIGUNAKAN"
-      if (checkinStatus === "SUDAH MASUK" || checkinStatus === "SELESAI (HARI 2)" || checkinStatus === "MASUK") {
-        showNotification("warning", ticket);
-        return;
-      }
-
-      // c. Jika "BELUM MASUK" (atau belum checkin), update status di storage lokal dan tandai "MASUK"
-      const nowWib = new Date().toLocaleString("id-ID", {
-        timeZone: "Asia/Jakarta",
-        hour12: false
-      }) + " WIB";
-
-      ticket.statusCheckin = "MASUK";
-      ticket.waktuScan = nowWib;
-      db[targetIndex] = ticket;
-
-      saveOfflineDb(db);
-      showNotification("success", ticket);
     }
 
     // Form Manual Scan
@@ -1093,12 +1097,6 @@
 
     // 1. Unduh Database Tiket dari Cloud ke HP
     btnDownloadDb.addEventListener("click", async () => {
-      if (!navigator.onLine) {
-        showToast("Perangkat sedang OFFLINE. Sambungkan internet untuk mengunduh.", false);
-        alert("Perangkat Anda sedang OFFLINE. Sambungkan ke WiFi/seluler untuk mengunduh database terbaru.");
-        return;
-      }
-
       btnDownloadDb.disabled = true;
       btnDownloadDbText.textContent = "Mengunduh...";
 
@@ -1117,33 +1115,15 @@
 
         if (res && res.status === "SUCCESS") {
           const ticketsData = Array.isArray(res.data) ? res.data : (res.tickets || []);
-          const totalCount = typeof res.total !== "undefined" ? res.total : ticketsData.length;
-          const currentLocalDb = getOfflineDb();
+          const totalTiket = typeof res.total !== "undefined" ? res.total : ticketsData.length;
 
-          // Pertahankan status checkin lokal jika ada tiket yang sudah masuk di HP
-          const mergedDb = ticketsData.map(cloudItem => {
-            const cloudCode = (cloudItem.kodeTiket || cloudItem.ticketCode || "").toString().trim().toUpperCase();
-            const localMatch = currentLocalDb.find(l => {
-              const lCode = (l.kodeTiket || l.ticketCode || "").toString().trim().toUpperCase();
-              return lCode === cloudCode || lCode.replace(/^#/, "") === cloudCode.replace(/^#/, "");
-            });
-            if (localMatch && (localMatch.statusCheckin === "SUDAH MASUK" || localMatch.statusCheckin === "MASUK" || localMatch.statusCheckin === "SELESAI (HARI 2)")) {
-              return {
-                ...cloudItem,
-                statusCheckin: localMatch.statusCheckin,
-                waktuScan: localMatch.waktuScan
-              };
-            }
-            return {
-              ...cloudItem,
-              statusCheckin: cloudItem.statusCheckin || "BELUM MASUK",
-              waktuScan: cloudItem.waktuScan || ""
-            };
-          });
+          // Simpan res.data ke dalam localStorage/IndexedDB dengan kunci 'offline_tickets'
+          localStorage.setItem("offline_tickets", JSON.stringify(ticketsData));
 
-          // Simpan res.data ke dalam localStorage dengan kunci 'offline_tickets'
-          localStorage.setItem("offline_tickets", JSON.stringify(mergedDb));
-          
+          // Perbarui angka counter di UI: DATABASE HP menjadi res.total tiket
+          const dbCountEl = document.getElementById("statDbCount");
+          if (dbCountEl) dbCountEl.textContent = `${totalTiket} Tiket`;
+
           // Tampilkan timestamp terakhir sinkronisasi di UI
           const nowStr = new Date().toLocaleString("id-ID", {
             timeZone: "Asia/Jakarta",
@@ -1157,18 +1137,21 @@
           localStorage.setItem("offline_tickets_last_sync", nowStr);
           updateLastSyncDisplay(nowStr);
 
-          // Tampilkan toast sukses
-          showToast("✅ Berhasil mengunduh " + totalCount + " data tiket untuk mode offline!", true);
+          // Tampilkan alert/toast: Berhasil mengunduh ${res.total} tiket!
+          const successMsg = `Berhasil mengunduh ${totalTiket} tiket!`;
+          showToast(successMsg, true);
+          alert(successMsg);
+
           updateCounters();
         } else {
-          const errMsg = (res && (res.message || res.error)) || "Respon server tidak valid.";
-          showToast("❌ " + errMsg, false);
-          alert("Gagal mengunduh: " + errMsg);
+          const errMsg = (res && (res.message || res.error)) || "Gagal mengunduh database tiket.";
+          showToast(errMsg, false);
+          alert("Gagal: " + errMsg);
         }
       } catch (err) {
         console.error("Gagal mengunduh database:", err);
-        showToast("❌ Gagal: " + err.message, false);
-        alert("Gagal mengunduh database: " + err.message);
+        showToast("Gagal: " + err.message, false);
+        alert("Gagal: " + err.message);
       } finally {
         btnDownloadDb.disabled = false;
         btnDownloadDbText.textContent = "📥 Unduh Database Tiket";
