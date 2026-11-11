@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bingkai Bisu - Fixlens Festival 2026 | Tiket Pameran Foto Jurnalistik</title>
-  <meta name="description" content="Pemesanan Tiket Resmi Pameran Foto Jurnalistik 'Bingkai Bisu' - Fixlens Festival 2026 di Hetero Space Banyumas. Akses pameran, photobook showcase, dan merchandise eksklusif." />
+  <title>Bingkai Bisu - Fixlens Festival 2026 | Portal Resmi Tiket</title>
+  <meta name="description" content="Pemesanan Tiket Resmi Pameran Foto Jurnalistik 'Bingkai Bisu' - Fixlens Festival 2026 di Hetero Space Banyumas. Pilihan Tiket 1 Hari, 2 Hari Biasa, 2 Hari + Stiker, dan Bundling Presale Ganci." />
 
   <!-- Open Graph Meta -->
   <meta property="og:title" content="Bingkai Bisu - Fixlens Festival 2026" />
   <meta property="og:description" content="Pameran Foto Jurnalistik di Hetero Space Banyumas. 29–30 November 2026." />
   <meta property="og:type" content="website" />
 
-  <!-- Google Fonts: Bebas Neue, EB Garamond (Italic), Inter, Space Mono -->
+  <!-- Google Fonts: Bebas Neue, Playfair Display, EB Garamond, Inter, Plus Jakarta Sans, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;0,900;1,500;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,29 +24,27 @@
         extend: {
           colors: {
             brand: {
-              yellow: '#FFDC17',
-              'yellow-hover': '#ECC90E',
-              dark: '#2D2A1A',
-              navy: '#081B59',
-              'navy-dark': '#05123d',
-              violet: '#2A0859',
-              'violet-card': '#2A0859',
-              'violet-border': 'rgba(255, 220, 23, 0.2)',
-            },
-            slate: {
-              300: '#E2E8F0',
-              400: '#94A3B8',
+              gold: '#FFDC17',
+              'gold-hover': '#ECC90E',
+              darkPlum: '#240638',
+              violet: '#1A0536',
+              deepVoid: '#0D021D',
+              card: '#240847',
+              cardLight: '#32105F',
+              borderGold: 'rgba(255, 220, 23, 0.3)',
+              textMuted: '#E2D9F3',
             }
           },
           fontFamily: {
-            sans: ['"Inter"', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', '"Inter"', 'sans-serif'],
             display: ['"Bebas Neue"', 'sans-serif'],
-            serif: ['"EB Garamond"', 'serif'],
-            mono: ['"Space Mono"', 'monospace'],
+            serif: ['"Playfair Display"', 'serif'],
+            editorial: ['"EB Garamond"', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
           },
           boxShadow: {
-            'glow-yellow': '0 0 25px rgba(255, 220, 23, 0.35)',
-            'glow-violet': '0 0 35px rgba(42, 8, 89, 0.6)',
+            'glow-gold': '0 0 25px rgba(255, 220, 23, 0.35)',
+            'glow-plum': '0 12px 32px -4px rgba(13, 2, 29, 0.85), 0 0 20px 0 rgba(255, 220, 23, 0.12)',
           }
         }
       }
@@ -58,79 +56,86 @@
 
   <style>
     body {
-      background-color: #081B59;
-      color: #FFFFFF;
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
+      background-color: #1A0536;
       background-image: 
-        radial-gradient(circle at 15% 10%, rgba(42, 8, 89, 0.85) 0%, transparent 55%),
-        radial-gradient(circle at 85% 60%, rgba(255, 220, 23, 0.08) 0%, transparent 45%),
-        radial-gradient(circle at 50% 95%, rgba(42, 8, 89, 0.9) 0%, transparent 50%);
+        radial-gradient(circle at 50% 0%, #2A0859 0%, #1A0536 45%, #0D021D 100%),
+        radial-gradient(circle at 90% 60%, rgba(255, 220, 23, 0.06) 0%, transparent 40%);
       background-attachment: fixed;
+      color: #FFFFFF;
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      overflow-x: hidden;
     }
 
     .bg-grain {
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
     }
 
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-8px); }
-      40%, 80% { transform: translateX(8px); }
+    .filigree-border {
+      border: 1px solid rgba(255, 220, 23, 0.3);
+      box-shadow: inset 0 0 0 1px rgba(255, 220, 23, 0.1);
     }
-    .animate-shake {
-      animation: shake 0.4s ease-in-out;
+
+    .tilted-box {
+      transform: rotate(-2deg);
+    }
+
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #FFF9F1 0%, #FFDC17 50%, #D4AF37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #081B59; }
-    ::-webkit-scrollbar-thumb { background: #2A0859; border-radius: 4px; border: 1px solid rgba(255, 220, 23, 0.25); }
+    ::-webkit-scrollbar-track { background: #0D021D; }
+    ::-webkit-scrollbar-thumb { background: #240847; border-radius: 4px; border: 1px solid rgba(255, 220, 23, 0.25); }
     ::-webkit-scrollbar-thumb:hover { background: #FFDC17; }
   </style>
 </head>
-<body class="min-h-screen bg-grain flex flex-col justify-between selection:bg-[#FFDC17] selection:text-[#2D2A1A] relative">
+<body class="min-h-screen bg-grain flex flex-col justify-between selection:bg-[#FFDC17] selection:text-[#240638] relative">
 
-  <!-- Top Accent Bar: Vivid Yellow -->
-  <div class="h-1.5 w-full bg-[#FFDC17] shadow-glow-yellow"></div>
+  <!-- Top Accent Bar: Vivid Gold & Sparkle Divider -->
+  <div class="h-1.5 w-full bg-[#FFDC17] shadow-glow-gold"></div>
 
   <!-- ==================== NOTIFIKASI TOAST MELAYANG ==================== -->
   <div 
     id="toastNotification" 
-    class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-[#2A0859] border border-[#FFDC17] text-white text-xs font-semibold shadow-glow-yellow opacity-0 translate-y-6 pointer-events-none transition-all duration-300 flex items-center gap-2"
+    class="fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl bg-[#240847] border border-[#FFDC17] text-white text-xs font-semibold shadow-glow-gold opacity-0 translate-y-6 pointer-events-none transition-all duration-300 flex items-center gap-2"
   >
-    <span id="toastMessage">✅ Ketersediaan tiket berhasil diperbarui!</span>
+    <span class="text-[#FFDC17]">✦</span>
+    <span id="toastMessage">Ketersediaan tiket berhasil diperbarui!</span>
   </div>
 
-  <!-- ==================== NAVBAR PUBLIK BERSIH ==================== -->
-  <nav class="w-full border-b border-[#FFDC17]/15 bg-[#081B59]/90 backdrop-blur-md sticky top-0 z-40">
+  <!-- ==================== NAVBAR PUBLIK STEALTH ==================== -->
+  <nav class="w-full border-b border-[#FFDC17]/20 bg-[#1A0536]/90 backdrop-blur-md sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
-      <!-- Logo Teks Kiri (dengan listener stealth tap) -->
+      <!-- Logo Teks Kiri (5-tap rapid trigger rahasia) -->
       <div 
         id="stealthLogo" 
         class="cursor-pointer select-none group flex flex-col active:scale-95 active:brightness-90 transition-all duration-100" 
         title="Bingkai Bisu 2026"
       >
         <div class="flex items-center gap-2">
+          <span class="text-[#FFDC17] text-xs">✦</span>
           <span class="font-display text-[#FFDC17] text-2xl sm:text-3xl tracking-wider leading-none group-hover:brightness-110">
             BINGKAI BISU
           </span>
-          <span class="w-2 h-2 rounded-full bg-[#FFDC17]/60"></span>
+          <span class="text-[#FFDC17] text-xs">✦</span>
         </div>
-        <span class="font-serif italic text-xs sm:text-sm text-slate-300 tracking-wide mt-0.5">
-          Fixlens 2026
+        <span class="font-editorial italic text-xs sm:text-sm text-[#E2D9F3] tracking-wider mt-0.5 pl-3">
+          Fixlens Festival 2026
         </span>
       </div>
 
-      <!-- Badge Lokasi & Jadwal Kanan (Tanpa tombol admin/gembok) -->
+      <!-- Badge Lokasi & Jadwal Kanan (Tanpa tombol admin publik) -->
       <div class="flex items-center gap-3">
-        <div class="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2A0859] border border-[#FFDC17]/25 text-xs text-slate-200 shadow-sm select-none">
+        <div class="hidden sm:inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#240847] border border-[#FFDC17]/30 text-xs text-[#E2D9F3] shadow-md select-none">
           <span class="text-base leading-none">📍</span>
           <span class="font-medium">Hetero Space Banyumas</span>
           <span class="text-[#FFDC17]/40">•</span>
-          <span class="text-[#FFDC17] font-semibold">29–30 Nov 2026</span>
+          <span class="text-[#FFDC17] font-bold">29–30 Nov 2026</span>
         </div>
-        <div class="sm:hidden inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2A0859] border border-[#FFDC17]/25 text-[11px] text-slate-200 select-none">
+        <div class="sm:hidden inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#240847] border border-[#FFDC17]/30 text-[11px] text-[#E2D9F3] select-none">
           <span>📍</span>
           <span class="text-[#FFDC17] font-semibold">29–30 Nov 2026</span>
         </div>
@@ -142,181 +147,146 @@
   <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
   <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-10 flex-1">
 
-    <!-- ==================== HERO SECTION (SPLIT 2 KOLOM GAYA LOKET.COM) ==================== -->
+    <!-- ==================== HERO SECTION (ROYAL BAROQUE NOIR SPLIT) ==================== -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
       
       <!-- Kolom Kiri: Detail Event -->
-      <div class="lg:col-span-7 space-y-5">
-        <!-- Kategori Pill -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2A0859] border border-[#FFDC17]/30 text-xs sm:text-sm text-slate-300 select-none">
-          <span class="text-sm">🏷️</span>
-          <span class="font-medium">Festival & Pameran Foto Jurnalistik • Seni & Budaya</span>
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Category Pill & Starlet -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#240847] border border-[#FFDC17]/30 text-xs sm:text-sm text-[#E2D9F3] select-none">
+          <span class="text-[#FFDC17]">✦</span>
+          <span class="font-medium tracking-wide">Pameran Foto Jurnalistik & Seni Rupa Visual</span>
+          <span class="text-[#FFDC17]">✦</span>
         </div>
 
-        <!-- Judul Acara -->
-        <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl text-white tracking-wide leading-tight">
-          BINGKAI BISU - FIXLENS FESTIVAL 2026
-        </h1>
+        <!-- Judul Pameran dengan Kotak Miring Ganda & Bintang Kilau -->
+        <div class="relative pt-2 pb-1">
+          <!-- Kotak miring ganda baroque di belakang judul -->
+          <div class="inline-block relative">
+            <div class="absolute -inset-2 bg-gradient-to-r from-[#FFDC17]/20 via-[#240847] to-[#FFDC17]/10 rounded-xl transform -rotate-2 border border-[#FFDC17]/40 pointer-events-none"></div>
+            <div class="relative px-3 py-1">
+              <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl tracking-wider leading-none text-white drop-shadow-lg">
+                <span class="text-[#FFDC17]">✦</span> BINGKAI BISU <span class="text-[#FFDC17]">✦</span>
+              </h1>
+            </div>
+          </div>
+          <p class="font-serif text-lg sm:text-2xl text-[#FFDC17] tracking-widest uppercase mt-3 font-semibold">
+            Fixlens Festival 2026
+          </p>
+        </div>
 
-        <!-- Editorial Subtitle -->
-        <p class="font-serif italic text-lg sm:text-xl text-slate-300 leading-relaxed max-w-2xl">
-          "Menghidupkan dan menyuarakan narasi realitas yang kerap tenggelam dalam kesunyian, terbingkai lewat kejujuran lensa visual pewarta."
+        <!-- Editorial Subtitle (EB Garamond Italic) -->
+        <p class="font-editorial italic text-lg sm:text-xl text-[#E2D9F3] leading-relaxed max-w-2xl border-l-2 border-[#FFDC17]/60 pl-4">
+          "Menyuarakan kedalaman narasi yang kerap tenggelam dalam kesenyapan, terbingkai secara jujur lewat mata lensa kuratorial pewarta."
         </p>
 
         <!-- Metadata Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
           <!-- Lokasi -->
-          <div class="flex items-start gap-3 p-3.5 rounded-xl bg-[#2A0859]/70 border border-[#FFDC17]/20 select-none">
-            <span class="text-xl">📍</span>
+          <div class="flex items-start gap-3.5 p-4 rounded-2xl bg-[#240847] border border-[#FFDC17]/30 select-none shadow-glow-plum">
+            <span class="text-2xl">📍</span>
             <div>
-              <span class="text-[10px] uppercase font-mono tracking-wider text-slate-400 block">Lokasi Venue</span>
-              <p class="text-xs sm:text-sm font-semibold text-white">Hetero Space Banyumas</p>
-              <span class="text-[11px] text-slate-300">Kab. Banyumas, Jawa Tengah</span>
+              <span class="text-[10px] uppercase font-mono tracking-widest text-[#FFDC17] block font-bold">LOKASI VENUE</span>
+              <p class="text-sm font-bold text-white mt-0.5">Hetero Space Banyumas</p>
+              <span class="text-xs text-[#E2D9F3]">Jalan Gatot Subroto, Kab. Banyumas</span>
             </div>
           </div>
 
           <!-- Waktu -->
-          <div class="flex items-start gap-3 p-3.5 rounded-xl bg-[#2A0859]/70 border border-[#FFDC17]/20 select-none">
-            <span class="text-xl">📅</span>
+          <div class="flex items-start gap-3.5 p-4 rounded-2xl bg-[#240847] border border-[#FFDC17]/30 select-none shadow-glow-plum">
+            <span class="text-2xl">📅</span>
             <div>
-              <span class="text-[10px] uppercase font-mono tracking-wider text-slate-400 block">Jadwal Acara</span>
-              <p class="text-xs sm:text-sm font-semibold text-[#FFDC17]">29–30 November 2026</p>
-              <span class="text-[11px] text-slate-300">09:00 - 21:00 WIB</span>
+              <span class="text-[10px] uppercase font-mono tracking-widest text-[#FFDC17] block font-bold">WAKTU & TANGGAL</span>
+              <p class="text-sm font-bold text-[#FFDC17] mt-0.5">29–30 November 2026</p>
+              <span class="text-xs text-[#E2D9F3]">09:00 - 21:00 WIB</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Kolom Kanan: Banner Visual Acara -->
+      <!-- Kolom Kanan: Banner Hero .WEBP -->
       <div class="lg:col-span-5">
-        <div class="aspect-[16/9] w-full rounded-2xl overflow-hidden border border-[#FFDC17]/30 shadow-2xl relative group bg-[#2A0859]">
+        <div class="aspect-[16/9] sm:aspect-[4/3] w-full rounded-2xl overflow-hidden border-2 border-[#FFDC17]/40 shadow-glow-plum relative group bg-[#240847]">
           <img 
-            src="assets/banner-pameran.jpg" 
+            src="assets/banner.webp" 
             onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop'" 
-            alt="Banner Pameran Foto Bingkai Bisu 2026"
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            alt="Official Banner Pameran Foto Bingkai Bisu 2026"
+            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" 
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-[#081B59] via-transparent to-transparent opacity-60"></div>
-          <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] text-slate-200 bg-[#081B59]/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-[#FFDC17]/20 select-none">
-            <span class="font-mono text-[#FFDC17]">#bingkaibisu</span>
-            <span>Hetero Space Banyumas</span>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0D021D] via-transparent to-transparent opacity-60"></div>
+          <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-[#E2D9F3] bg-[#1A0536]/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#FFDC17]/30 select-none">
+            <span class="font-mono text-[#FFDC17] font-bold">✦ #bingkaibisu2026</span>
+            <span class="font-serif italic">Hetero Space Banyumas</span>
           </div>
         </div>
       </div>
 
     </section>
 
-    <!-- ==================== KONTEN UTAMA: 3 TAB & STICKY SIDEBAR ==================== -->
+    <!-- ==================== KONTEN UTAMA: 4 TAB INTERAKTIF & STICKY SIDEBAR ==================== -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-4">
 
-      <!-- ==================== KOLOM KIRI (65% / 8 COLS): 3 TAB INTERAKTIF ==================== -->
+      <!-- ==================== KOLOM KIRI (65% / 8 COLS): 4 TAB NAVIGASI ==================== -->
       <div class="lg:col-span-8 space-y-6">
 
-        <!-- Tab Header Bar (Loket.com Style) -->
-        <div class="border-b border-[#FFDC17]/20 flex items-center gap-2 sm:gap-6 overflow-x-auto pb-0 select-none">
+        <!-- 4 Tab Header Bar -->
+        <div class="border-b border-[#FFDC17]/25 flex items-center gap-1 sm:gap-2 overflow-x-auto pb-0 select-none scrollbar-none">
           <button 
             type="button" 
-            id="tabNavDeskripsi" 
-            onclick="switchMainTab('deskripsi')"
-            class="tab-nav-btn py-3 px-3 sm:px-4 text-sm sm:text-base font-semibold relative border-b-2 border-[#FFDC17] text-[#FFDC17] whitespace-nowrap active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
-          >
-            Deskripsi
-          </button>
-          <button 
-            type="button" 
-            id="tabNavTiket" 
+            id="tabBtn01" 
             onclick="switchMainTab('tiket')"
-            class="tab-nav-btn py-3 px-3 sm:px-4 text-sm sm:text-base font-medium relative border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
+            class="tab-nav-btn py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold relative border-b-2 border-[#FFDC17] text-[#FFDC17] whitespace-nowrap active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
           >
-            Tiket
+            01. PILIH TIKET
           </button>
           <button 
             type="button" 
-            id="tabNavSnk" 
-            onclick="switchMainTab('snk')"
-            class="tab-nav-btn py-3 px-3 sm:px-4 text-sm sm:text-base font-medium relative border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
+            id="tabBtn02" 
+            onclick="switchMainTab('deskripsi')"
+            class="tab-nav-btn py-3 px-3 sm:px-4 text-xs sm:text-sm font-semibold relative border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
           >
-            Syarat dan Ketentuan
+            02. DESKRIPSI ACARA
+          </button>
+          <button 
+            type="button" 
+            id="tabBtn03" 
+            onclick="switchMainTab('snk')"
+            class="tab-nav-btn py-3 px-3 sm:px-4 text-xs sm:text-sm font-semibold relative border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
+          >
+            03. SYARAT & KETENTUAN
+          </button>
+          <button 
+            type="button" 
+            id="tabBtn04" 
+            onclick="switchMainTab('cek')"
+            class="tab-nav-btn py-3 px-3 sm:px-4 text-xs sm:text-sm font-semibold relative border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
+          >
+            04. CEK STATUS PESANAN
           </button>
         </div>
 
-        <!-- ==================== TAB 1: DESKRIPSI ==================== -->
-        <div id="tabContentDeskripsi" class="space-y-6">
-          <!-- Narasi Editorial Pameran -->
-          <div class="bg-[#2A0859] border border-[#FFDC17]/20 rounded-2xl p-6 sm:p-8 space-y-4 shadow-glow-violet">
-            <h2 class="font-display text-2xl sm:text-3xl text-white tracking-wide">
-              Tentang Pameran "Bingkai Bisu"
-            </h2>
-            <p class="font-sans text-slate-300 text-sm sm:text-base leading-relaxed">
-              Pameran Foto Jurnalistik <strong class="text-white">"Bingkai Bisu"</strong> merupakan etalase karya kuratorial persembahan Fixlens Festival 2026. Menghadirkan rekaman visual jujur dan humanis, pameran ini menyoroti fenomena sosial, denyut kehidupan marjinal, dan narasi-narasi kemanusiaan yang kerap tenggelam tanpa suara di tengah riuh dinamika modernitas.
-            </p>
-            <p class="font-serif italic text-slate-300 text-base sm:text-lg leading-relaxed border-l-2 border-[#FFDC17] pl-4 my-3">
-              "Setiap jepretan foto adalah saksi sunyi yang menolak bungkam, merawat ingatan bersama melalui ketajaman rasa dan kejujuran jurnalistik."
-            </p>
-          </div>
+        <!-- ==================== TAB 01: PILIH TIKET & CHECKOUT ==================== -->
+        <div id="tabContentTiket" class="space-y-6">
 
-          <!-- Sorotan Acara Grid -->
-          <div class="space-y-3">
-            <h3 class="font-display text-xl text-white tracking-wide">Sorotan & Program Acara</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              
-              <!-- Sorotan 1 -->
-              <div class="bg-[#2A0859] border border-[#FFDC17]/20 rounded-xl p-5 space-y-2 select-none">
-                <div class="w-10 h-10 rounded-lg bg-[#FFDC17]/10 text-[#FFDC17] flex items-center justify-center text-xl">
-                  📖
-                </div>
-                <h4 class="font-sans font-bold text-sm sm:text-base text-white">Photobook Showcase</h4>
-                <p class="text-xs text-slate-300 leading-relaxed">
-                  Pameran buku foto kurasi istimewa dari para fotografer independen dan zine visual alternatif.
-                </p>
-              </div>
-
-              <!-- Sorotan 2 -->
-              <div class="bg-[#2A0859] border border-[#FFDC17]/20 rounded-xl p-5 space-y-2 select-none">
-                <div class="w-10 h-10 rounded-lg bg-[#FFDC17]/10 text-[#FFDC17] flex items-center justify-center text-xl">
-                  🖼️
-                </div>
-                <h4 class="font-sans font-bold text-sm sm:text-base text-white">Curated Exhibition</h4>
-                <p class="text-xs text-slate-300 leading-relaxed">
-                  Galeri puluhan karya foto jurnalistik terpilih berstandar pameran nasional dengan narasi mendalam.
-                </p>
-              </div>
-
-              <!-- Sorotan 3 -->
-              <div class="bg-[#2A0859] border border-[#FFDC17]/20 rounded-xl p-5 space-y-2 select-none">
-                <div class="w-10 h-10 rounded-lg bg-[#FFDC17]/10 text-[#FFDC17] flex items-center justify-center text-xl">
-                  🎙️
-                </div>
-                <h4 class="font-sans font-bold text-sm sm:text-base text-white">Artist Talk & Diskusi</h4>
-                <p class="text-xs text-slate-300 leading-relaxed">
-                  Sesi bincang hangat bersama pewarta foto senior dan kurator mengenai etika serta di balik lensa.
-                </p>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <!-- ==================== TAB 2: TIKET (ALUR LOKET + CHECKOUT SATU KOLOM) ==================== -->
-        <div id="tabContentTiket" class="hidden space-y-6">
-
-          <!-- Header Pilih Tiket & Tombol Refresh Stok Gaya Loket.com -->
-          <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-[#FFDC17]/15">
+          <!-- Header Pilih Tiket & Tombol Refresh Stok -->
+          <div class="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-[#FFDC17]/20">
             <div>
               <h2 class="font-display text-2xl sm:text-3xl text-white tracking-wide">
-                Langkah 1: Pilih Tiket
+                Langkah 1: Pilih Tiket Festival
               </h2>
-              <p class="text-xs text-slate-400 font-sans">
-                Pilih varian tiket yang Anda inginkan untuk membuka formulir checkout.
+              <p class="text-xs text-[#E2D9F3] font-sans">
+                Tersedia 4 kategori akses pameran dan paket merchandise eksklusif.
               </p>
             </div>
             
-            <!-- Tombol Refresh Stok Gaya Loket.com Sesuai Spesifikasi -->
+            <!-- Tombol Refresh Stok Ketersediaan Tiket -->
             <button 
               id="btnRefreshQuota" 
               type="button" 
               onclick="refreshTicketStock(true)"
-              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2A0859] border border-[#FFDC17]/30 text-[#FFDC17] text-xs font-semibold hover:bg-[#FFDC17]/10 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-sm"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#240847] border border-[#FFDC17]/40 text-[#FFDC17] text-xs font-bold hover:bg-[#FFDC17]/10 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none shadow-sm"
+              title="Perbarui data kuota terkini dari server"
             >
               <svg id="refreshIcon" class="w-4 h-4 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -325,134 +295,176 @@
             </button>
           </div>
 
-          <!-- DAFTAR 3 VARIAN TIKET BERJEJER VERTIKAL -->
+          <!-- DAFTAR 4 VARIAN TIKET RESMI BERJEJER VERTIKAL (.WEBP) -->
           <div class="space-y-4" id="ticketVariantsList">
 
-            <!-- VARIAN 1: Tiket 1 Hari (Reguler) - Rp 4.000 -->
+            <!-- TIKET 1: Tiket 1 Hari (Rp 4.000) -->
             <div 
               id="cardVariant1"
               onclick="selectTicketVariant('tiket_1hari')" 
-              class="variant-card bg-[#2A0859] border border-[#FFDC17]/20 rounded-xl p-5 hover:border-[#FFDC17]/60 active:scale-[0.99] active:brightness-95 transition-all duration-100 cursor-pointer relative group"
+              class="variant-card bg-[#240847] border border-[#FFDC17]/30 rounded-2xl p-5 hover:border-[#FFDC17] active:scale-[0.99] active:brightness-95 transition-all duration-100 cursor-pointer select-none relative group shadow-glow-plum"
             >
-              <!-- Slot Mockup Gambar -->
+              <!-- Slot Gambar .webp Resmi -->
               <img 
-                src="assets/tiket-reguler.jpg" 
-                onerror="this.src='https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&auto=format&fit=crop'"
-                alt="Mockup Tiket 1 Hari Reguler" 
-                class="w-full aspect-[16/9] object-cover rounded-lg mb-3 border border-[#FFDC17]/15 group-hover:border-[#FFDC17]/40 transition-colors"
+                src="assets/Tiket_1hari.webp" 
+                alt="Mockup Tiket 1 Hari" 
+                class="w-full aspect-[16/9] object-cover rounded-xl mb-3 border border-[#FFDC17]/20 group-hover:border-[#FFDC17]/50 transition-colors"
               />
 
               <div class="flex items-start justify-between gap-4">
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
-                    <h3 class="font-sans font-bold text-lg text-white">Tiket 1 Hari (Reguler)</h3>
-                    <span class="px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-slate-300">Reguler</span>
+                    <span class="text-[#FFDC17] text-xs">✦</span>
+                    <h3 class="font-serif font-bold text-lg text-white">Tiket 1 Hari</h3>
+                    <span class="px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-[#E2D9F3]">Reguler Pass</span>
                   </div>
-                  <p class="text-xs text-slate-300">
-                    Fasilitas: Akses 1 hari pameran & photobook showcase.
+                  <p class="text-xs text-[#E2D9F3] leading-relaxed">
+                    Fasilitas: Akses 1 hari pameran foto jurnalistik & area Photobook Showcase.
                   </p>
                 </div>
                 <div class="text-right flex-shrink-0">
-                  <span class="font-display text-2xl sm:text-3xl text-[#FFDC17] block">Rp 4.000</span>
+                  <span class="font-display text-3xl sm:text-4xl text-[#FFDC17] block leading-none">Rp 4.000</span>
                   <span class="text-[10px] text-slate-400 font-mono">/ orang</span>
                 </div>
               </div>
 
-              <div class="mt-4 pt-3 border-t border-[#FFDC17]/15 flex items-center justify-between">
-                <span id="badgeSelect1" class="text-xs text-slate-400 font-medium">Klik untuk memilih</span>
+              <div class="mt-4 pt-3 border-t border-[#FFDC17]/20 flex items-center justify-between">
+                <span id="badgeSelect1" class="text-xs text-slate-400 font-medium">Klik untuk memilih tiket ini</span>
                 <button 
                   type="button" 
                   id="btnSelect1"
-                  class="btn-select-variant px-4 py-1.5 rounded-lg text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer flex items-center gap-1"
+                  class="btn-select-variant px-5 py-2 rounded-xl text-xs font-bold bg-[#FFDC17] text-[#240638] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none flex items-center gap-1.5 shadow-md"
                 >
                   <span id="btnSelectText1">Pilih Tiket ⌵</span>
                 </button>
               </div>
             </div>
 
-            <!-- VARIAN 2: Tiket 2 Hari (Stiker) - Rp 8.000 -->
+            <!-- TIKET 2: Tiket 2 Hari Biasa (Rp 6.000) -->
             <div 
               id="cardVariant2"
-              onclick="selectTicketVariant('tiket_2hari')" 
-              class="variant-card bg-[#2A0859] border border-[#FFDC17]/20 rounded-xl p-5 hover:border-[#FFDC17]/60 active:scale-[0.99] active:brightness-95 transition-all duration-100 cursor-pointer relative group"
+              onclick="selectTicketVariant('tiket_2hari_biasa')" 
+              class="variant-card bg-[#240847] border border-[#FFDC17]/30 rounded-2xl p-5 hover:border-[#FFDC17] active:scale-[0.99] active:brightness-95 transition-all duration-100 cursor-pointer select-none relative group shadow-glow-plum"
             >
-              <!-- Slot Mockup Gambar -->
+              <!-- Slot Gambar .webp Resmi -->
               <img 
-                src="assets/tiket-stiker.jpg" 
-                onerror="this.src='https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&auto=format&fit=crop'"
-                alt="Mockup Tiket 2 Hari Stiker" 
-                class="w-full aspect-[16/9] object-cover rounded-lg mb-3 border border-[#FFDC17]/15 group-hover:border-[#FFDC17]/40 transition-colors"
+                src="assets/tiket_2hari_biasa.webp" 
+                alt="Mockup Tiket 2 Hari Biasa" 
+                class="w-full aspect-[16/9] object-cover rounded-xl mb-3 border border-[#FFDC17]/20 group-hover:border-[#FFDC17]/50 transition-colors"
               />
 
               <div class="flex items-start justify-between gap-4">
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
-                    <h3 class="font-sans font-bold text-lg text-white">Tiket 2 Hari (Stiker)</h3>
-                    <span class="px-2 py-0.5 rounded bg-[#FFDC17]/15 text-[10px] font-mono text-[#FFDC17] font-semibold">Free Stiker</span>
+                    <span class="text-[#FFDC17] text-xs">✦</span>
+                    <h3 class="font-serif font-bold text-lg text-white">Tiket 2 Hari Biasa</h3>
+                    <span class="px-2 py-0.5 rounded bg-[#FFDC17]/15 text-[10px] font-mono text-[#FFDC17] font-semibold">2-Day Pass</span>
                   </div>
-                  <p class="text-xs text-slate-300">
-                    Fasilitas: Akses penuh 2 Hari (29 & 30 Nov) + 1x Official Vinyl Sticker "Bingkai Bisu".
+                  <p class="text-xs text-[#E2D9F3] leading-relaxed">
+                    Fasilitas: Akses penuh 2 Hari pameran (29 & 30 Nov 2026) tanpa merchandise fisik.
                   </p>
                 </div>
                 <div class="text-right flex-shrink-0">
-                  <span class="font-display text-2xl sm:text-3xl text-[#FFDC17] block">Rp 8.000</span>
+                  <span class="font-display text-3xl sm:text-4xl text-[#FFDC17] block leading-none">Rp 6.000</span>
                   <span class="text-[10px] text-slate-400 font-mono">/ orang</span>
                 </div>
               </div>
 
-              <div class="mt-4 pt-3 border-t border-[#FFDC17]/15 flex items-center justify-between">
-                <span id="badgeSelect2" class="text-xs text-slate-400 font-medium">Klik untuk memilih</span>
+              <div class="mt-4 pt-3 border-t border-[#FFDC17]/20 flex items-center justify-between">
+                <span id="badgeSelect2" class="text-xs text-slate-400 font-medium">Klik untuk memilih tiket ini</span>
                 <button 
                   type="button" 
                   id="btnSelect2"
-                  class="btn-select-variant px-4 py-1.5 rounded-lg text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer flex items-center gap-1"
+                  class="btn-select-variant px-5 py-2 rounded-xl text-xs font-bold bg-[#FFDC17] text-[#240638] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none flex items-center gap-1.5 shadow-md"
                 >
                   <span id="btnSelectText2">Pilih Tiket ⌵</span>
                 </button>
               </div>
             </div>
 
-            <!-- VARIAN 3: Bundling Spesial (Stiker + Ganci) - Rp 10.000 -->
+            <!-- TIKET 3: Tiket 2 Hari + Free Stiker (Rp 8.000) -->
             <div 
               id="cardVariant3"
-              onclick="selectTicketVariant('tiket_bundling')" 
-              class="variant-card bg-[#2A0859] border border-[#FFDC17]/20 rounded-xl p-5 hover:border-[#FFDC17]/60 active:scale-[0.99] active:brightness-95 transition-all duration-100 cursor-pointer relative group"
+              onclick="selectTicketVariant('tiket_2hari_stiker')" 
+              class="variant-card bg-[#240847] border border-[#FFDC17]/30 rounded-2xl p-5 hover:border-[#FFDC17] active:scale-[0.99] active:brightness-95 transition-all duration-100 cursor-pointer select-none relative group shadow-glow-plum"
             >
-              <!-- Slot Mockup Gambar -->
+              <!-- Slot Gambar .webp Resmi -->
               <img 
-                src="assets/tiket-bundling.jpg" 
-                onerror="this.src='https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&auto=format&fit=crop'"
-                alt="Mockup Bundling Spesial Stiker dan Ganci" 
-                class="w-full aspect-[16/9] object-cover rounded-lg mb-3 border border-[#FFDC17]/15 group-hover:border-[#FFDC17]/40 transition-colors"
+                src="assets/tiket_2hari_stiker.webp" 
+                alt="Mockup Tiket 2 Hari Stiker" 
+                class="w-full aspect-[16/9] object-cover rounded-xl mb-3 border border-[#FFDC17]/20 group-hover:border-[#FFDC17]/50 transition-colors"
+              />
+
+              <div class="flex items-start justify-between gap-4">
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[#FFDC17] text-xs">✦</span>
+                    <h3 class="font-serif font-bold text-lg text-white">Tiket 2 Hari + Free Stiker</h3>
+                    <span class="px-2 py-0.5 rounded bg-[#FFDC17]/20 text-[10px] font-mono text-[#FFDC17] font-bold">+ Free Stiker</span>
+                  </div>
+                  <p class="text-xs text-[#E2D9F3] leading-relaxed">
+                    Fasilitas: Akses penuh 2 Hari pameran + 1x Official Vinyl Sticker "Bingkai Bisu" saat check-in.
+                  </p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                  <span class="font-display text-3xl sm:text-4xl text-[#FFDC17] block leading-none">Rp 8.000</span>
+                  <span class="text-[10px] text-slate-400 font-mono">/ orang</span>
+                </div>
+              </div>
+
+              <div class="mt-4 pt-3 border-t border-[#FFDC17]/20 flex items-center justify-between">
+                <span id="badgeSelect3" class="text-xs text-slate-400 font-medium">Klik untuk memilih tiket ini</span>
+                <button 
+                  type="button" 
+                  id="btnSelect3"
+                  class="btn-select-variant px-5 py-2 rounded-xl text-xs font-bold bg-[#FFDC17] text-[#240638] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none flex items-center gap-1.5 shadow-md"
+                >
+                  <span id="btnSelectText3">Pilih Tiket ⌵</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- TIKET 4: Presale Tiket + Stiker + Ganci (Rp 10.000, Kuota 100 Pcs) -->
+            <div 
+              id="cardVariant4"
+              onclick="selectTicketVariant('tiket_presale')" 
+              class="variant-card bg-[#240847] border border-[#FFDC17]/40 rounded-2xl p-5 hover:border-[#FFDC17] active:scale-[0.99] active:brightness-95 transition-all duration-100 cursor-pointer select-none relative group shadow-glow-plum"
+            >
+              <!-- Slot Gambar .webp Resmi -->
+              <img 
+                src="assets/tiket_2hari_stikerganci.webp" 
+                alt="Mockup Presale Tiket Stiker dan Ganci" 
+                class="w-full aspect-[16/9] object-cover rounded-xl mb-3 border border-[#FFDC17]/25 group-hover:border-[#FFDC17]/60 transition-colors"
               />
 
               <div class="flex items-start justify-between gap-4">
                 <div class="space-y-1">
                   <div class="flex items-center gap-2 flex-wrap">
-                    <h3 class="font-sans font-bold text-lg text-white">Bundling Spesial (Stiker + Ganci)</h3>
-                    <!-- Badge Kuota Dinamis -->
-                    <span id="badgeQuotaBundling" class="px-2 py-0.5 rounded bg-[#FFDC17]/20 text-[10px] font-mono font-bold text-[#FFDC17] border border-[#FFDC17]/40">
-                      [ Sisa 95 Tiket ]
+                    <span class="text-[#FFDC17] text-xs">✦</span>
+                    <h3 class="font-serif font-bold text-lg text-white">Presale: Tiket + Stiker + Ganci</h3>
+                    <!-- Badge Kuota Dinamis Kuota 100 Pcs -->
+                    <span id="badgeQuotaPresale" class="px-2.5 py-0.5 rounded-full bg-[#FFDC17]/20 text-[10px] font-mono font-bold text-[#FFDC17] border border-[#FFDC17]/40">
+                      [ Sisa 100 / 100 Pcs ]
                     </span>
                   </div>
-                  <p class="text-xs text-slate-300">
-                    Fasilitas: Akses 1 Hari + 1x Official Sticker + 1x Ganci Akrilik Eksklusif.
+                  <p class="text-xs text-[#E2D9F3] leading-relaxed">
+                    Fasilitas: Akses 2 Hari Pameran + 1x Official Vinyl Sticker + 1x Gantungan Kunci Akrilik Eksklusif Fixlens.
                   </p>
                 </div>
                 <div class="text-right flex-shrink-0">
-                  <span class="font-display text-2xl sm:text-3xl text-[#FFDC17] block">Rp 10.000</span>
+                  <span class="font-display text-3xl sm:text-4xl text-[#FFDC17] block leading-none">Rp 10.000</span>
                   <span class="text-[10px] text-slate-400 font-mono">/ orang</span>
                 </div>
               </div>
 
-              <div class="mt-4 pt-3 border-t border-[#FFDC17]/15 flex items-center justify-between">
-                <span id="badgeSelect3" class="text-xs text-slate-400 font-medium">Klik untuk memilih</span>
+              <div class="mt-4 pt-3 border-t border-[#FFDC17]/20 flex items-center justify-between">
+                <span id="badgeSelect4" class="text-xs text-slate-400 font-medium">Klik untuk memilih paket ini</span>
                 <button 
                   type="button" 
-                  id="btnSelect3"
-                  class="btn-select-variant px-4 py-1.5 rounded-lg text-xs font-bold bg-[#FFDC17] text-[#2D2A1A] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer flex items-center gap-1"
+                  id="btnSelect4"
+                  class="btn-select-variant px-5 py-2 rounded-xl text-xs font-bold bg-[#FFDC17] text-[#240638] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none flex items-center gap-1.5 shadow-md"
                 >
-                  <span id="btnSelectText3">Pilih Tiket ⌵</span>
+                  <span id="btnSelectText4">Pilih Tiket ⌵</span>
                 </button>
               </div>
             </div>
@@ -460,25 +472,25 @@
           </div>
 
           <!-- ==================== FORMULIR CHECKOUT SATU KOLOM ==================== -->
-          <div id="checkoutFormContainer" class="bg-[#2A0859] border border-[#FFDC17]/30 rounded-2xl p-6 sm:p-8 space-y-6 shadow-glow-violet">
+          <div id="checkoutFormContainer" class="bg-[#240847] border border-[#FFDC17]/40 rounded-2xl p-6 sm:p-8 space-y-6 shadow-glow-plum">
             
             <div class="border-b border-[#FFDC17]/20 pb-4">
-              <span class="text-[11px] font-mono uppercase tracking-wider text-[#FFDC17] font-bold block mb-1">
-                Langkah 2: Lengkapi Data & Checkout
+              <span class="text-[11px] font-mono uppercase tracking-widest text-[#FFDC17] font-bold block mb-1">
+                ✦ LANGKAH 2: FORMULIR PEMESANAN & CHECKOUT
               </span>
-              <h3 class="font-display text-2xl sm:text-3xl text-white">Formulir Pemesanan Tiket</h3>
-              <div class="flex items-center gap-2 mt-2 text-xs text-slate-300">
+              <h3 class="font-serif font-bold text-2xl sm:text-3xl text-white">Data Pengunjung Pameran</h3>
+              <div class="flex items-center gap-2 mt-2 text-xs text-[#E2D9F3]">
                 <span>Paket Terpilih:</span>
-                <span id="checkoutSelectedBadge" class="font-bold text-[#FFDC17]">Tiket 1 Hari (Reguler) - Rp 4.000</span>
+                <span id="checkoutSelectedBadge" class="font-bold text-[#FFDC17]">Tiket 1 Hari - Rp 4.000</span>
               </div>
             </div>
 
-            <!-- Form Tag -->
+            <!-- Formulir Pemesanan -->
             <form id="orderForm" class="space-y-5" onsubmit="handleOrderSubmit(event)">
 
               <!-- Field 1: Nama Lengkap -->
               <div class="space-y-1.5">
-                <label for="inputName" class="block text-xs font-semibold uppercase font-mono tracking-wider text-slate-300">
+                <label for="inputName" class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
                   Nama Lengkap Pemesan <span class="text-red-400">*</span>
                 </label>
                 <input 
@@ -486,13 +498,13 @@
                   id="inputName" 
                   required 
                   placeholder="Contoh: Budi Santoso"
-                  class="w-full px-4 py-3 rounded-xl bg-[#081B59] border border-[#FFDC17]/30 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] focus:ring-1 focus:ring-[#FFDC17] text-sm transition-all"
+                  class="w-full px-4 py-3 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] focus:ring-1 focus:ring-[#FFDC17] text-sm transition-all"
                 />
               </div>
 
               <!-- Field 2: Alamat Email Aktif -->
               <div class="space-y-1.5">
-                <label for="inputEmail" class="block text-xs font-semibold uppercase font-mono tracking-wider text-slate-300">
+                <label for="inputEmail" class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
                   Alamat Email Aktif <span class="text-red-400">*</span>
                 </label>
                 <input 
@@ -500,16 +512,16 @@
                   id="inputEmail" 
                   required 
                   placeholder="namaanda@email.com"
-                  class="w-full px-4 py-3 rounded-xl bg-[#081B59] border border-[#FFDC17]/30 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] focus:ring-1 focus:ring-[#FFDC17] text-sm transition-all"
+                  class="w-full px-4 py-3 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] focus:ring-1 focus:ring-[#FFDC17] text-sm transition-all"
                 />
-                <p class="text-[11px] text-slate-400 font-sans">
-                  ℹ️ E-Ticket resmi (PDF) ber-QR Code akan dikirimkan otomatis ke email ini setelah bukti pembayaran disetujui panitia.
+                <p class="text-[11px] text-[#E2D9F3] font-sans">
+                  ℹ️ E-Ticket resmi PDF akan dikirim otomatis ke email ini setelah pembayaran disetujui.
                 </p>
               </div>
 
               <!-- Field 3: Nomor WhatsApp -->
               <div class="space-y-1.5">
-                <label for="inputWa" class="block text-xs font-semibold uppercase font-mono tracking-wider text-slate-300">
+                <label for="inputWa" class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
                   Nomor WhatsApp Aktif <span class="text-red-400">*</span>
                 </label>
                 <input 
@@ -517,13 +529,13 @@
                   id="inputWa" 
                   required 
                   placeholder="081234567890"
-                  class="w-full px-4 py-3 rounded-xl bg-[#081B59] border border-[#FFDC17]/30 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] focus:ring-1 focus:ring-[#FFDC17] text-sm transition-all"
+                  class="w-full px-4 py-3 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] focus:ring-1 focus:ring-[#FFDC17] text-sm transition-all"
                 />
               </div>
 
               <!-- Field 4: Jumlah Tiket -->
               <div class="space-y-1.5">
-                <label for="ticketQty" class="block text-xs font-semibold uppercase font-mono tracking-wider text-slate-300">
+                <label for="ticketQty" class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
                   Jumlah Tiket
                 </label>
                 <div class="flex items-center gap-3">
@@ -531,7 +543,7 @@
                     type="button" 
                     id="btnDecQty" 
                     onclick="adjustQuantity(-1)"
-                    class="w-11 h-11 rounded-xl bg-[#081B59] border border-[#FFDC17]/30 text-white hover:border-[#FFDC17] flex items-center justify-center text-lg font-bold active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
+                    class="w-11 h-11 rounded-xl bg-[#14032B] border border-[#FFDC17]/40 text-[#FFDC17] hover:border-[#FFDC17] flex items-center justify-center text-lg font-bold active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
                   >
                     -
                   </button>
@@ -541,77 +553,79 @@
                     min="1" 
                     value="1" 
                     oninput="handleQuantityChange()"
-                    class="w-24 text-center py-2.5 rounded-xl bg-[#081B59] border border-[#FFDC17]/30 text-white font-mono font-bold text-base focus:outline-none focus:border-[#FFDC17]"
+                    class="w-24 text-center py-2.5 rounded-xl bg-[#14032B] border border-[#FFDC17]/40 text-white font-mono font-bold text-base focus:outline-none focus:border-[#FFDC17]"
                   />
                   <button 
                     type="button" 
                     id="btnIncQty" 
                     onclick="adjustQuantity(1)"
-                    class="w-11 h-11 rounded-xl bg-[#081B59] border border-[#FFDC17]/30 text-white hover:border-[#FFDC17] flex items-center justify-center text-lg font-bold active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
+                    class="w-11 h-11 rounded-xl bg-[#14032B] border border-[#FFDC17]/40 text-[#FFDC17] hover:border-[#FFDC17] flex items-center justify-center text-lg font-bold active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
                   >
                     +
                   </button>
-                  <!-- Total Perhitungan Realtime -->
+                  
                   <div class="ml-auto text-right">
-                    <span class="text-[10px] text-slate-400 font-mono uppercase block">Total Bayar:</span>
+                    <span class="text-[10px] text-slate-400 font-mono uppercase block">Total Pembayaran:</span>
                     <span id="calculatedTotalDisplay" class="font-display text-2xl sm:text-3xl text-[#FFDC17]">Rp 4.000</span>
                   </div>
                 </div>
 
                 <!-- Peringatan Kuota Melebihi Batas -->
-                <div id="quotaWarningBox" class="hidden p-3 rounded-xl bg-red-950/70 border border-red-500/50 text-red-300 text-xs mt-2">
+                <div id="quotaWarningBox" class="hidden p-3 rounded-xl bg-red-950/80 border border-red-500/60 text-red-200 text-xs mt-2">
                   <span id="quotaWarningText">⚠️ Pesanan melebihi sisa kuota! Maksimal pemesanan paket ini adalah [SISA] tiket.</span>
                 </div>
               </div>
 
-              <!-- ==================== FIELD 5: PEMBAYARAN MURNI QRIS (TANPA TRANSFER BANK MANUAL) ==================== -->
-              <div class="p-5 sm:p-6 rounded-2xl bg-[#081B59] border border-[#FFDC17]/30 space-y-4">
-                <div class="flex items-center justify-between border-b border-[#FFDC17]/15 pb-2.5">
+              <!-- ==================== FIELD 5: PEMBAYARAN MURNI QRIS ==================== -->
+              <div class="p-5 sm:p-6 rounded-2xl bg-[#14032B] border border-[#FFDC17]/40 space-y-4 shadow-inner">
+                <div class="flex items-center justify-between border-b border-[#FFDC17]/20 pb-2.5">
                   <div class="flex items-center gap-2">
-                    <span class="text-base">💳</span>
+                    <span class="text-[#FFDC17]">✦</span>
                     <span class="font-mono text-xs uppercase tracking-wider text-[#FFDC17] font-bold">
                       Metode Pembayaran: QRIS Nasional
                     </span>
                   </div>
-                  <span class="text-[11px] text-slate-300 font-mono">Semua Bank / E-Wallet</span>
+                  <span class="text-[11px] text-slate-400 font-mono">BCA • Mandiri • GoPay • OVO • Dana</span>
                 </div>
 
-                <!-- Total Nominal yang Harus Dibayar (Bebas Neue Text-2xl / Bold #FFDC17) -->
-                <div class="text-center py-2.5 bg-[#2A0859]/60 rounded-xl border border-[#FFDC17]/20 select-none">
-                  <span class="text-[11px] uppercase font-mono tracking-wider text-slate-300 block">Total Nominal yang Harus Dibayar:</span>
+                <!-- Total Nominal yang Harus Dibayar -->
+                <div class="text-center py-3 bg-[#240847] rounded-xl border border-[#FFDC17]/30 select-none">
+                  <span class="text-[11px] uppercase font-mono tracking-wider text-[#E2D9F3] block">Total Nominal yang Harus Dibayar:</span>
                   <span id="qrisTotalAmount" class="font-display font-extrabold text-3xl sm:text-4xl text-[#FFDC17] tracking-wider block mt-0.5">Rp 4.000</span>
-                  <span class="text-[10px] text-slate-400 font-mono block">Pastikan nominal transfer sesuai tepat tanpa pembulatan</span>
+                  <span class="text-[10px] text-slate-400 font-mono block">Pastikan nominal transfer tepat hingga rupiah terakhir</span>
                 </div>
 
                 <!-- Container QRIS: Kotak putih rapi dengan border #FFDC17 -->
-                <div class="text-center p-4 bg-[#2A0859]/40 rounded-2xl border border-[#FFDC17]/30 space-y-3">
-                  <div class="inline-block p-3 bg-white rounded-2xl border-2 border-[#FFDC17] shadow-xl">
+                <div class="text-center p-4 bg-[#240847]/50 rounded-2xl border border-[#FFDC17]/30 space-y-3">
+                  <div class="inline-block p-3 bg-white rounded-2xl border-2 border-[#FFDC17] shadow-2xl">
                     <img 
                       id="qrisImg" 
                       src="assets/qris.jpg" 
                       onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=QRIS_BINGKAI_BISU_2026'" 
-                      alt="QRIS Bingkai Bisu 2026" 
-                      class="w-64 h-64 object-contain mx-auto rounded-xl p-2 bg-white shadow-md"
+                      alt="QRIS Pembayaran Resmi Bingkai Bisu 2026" 
+                      class="w-64 h-64 object-contain mx-auto rounded-xl p-2 bg-white"
                     />
                   </div>
 
-                  <!-- Tombol Unduh QRIS Tepat di Bawah Gambar Sesuai Spesifikasi -->
+                  <!-- Tombol Unduh QRIS Sesuai Spesifikasi -->
                   <div>
                     <a 
                       href="assets/qris.jpg" 
                       download="QRIS_Bingkai_Bisu_2026.jpg" 
-                      class="inline-flex items-center justify-center gap-2 mt-3 px-5 py-2.5 bg-[#FFDC17] text-[#2D2A1A] font-extrabold text-xs uppercase tracking-wider rounded-lg shadow-md active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
+                      class="inline-flex items-center justify-center gap-2 mt-2 px-6 py-3 bg-[#FFDC17] text-[#240638] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
                     >
-                      📥 Unduh / Simpan Gambar QRIS
+                      📥 Simpan / Unduh Gambar QRIS
                     </a>
                   </div>
 
-                  <!-- Teks Petunjuk Singkat Sesuai Spesifikasi -->
-                  <div class="text-left text-xs text-slate-300 bg-[#081B59]/90 p-4 rounded-xl border border-[#FFDC17]/20 space-y-1.5 max-w-md mx-auto font-sans leading-relaxed">
-                    <p class="font-semibold text-white text-[11px] uppercase font-mono tracking-wider">Petunjuk Pembayaran QRIS:</p>
-                    <p>1. Klik tombol di atas untuk menyimpan QRIS ke galeri HP.</p>
-                    <p>2. Buka aplikasi m-Banking / E-Wallet (BCA, GoPay, OVO, Dana, ShopeePay, dll), pilih menu bayar/scan lalu upload QRIS dari galeri.</p>
-                    <p>3. Unggah tangkapan layar (screenshot) bukti pembayaran di formulir bawah.</p>
+                  <!-- Teks Petunjuk Pembayaran -->
+                  <div class="text-left text-xs text-[#E2D9F3] bg-[#14032B] p-4 rounded-xl border border-[#FFDC17]/20 space-y-1.5 max-w-md mx-auto font-sans leading-relaxed">
+                    <p class="font-semibold text-white text-[11px] uppercase font-mono tracking-wider text-[#FFDC17]">
+                      Petunjuk Pembayaran QRIS:
+                    </p>
+                    <p>1. Klik tombol di atas untuk menyimpan gambar QRIS ke galeri ponsel Anda.</p>
+                    <p>2. Buka aplikasi m-Banking / E-Wallet (BCA Mobile, Livin', GoPay, Dana, OVO, ShopeePay), pilih menu bayar/scan lalu upload QRIS dari galeri.</p>
+                    <p>3. Unggah tangkapan layar (screenshot) bukti transfer pembayaran pada kotak unggah di bawah.</p>
                   </div>
                 </div>
 
@@ -619,14 +633,14 @@
 
               <!-- Field 6: Unggah Struk Pembayaran -->
               <div class="space-y-2">
-                <label class="block text-xs font-semibold uppercase font-mono tracking-wider text-slate-300">
+                <label class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
                   Unggah Bukti Pembayaran / Transfer QRIS <span class="text-red-400">*</span>
                 </label>
                 
                 <div 
                   id="dropZoneProof" 
                   onclick="document.getElementById('inputProofFile').click()" 
-                  class="border-2 border-dashed border-[#FFDC17]/40 hover:border-[#FFDC17] rounded-xl p-6 text-center cursor-pointer transition-all bg-[#081B59]/50 space-y-2 active:scale-[0.99] active:brightness-95 select-none"
+                  class="border-2 border-dashed border-[#FFDC17]/40 hover:border-[#FFDC17] rounded-2xl p-6 text-center cursor-pointer transition-all bg-[#14032B]/70 space-y-2 active:scale-[0.99] active:brightness-95 select-none"
                 >
                   <input 
                     type="file" 
@@ -637,33 +651,33 @@
                   />
                   <div id="dropZoneContent">
                     <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-[#FFDC17]"></i>
-                    <p class="text-xs text-slate-300 font-medium pt-1">
-                      Klik untuk memilih file struk / tangkapan layar pembayaran QRIS
+                    <p class="text-xs text-slate-200 font-medium pt-1">
+                      Klik untuk memilih file tangkapan layar / bukti transfer QRIS
                     </p>
-                    <span class="text-[10px] text-slate-400 font-mono block">Format JPG, PNG, WEBP (Maks. 5 MB)</span>
+                    <span class="text-[10px] text-slate-400 font-mono block">Format JPG, PNG, WEBP (Maksimal 5 MB)</span>
                   </div>
                   <!-- Pratinjau Bukti -->
                   <div id="proofPreviewBox" class="hidden flex items-center justify-center gap-3 pt-2">
-                    <img id="proofPreviewImg" src="" alt="Pratinjau Bukti" class="max-h-24 rounded border border-[#FFDC17]/40" />
+                    <img id="proofPreviewImg" src="" alt="Pratinjau Bukti" class="max-h-24 rounded-xl border border-[#FFDC17]/40" />
                     <div class="text-left">
-                      <span id="proofFileName" class="text-xs font-mono text-white block">file.jpg</span>
+                      <span id="proofFileName" class="text-xs font-mono text-white block">bukti_qris.jpg</span>
                       <span id="proofFileSize" class="text-[10px] font-mono text-[#FFDC17] block">0 KB</span>
-                      <span class="text-[10px] text-emerald-400 font-medium">✓ Siap dikirim</span>
+                      <span class="text-[10px] text-emerald-400 font-bold">✓ Siap diunggah</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Tombol Submit (Anti Auto-ACC) -->
+              <!-- Tombol Submit (Murni Pending, Anti Auto-ACC) -->
               <button 
                 type="submit" 
                 id="btnSubmitOrder" 
-                class="w-full py-4 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer text-[#2D2A1A] font-sans font-black text-base uppercase tracking-wider shadow-glow-yellow flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="w-full py-4 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none text-[#240638] font-bold text-base uppercase tracking-wider shadow-glow-gold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <i data-lucide="ticket" class="w-5 h-5 stroke-[2.5]"></i>
                 <span id="btnSubmitText">BAYAR & KONFIRMASI TIKET</span>
                 <span id="btnSubmitSpinner" class="hidden">
-                  <svg class="animate-spin h-5 w-5 text-[#2D2A1A]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg class="animate-spin h-5 w-5 text-[#240638]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                   </svg>
@@ -676,120 +690,265 @@
 
         </div>
 
-        <!-- ==================== TAB 3: SYARAT DAN KETENTUAN ==================== -->
+        <!-- ==================== TAB 02: DESKRIPSI ACARA ==================== -->
+        <div id="tabContentDeskripsi" class="hidden space-y-6">
+          <div class="bg-[#240847] border border-[#FFDC17]/30 rounded-2xl p-6 sm:p-8 space-y-5 shadow-glow-plum">
+            <div class="flex items-center gap-2 border-b border-[#FFDC17]/20 pb-3">
+              <span class="text-[#FFDC17] text-base">✦</span>
+              <h2 class="font-serif font-bold text-2xl sm:text-3xl text-white">
+                Kuratorial Pameran "Bingkai Bisu"
+              </h2>
+            </div>
+            
+            <p class="font-sans text-[#E2D9F3] text-sm sm:text-base leading-relaxed">
+              Pameran Foto Jurnalistik <strong class="text-white">"Bingkai Bisu"</strong> merupakan panggung kuratorial utama yang diselenggarakan oleh Komunitas Fixlens Fotografi 2026. Menghadirkan arsip dan jepretan visual jujur, pameran ini menyingkap realitas sosial, isu humaniora, dan dinamika akar rumput yang kerap luput dari perbincangan publik.
+            </p>
+
+            <blockquote class="font-editorial italic text-base sm:text-lg text-[#FFDC17] leading-relaxed border-l-2 border-[#FFDC17] pl-4 py-1 my-3 bg-[#14032B]/50 rounded-r-xl">
+              "Setiap bingkai foto adalah saksi sejarah yang menolak sunyi, merawat ingatan kolektif melalui kejujuran mata lensa dan ketajaman rasa."
+            </blockquote>
+
+            <!-- 3 Sorotan Program -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div class="bg-[#14032B] border border-[#FFDC17]/20 rounded-xl p-4 space-y-2">
+                <span class="text-2xl">📖</span>
+                <h4 class="font-bold text-sm text-white">Photobook Showcase</h4>
+                <p class="text-xs text-[#E2D9F3] leading-relaxed">
+                  Pameran buku foto fisik kurasi khusus dari para pewarta foto independen.
+                </p>
+              </div>
+
+              <div class="bg-[#14032B] border border-[#FFDC17]/20 rounded-xl p-4 space-y-2">
+                <span class="text-2xl">🖼️</span>
+                <h4 class="font-bold text-sm text-white">Curated Gallery</h4>
+                <p class="text-xs text-[#E2D9F3] leading-relaxed">
+                  Galeri puluhan karya foto cetak berstandar kurasi museum nasional.
+                </p>
+              </div>
+
+              <div class="bg-[#14032B] border border-[#FFDC17]/20 rounded-xl p-4 space-y-2">
+                <span class="text-2xl">🎙️</span>
+                <h4 class="font-bold text-sm text-white">Artist Talk & Diskusi</h4>
+                <p class="text-xs text-[#E2D9F3] leading-relaxed">
+                  Bincang hangat dan bedah proses kreatif bersama pewarta foto senior.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 03: SYARAT & KETENTUAN ==================== -->
         <div id="tabContentSnk" class="hidden space-y-6">
-          <div class="bg-[#2A0859] border border-[#FFDC17]/20 rounded-2xl p-6 sm:p-8 space-y-6 shadow-glow-violet">
-            <h2 class="font-display text-2xl sm:text-3xl text-white tracking-wide border-b border-[#FFDC17]/20 pb-3">
-              Syarat dan Ketentuan Pameran
-            </h2>
+          <div class="bg-[#240847] border border-[#FFDC17]/30 rounded-2xl p-6 sm:p-8 space-y-6 shadow-glow-plum">
+            <div class="flex items-center gap-2 border-b border-[#FFDC17]/20 pb-3">
+              <span class="text-[#FFDC17] text-base">✦</span>
+              <h2 class="font-serif font-bold text-2xl sm:text-3xl text-white">
+                Syarat & Ketentuan Pengunjung
+              </h2>
+            </div>
 
-            <ol class="space-y-4 text-sm sm:text-base text-slate-300 list-none">
-              
+            <ol class="space-y-4 text-sm sm:text-base text-[#E2D9F3] list-none">
               <li class="flex items-start gap-3.5">
-                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/15 border border-[#FFDC17]/30 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center select-none">1</span>
+                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/20 border border-[#FFDC17]/40 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center">1</span>
                 <div>
-                  <strong class="text-white block font-sans">Tiket Bersifat Final</strong>
-                  <span>Tiket yang telah dibeli bersifat final dan tidak dapat dibatalkan atau dikembalikan (non-refundable).</span>
+                  <strong class="text-white block font-sans">Tiket Bersifat Non-Refundable</strong>
+                  <span>Tiket yang telah dibeli bersifat final dan tidak dapat dibatalkan atau diuangkan kembali.</span>
                 </div>
               </li>
 
               <li class="flex items-start gap-3.5">
-                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/15 border border-[#FFDC17]/30 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center select-none">2</span>
+                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/20 border border-[#FFDC17]/40 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center">2</span>
                 <div>
-                  <strong class="text-white block font-sans">Berlaku untuk 1 Pengunjung</strong>
-                  <span>Satu tiket berlaku untuk satu orang pengunjung sesuai dengan tanggal/paket yang tertera pada e-ticket.</span>
+                  <strong class="text-white block font-sans">Berlaku untuk 1 Orang Pengunjung</strong>
+                  <span>Satu lembar tiket e-ticket berlaku untuk satu orang pengunjung sesuai hari dan paket yang tertera.</span>
                 </div>
               </li>
 
               <li class="flex items-start gap-3.5">
-                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/15 border border-[#FFDC17]/30 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center select-none">3</span>
+                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/20 border border-[#FFDC17]/40 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center">3</span>
                 <div>
-                  <strong class="text-white block font-sans">Wajib Menunjukkan E-Ticket Resmi</strong>
-                  <span>E-Ticket resmi (PDF) ber-QR Code wajib ditunjukkan kepada petugas di gerbang masuk Hetero Space Banyumas melalui layar ponsel atau cetak fisik.</span>
+                  <strong class="text-white block font-sans">Wajib Membawa E-Ticket Resmi PDF</strong>
+                  <span>Tunjukkan berkas PDF E-Ticket resmi yang telah diverifikasi pada layar gawai atau hasil cetak saat tiba di gerbang masuk Hetero Space Banyumas.</span>
                 </div>
               </li>
 
               <li class="flex items-start gap-3.5">
-                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/15 border border-[#FFDC17]/30 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center select-none">4</span>
+                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/20 border border-[#FFDC17]/40 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center">4</span>
                 <div>
-                  <strong class="text-white block font-sans">Akses Tiket 2 Hari</strong>
-                  <span>Varian Tiket 2 Hari (8k) dapat digunakan kembali untuk check-in pada Hari ke-2 (30 November 2026) dengan QR Code yang sama.</span>
+                  <strong class="text-white block font-sans">Akses Varian 2 Hari</strong>
+                  <span>Pemegang varian Tiket 2 Hari (Biasa, Stiker, atau Presale) dapat menggunakan QR code yang sama untuk check-in di hari kedua (30 November 2026).</span>
                 </div>
               </li>
 
               <li class="flex items-start gap-3.5">
-                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/15 border border-[#FFDC17]/30 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center select-none">5</span>
+                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/20 border border-[#FFDC17]/40 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center">5</span>
                 <div>
-                  <strong class="text-white block font-sans">Pengambilan Hak Merchandise Fisik</strong>
-                  <span>Pengambilan hak merchandise fisik (Stiker / Gantungan Kunci) dilakukan langsung di meja registrasi gate acara saat pertama kali check-in.</span>
+                  <strong class="text-white block font-sans">Pengambilan Merchandise Fisik</strong>
+                  <span>Klaim Stiker Vinyl dan Gantungan Kunci Akrilik dilakukan langsung di meja registrasi gate acara pada saat pemindaian tiket pertama kali.</span>
                 </div>
               </li>
 
               <li class="flex items-start gap-3.5">
-                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/15 border border-[#FFDC17]/30 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center select-none">6</span>
+                <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#FFDC17]/20 border border-[#FFDC17]/40 text-[#FFDC17] font-mono font-bold text-xs flex items-center justify-center">6</span>
                 <div>
-                  <strong class="text-white block font-sans">Etika Galeri & Kebersihan</strong>
-                  <span>Pengunjung dilarang menyentuh materi pameran, membawa makanan/minuman ke area display foto, dan wajib menjaga kebersihan venue.</span>
+                  <strong class="text-white block font-sans">Etika Galeri Pameran</strong>
+                  <span>Dilarang menyentuh materi karya foto yang dipamerkan, dilarang membawa makanan ke area galeri utama, dan wajib menjaga kebersihan venue.</span>
                 </div>
               </li>
-
             </ol>
+          </div>
+        </div>
+
+        <!-- ==================== TAB 04: CEK STATUS PESANAN MANDIRI ==================== -->
+        <div id="tabContentCek" class="hidden space-y-6">
+          <div class="bg-[#240847] border border-[#FFDC17]/30 rounded-2xl p-6 sm:p-8 space-y-6 shadow-glow-plum">
+            <div class="flex items-center gap-2 border-b border-[#FFDC17]/20 pb-3">
+              <span class="text-[#FFDC17] text-base">✦</span>
+              <h2 class="font-serif font-bold text-2xl sm:text-3xl text-white">
+                Cek Status Pesanan & Unduh E-Ticket
+              </h2>
+            </div>
+            
+            <p class="text-xs sm:text-sm text-[#E2D9F3] font-sans">
+              Masukkan Nomor WhatsApp atau Alamat Email yang Anda gunakan saat pemesanan untuk memeriksa status verifikasi dan mengunduh E-Ticket PDF resmi.
+            </p>
+
+            <form onsubmit="handleCheckStatusSubmit(event)" class="space-y-4">
+              <div class="space-y-1.5">
+                <label for="checkStatusQueryInput" class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
+                  Nomor WhatsApp atau Email Pemesan <span class="text-red-400">*</span>
+                </label>
+                <div class="relative">
+                  <input 
+                    type="text" 
+                    id="checkStatusQueryInput" 
+                    required 
+                    placeholder="Contoh: 081234567890 atau nama@email.com"
+                    class="w-full px-4 py-3 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] focus:ring-1 focus:ring-[#FFDC17] text-sm transition-all"
+                  />
+                </div>
+              </div>
+
+              <button 
+                type="submit" 
+                id="btnCheckQuerySubmit" 
+                class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none text-[#240638] font-bold text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2"
+              >
+                <i data-lucide="search" class="w-4 h-4 stroke-[2.5]"></i>
+                <span id="btnCheckQueryText">Cek Status Pesanan</span>
+              </button>
+            </form>
+
+            <!-- Wadah Hasil Cek Status -->
+            <div id="checkStatusResultContainer" class="hidden pt-4 border-t border-[#FFDC17]/20 space-y-4">
+              
+              <!-- Hasil: PENDING -->
+              <div id="checkResultPendingBox" class="hidden p-5 rounded-xl bg-amber-950/70 border border-amber-500/50 space-y-2 text-left">
+                <div class="flex items-center gap-2 text-amber-300 font-bold text-sm uppercase">
+                  <span>⏳</span>
+                  <span>Pembayaran sedang diverifikasi admin.</span>
+                </div>
+                <p class="text-xs text-[#E2D9F3] leading-relaxed">
+                  Pesanan atas nama <strong id="resPendingName" class="text-white">-</strong> telah tercatat di sistem kami. Bukti transfer QRIS sedang ditinjau manual oleh bendahara panitia.
+                </p>
+                <div class="text-[11px] font-mono text-amber-200/80 pt-1">
+                  Varian: <span id="resPendingVariant">-</span> • Jumlah: <span id="resPendingQty">-</span> Tiket
+                </div>
+              </div>
+
+              <!-- Hasil: APPROVED -->
+              <div id="checkResultApprovedBox" class="hidden p-5 rounded-xl bg-emerald-950/70 border border-emerald-500/50 space-y-3 text-left shadow-lg">
+                <div class="flex items-center gap-2 text-emerald-300 font-bold text-sm uppercase">
+                  <span>✅</span>
+                  <span>Pembayaran Terverifikasi! Kode: <span id="resApprovedCode" class="font-mono text-[#FFDC17]">-</span></span>
+                </div>
+                <div class="text-xs text-[#E2D9F3] space-y-1">
+                  <p>Nama Pengunjung: <strong id="resApprovedName" class="text-white">-</strong></p>
+                  <p>Kategori: <strong id="resApprovedVariant" class="text-white">-</strong> (<span id="resApprovedQty">1</span> Pax)</p>
+                </div>
+                <a 
+                  id="btnDownloadApprovedPdf" 
+                  href="#" 
+                  target="_blank" 
+                  class="inline-flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl bg-[#FFDC17] text-[#240638] text-xs font-bold uppercase tracking-wider active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none shadow-md"
+                >
+                  <i data-lucide="download" class="w-4 h-4 stroke-[2.5]"></i>
+                  <span>Unduh E-Ticket Resmi (PDF)</span>
+                </a>
+              </div>
+
+              <!-- Hasil: NOT FOUND -->
+              <div id="checkResultNotFoundBox" class="hidden p-5 rounded-xl bg-red-950/70 border border-red-500/50 space-y-1 text-left">
+                <div class="flex items-center gap-2 text-red-300 font-bold text-sm uppercase">
+                  <span>❌</span>
+                  <span>Data Pesanan Tidak Ditemukan</span>
+                </div>
+                <p class="text-xs text-[#E2D9F3]">
+                  Pastikan Nomor WhatsApp atau Alamat Email yang Anda masukkan persis sesuai saat melakukan pemesanan tiket.
+                </p>
+              </div>
+
+            </div>
+
           </div>
         </div>
 
       </div>
 
-      <!-- ==================== KOLOM KANAN (35% / 4 COLS): STICKY SIDEBAR (LOKET.COM STYLE) ==================== -->
+      <!-- ==================== KOLOM KANAN (35% / 4 COLS): STICKY SIDEBAR ==================== -->
       <div class="lg:col-span-4">
-        <div class="bg-[#2A0859] border border-[#FFDC17]/25 rounded-2xl p-6 sticky top-24 shadow-2xl space-y-5">
+        <div class="bg-[#240847] border border-[#FFDC17]/30 rounded-2xl p-6 sticky top-24 shadow-glow-plum space-y-5">
           
-          <!-- Harga Mulai Dari Box -->
+          <!-- Harga Mulai Dari -->
           <div class="space-y-1">
-            <span class="text-xs uppercase font-mono tracking-wider text-slate-400">Harga mulai dari</span>
+            <span class="text-xs uppercase font-mono tracking-widest text-[#FFDC17]">✦ Tiket Mulai Dari</span>
             <div class="flex items-baseline gap-2">
               <span class="font-display text-4xl sm:text-5xl text-[#FFDC17] leading-none">IDR 4.000</span>
-              <span class="text-xs text-slate-400 font-mono">/ orang</span>
+              <span class="text-xs text-[#E2D9F3] font-mono">/ orang</span>
             </div>
           </div>
 
-          <!-- Tombol CTA Beli Tiket dengan Tactile Feedback -->
+          <!-- Tombol CTA Dapatkan Tiket -->
           <button 
             type="button" 
             onclick="scrollToTicketsSection()" 
-            class="w-full py-3.5 rounded-xl font-sans font-black text-sm uppercase tracking-wider text-[#2D2A1A] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-glow-yellow flex items-center justify-center gap-2"
+            class="w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider text-[#240638] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none shadow-glow-gold flex items-center justify-center gap-2"
           >
             <i data-lucide="shopping-cart" class="w-4 h-4 stroke-[2.5]"></i>
-            <span>Beli Tiket</span>
+            <span>DAPATKAN TIKET</span>
           </button>
 
           <!-- Divider Halus -->
           <div class="border-t border-[#FFDC17]/20"></div>
 
-          <!-- Penyelenggara Info -->
+          <!-- Info Penyelenggara -->
           <div class="space-y-3">
-            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Penyelenggara</span>
-            <div class="flex items-center gap-3 bg-[#081B59]/60 p-3 rounded-xl border border-[#FFDC17]/15">
+            <span class="text-[11px] font-mono uppercase tracking-widest text-[#FFDC17] block">Penyelenggara Resmi</span>
+            <div class="flex items-center gap-3 bg-[#14032B] p-3.5 rounded-xl border border-[#FFDC17]/25">
               <img 
-                src="asset/LOGO_FIXFEST_TEKS_BAWAH_PUTIH.png" 
-                alt="Logo Fixlens Festival" 
-                class="h-8 w-auto object-contain"
+                src="assets/LOGO_FIXFEST_TEKS_BAWAH_PUTIH.png" 
+                alt="Logo Fixlens Fotografi" 
+                class="h-9 w-auto object-contain"
               />
               <div class="text-left">
-                <span class="text-xs font-bold text-white block">Fixlens Festival 2026</span>
-                <span class="text-[10px] text-slate-400 block">Komunitas Pewarta Foto & Visual</span>
+                <span class="text-xs font-bold text-white block">Komunitas Fixlens Fotografi</span>
+                <span class="text-[10px] text-[#E2D9F3] block">Kurasi Visual Humanis Banyumas</span>
               </div>
             </div>
+            <p class="font-editorial italic text-xs text-[#E2D9F3] text-center pt-1">
+              "Merawat ingatan bersama melalui kejujuran bingkai jurnalistik."
+            </p>
           </div>
 
           <!-- Bagikan Event -->
-          <div class="space-y-2 pt-1">
-            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">Bagikan Event</span>
+          <div class="space-y-2 pt-2 border-t border-[#FFDC17]/20">
+            <span class="text-[11px] font-mono uppercase tracking-widest text-[#FFDC17] block">Bagikan Event</span>
             <div class="grid grid-cols-3 gap-2">
               <button 
                 type="button" 
                 onclick="copyPageUrl(this)" 
-                class="py-2 px-2 rounded-lg bg-[#081B59] border border-[#FFDC17]/20 hover:border-[#FFDC17] text-slate-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
-                title="Salin Link Halaman"
+                class="py-2.5 px-2 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 hover:border-[#FFDC17] text-[#E2D9F3] hover:text-white text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
+                title="Salin Tautan"
               >
                 <i data-lucide="link" class="w-3.5 h-3.5"></i>
                 <span class="text-[11px]">Salin</span>
@@ -798,7 +957,7 @@
               <button 
                 type="button" 
                 onclick="shareToWhatsApp()" 
-                class="py-2 px-2 rounded-lg bg-[#081B59] border border-[#FFDC17]/20 hover:border-[#FFDC17] text-slate-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
+                class="py-2.5 px-2 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 hover:border-[#FFDC17] text-[#E2D9F3] hover:text-white text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
                 title="Bagikan ke WhatsApp"
               >
                 <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
@@ -809,7 +968,7 @@
                 href="https://instagram.com" 
                 target="_blank" 
                 rel="noopener"
-                class="py-2 px-2 rounded-lg bg-[#081B59] border border-[#FFDC17]/20 hover:border-[#FFDC17] text-slate-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
+                class="py-2.5 px-2 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 hover:border-[#FFDC17] text-[#E2D9F3] hover:text-white text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
                 title="Buka Instagram"
               >
                 <i data-lucide="instagram" class="w-3.5 h-3.5"></i>
@@ -818,15 +977,15 @@
             </div>
           </div>
 
-          <!-- Akses Cek Status Tiket Pemesan -->
-          <div class="pt-2 border-t border-[#FFDC17]/15 text-center">
+          <!-- Tautan Cek Status Cepat -->
+          <div class="pt-2 text-center">
             <button 
               type="button" 
-              onclick="openCheckTicketModal()"
-              class="text-xs text-[#FFDC17] hover:underline font-medium inline-flex items-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
+              onclick="switchMainTab('cek')"
+              class="text-xs text-[#FFDC17] hover:underline font-semibold inline-flex items-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
             >
               <i data-lucide="search" class="w-3.5 h-3.5"></i>
-              <span>Sudah pesan tiket? Cek status di sini</span>
+              <span>Sudah memesan tiket? Cek status di sini</span>
             </button>
           </div>
 
@@ -838,14 +997,14 @@
   </main>
 
   <!-- ==================== FOOTER & TAGAR EVENT ==================== -->
-  <footer class="w-full border-t border-[#FFDC17]/15 bg-[#081B59]/90 mt-16 py-8">
+  <footer class="w-full border-t border-[#FFDC17]/20 bg-[#0D021D] mt-16 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
       
       <!-- Tagar Event -->
       <div class="flex items-center justify-center flex-wrap gap-3 font-mono text-xs sm:text-sm text-[#FFDC17]">
-        <span>#bingkaibisu</span>
+        <span>#bingkaibisu2026</span>
         <span class="text-slate-600">•</span>
-        <span>#fixlens2026</span>
+        <span>#fixlensfestival</span>
         <span class="text-slate-600">•</span>
         <span>#pameranfotobanyumas</span>
         <span class="text-slate-600">•</span>
@@ -865,24 +1024,24 @@
   </footer>
 
 
-  <!-- ==================== MODAL PIN ADMIN (STEALTH EASTER EGG) ==================== -->
+  <!-- ==================== MODAL PIN ADMIN STEALTH ==================== -->
   <div 
     id="adminPinModal" 
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden transition-all duration-300"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden transition-all duration-300"
     role="dialog"
     aria-modal="true"
   >
     <div 
       id="adminPinModalContainer" 
-      class="w-full max-w-sm bg-[#2A0859] border border-[#FFDC17]/40 rounded-3xl p-6 sm:p-7 text-center shadow-glow-yellow space-y-5"
+      class="w-full max-w-sm bg-[#240847] border border-[#FFDC17]/40 rounded-3xl p-6 sm:p-7 text-center shadow-glow-gold space-y-5"
     >
-      <div class="w-12 h-12 mx-auto rounded-2xl bg-[#FFDC17] text-[#2D2A1A] flex items-center justify-center shadow-lg">
+      <div class="w-12 h-12 mx-auto rounded-2xl bg-[#FFDC17] text-[#240638] flex items-center justify-center shadow-lg">
         <i data-lucide="shield" class="w-6 h-6 stroke-[2.5]"></i>
       </div>
 
       <div class="space-y-1">
-        <h3 class="font-display text-2xl text-white tracking-wide">Akses Panitia</h3>
-        <p class="text-xs text-slate-300">Masukkan PIN Rahasia untuk masuk ke Dashboard</p>
+        <h3 class="font-serif font-bold text-2xl text-white tracking-wide">Akses Panitia Pameran</h3>
+        <p class="text-xs text-[#E2D9F3]">Masukkan PIN Keamanan untuk membuka dashboard</p>
       </div>
 
       <form id="adminPinForm" onsubmit="handleAdminPinSubmit(event)" class="space-y-4">
@@ -890,27 +1049,24 @@
           <input 
             type="password" 
             id="adminSecretPinInput" 
-            maxlength="10" 
+            maxlength="20" 
             placeholder="Ketik PIN..." 
-            class="w-full px-4 py-3 rounded-xl bg-[#081B59] border border-[#FFDC17]/40 text-center font-mono font-bold text-lg text-white tracking-widest placeholder-slate-600 focus:outline-none focus:border-[#FFDC17]"
+            class="w-full px-4 py-3 rounded-xl bg-[#14032B] border border-[#FFDC17]/40 text-center font-mono font-bold text-lg text-white tracking-widest placeholder-slate-600 focus:outline-none focus:border-[#FFDC17]"
             autofocus
           />
-          <p id="adminPinErrorText" class="text-xs text-red-400 font-semibold mt-1.5 hidden">
-            PIN Salah!
-          </p>
         </div>
 
         <div class="flex items-center gap-3">
           <button 
             type="button" 
             onclick="closeAdminPinModal()" 
-            class="w-1/2 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-slate-300 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
+            class="w-1/2 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-slate-300 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
           >
             Batal
           </button>
           <button 
             type="submit" 
-            class="w-1/2 py-2.5 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] text-xs font-bold text-[#2D2A1A] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-glow-yellow"
+            class="w-1/2 py-2.5 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] text-xs font-bold text-[#240638] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none shadow-glow-gold"
           >
             Masuk
           </button>
@@ -920,32 +1076,32 @@
   </div>
 
 
-  <!-- ==================== MODAL NOTIFIKASI STATUS PENDING (ANTI AUTO-ACC) ==================== -->
+  <!-- ==================== MODAL STATUS PENDING (ANTI AUTO-ACC) ==================== -->
   <div 
     id="orderPendingModal" 
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden transition-all duration-300"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden transition-all duration-300"
     role="dialog"
     aria-modal="true"
   >
-    <div class="w-full max-w-md bg-[#2A0859] border-2 border-[#FFDC17] rounded-3xl p-6 sm:p-8 text-center shadow-glow-yellow space-y-5">
+    <div class="w-full max-w-md bg-[#240847] border-2 border-[#FFDC17] rounded-3xl p-6 sm:p-8 text-center shadow-glow-gold space-y-5">
       <div class="w-16 h-16 mx-auto rounded-2xl bg-[#FFDC17]/15 border border-[#FFDC17]/40 text-[#FFDC17] flex items-center justify-center shadow-lg text-3xl">
         ⏳
       </div>
 
       <div class="space-y-2">
-        <span class="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[11px] font-mono font-bold uppercase select-none">
+        <span class="px-3.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[11px] font-mono font-bold uppercase select-none">
           Menunggu Verifikasi Pembayaran
         </span>
-        <h3 class="font-display text-2xl sm:text-3xl text-white tracking-wide">
-          ⏳ PESANAN BERHASIL DICATAT
+        <h3 class="font-serif font-bold text-2xl sm:text-3xl text-white tracking-wide">
+          ⏳ PESANAN BERHASIL DICATAT!
         </h3>
-        <p id="pendingModalMessage" class="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans text-left bg-[#081B59]/70 p-4 rounded-xl border border-[#FFDC17]/20">
-          Terima kasih, <strong id="pendingNameText" class="text-[#FFDC17]">-</strong>. Pembayaran QRIS Anda sedang menunggu verifikasi manual oleh panitia. Tiket resmi ber-QR Code (PDF) akan dikirimkan otomatis ke email: <strong id="pendingEmailText" class="text-white">-</strong> setelah bukti transfer disetujui.
+        <p class="text-xs sm:text-sm text-[#E2D9F3] leading-relaxed font-sans text-left bg-[#14032B] p-4 rounded-xl border border-[#FFDC17]/30">
+          Terima kasih, <strong id="pendingNameText" class="text-[#FFDC17]">-</strong>. Pembayaran QRIS Anda sedang menunggu verifikasi panitia. E-Ticket resmi PDF akan dikirimkan ke email Anda: <strong id="pendingEmailText" class="text-white">-</strong> setelah pembayaran disetujui.
         </p>
       </div>
 
       <!-- Kode Referensi Tiket -->
-      <div class="p-3.5 rounded-xl bg-[#081B59] border border-[#FFDC17]/30 flex items-center justify-between text-xs font-mono">
+      <div class="p-3.5 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 flex items-center justify-between text-xs font-mono">
         <span class="text-slate-400 uppercase">Kode Referensi:</span>
         <span id="pendingTicketCode" class="font-display text-xl text-[#FFDC17] font-bold">-</span>
       </div>
@@ -954,7 +1110,7 @@
         <button 
           type="button" 
           onclick="closeOrderPendingModal()" 
-          class="w-full py-3.5 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] text-xs font-bold text-[#2D2A1A] uppercase tracking-wider active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-glow-yellow"
+          class="w-full py-3.5 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] text-xs font-bold text-[#240638] uppercase tracking-wider active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none shadow-glow-gold"
         >
           Mengerti & Tutup
         </button>
@@ -963,155 +1119,56 @@
   </div>
 
 
-  <!-- ==================== MODAL CEK STATUS TIKET ==================== -->
-  <div 
-    id="checkTicketModal" 
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden transition-all duration-300"
-    role="dialog"
-    aria-modal="true"
-  >
-    <div class="w-full max-w-md bg-[#2A0859] border border-[#FFDC17]/40 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
-      <div class="flex items-center justify-between border-b border-[#FFDC17]/20 pb-3">
-        <div class="flex items-center gap-2">
-          <i data-lucide="search" class="w-5 h-5 text-[#FFDC17]"></i>
-          <h3 class="font-display text-xl text-white">Cek Status Tiket Anda</h3>
-        </div>
-        <button 
-          type="button" 
-          onclick="closeCheckTicketModal()" 
-          class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
-        >
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <form onsubmit="handleCheckTicketSubmit(event)" class="space-y-4">
-        <div class="space-y-1">
-          <label class="block text-xs font-semibold uppercase font-mono text-slate-300">
-            Nomor WhatsApp
-          </label>
-          <input 
-            type="tel" 
-            id="checkInputWa" 
-            required 
-            placeholder="0812xxxxxxxx" 
-            class="w-full px-4 py-2.5 rounded-xl bg-[#081B59] border border-[#FFDC17]/30 text-white text-sm focus:outline-none focus:border-[#FFDC17]"
-          />
-        </div>
-
-        <div class="space-y-1">
-          <label class="block text-xs font-semibold uppercase font-mono text-slate-300">
-            Nama Pemesan
-          </label>
-          <input 
-            type="text" 
-            id="checkInputName" 
-            required 
-            placeholder="Nama saat memesan" 
-            class="w-full px-4 py-2.5 rounded-xl bg-[#081B59] border border-[#FFDC17]/30 text-white text-sm focus:outline-none focus:border-[#FFDC17]"
-          />
-        </div>
-
-        <button 
-          type="submit" 
-          id="btnCheckQuery" 
-          class="w-full py-3 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] text-xs font-bold text-[#2D2A1A] uppercase tracking-wider flex items-center justify-center gap-2 active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
-        >
-          <i data-lucide="search" class="w-4 h-4 stroke-[2.5]"></i>
-          <span>Periksa Tiket</span>
-        </button>
-      </form>
-
-      <!-- Hasil Cek Tiket -->
-      <div id="checkResultContainer" class="hidden pt-3 border-t border-[#FFDC17]/20 space-y-3">
-        <!-- Result Box Approved -->
-        <div id="checkResultApproved" class="hidden p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/50 space-y-2 text-left">
-          <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase">
-            <i data-lucide="check-circle" class="w-4 h-4"></i>
-            <span>Tiket Telah Terbit (APPROVED)</span>
-          </div>
-          <div class="text-xs text-slate-300 space-y-1">
-            <p>Kode: <strong id="resCheckCode" class="text-white font-mono">-</strong></p>
-            <p>Varian: <strong id="resCheckVariant" class="text-white">-</strong></p>
-          </div>
-          <a 
-            id="btnDownloadCheckPdf" 
-            href="#" 
-            target="_blank" 
-            class="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-[#FFDC17] text-[#2D2A1A] text-xs font-black uppercase mt-2 shadow-sm active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer"
-          >
-            <i data-lucide="download" class="w-4 h-4 stroke-[2.5]"></i>
-            <span>Unduh E-Ticket (PDF)</span>
-          </a>
-        </div>
-
-        <!-- Result Box Pending -->
-        <div id="checkResultPending" class="hidden p-4 rounded-xl bg-amber-950/60 border border-amber-500/50 space-y-1 text-left">
-          <div class="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase">
-            <i data-lucide="clock" class="w-4 h-4"></i>
-            <span>Menunggu Verifikasi Admin</span>
-          </div>
-          <p class="text-xs text-slate-300">
-            Pesanan Anda telah tercatat dan sedang diverifikasi oleh panitia. Silakan cek berkala.
-          </p>
-        </div>
-
-        <!-- Result Box Not Found -->
-        <div id="checkResultNotFound" class="hidden p-4 rounded-xl bg-red-950/60 border border-red-500/50 space-y-1 text-left">
-          <div class="flex items-center gap-2 text-red-400 font-bold text-xs uppercase">
-            <i data-lucide="alert-circle" class="w-4 h-4"></i>
-            <span>Data Tidak Ditemukan</span>
-          </div>
-          <p class="text-xs text-slate-300">
-            Pastikan Nomor WhatsApp dan Nama Pemesan sesuai dengan saat pemesanan.
-          </p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-
-  <!-- ==================== LOGIKA APLIKASI (JAVASCRIPT) ==================== -->
+  <!-- ==================== LOGIKA JAVASCRIPT LENGKAP ==================== -->
   <script>
-    // Konfigurasi Google Apps Script Endpoint
+    // Konfigurasi Endpoint Apps Script Resmi
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRMLG227dO9VkqJh__-Prb6HGw_t1JMY14FLLeQHO6kMwq5jlClzXlkMTfMYOh31zw/exec";
 
-    // Data Varian Tiket
+    // Data 4 Kategori Tiket Resmi
     const VARIANTS = {
       tiket_1hari: {
         key: "tiket_1hari",
-        name: "Tiket 1 Hari (Reguler)",
+        name: "Tiket 1 Hari",
         price: 4000,
-        badgeText: "Tiket 1 Hari (Reguler) - Rp 4.000",
-        isBundling: false
+        badgeText: "Tiket 1 Hari - Rp 4.000",
+        img: "assets/Tiket_1hari.webp",
+        isPresale: false
       },
-      tiket_2hari: {
-        key: "tiket_2hari",
-        name: "Tiket 2 Hari (Stiker)",
+      tiket_2hari_biasa: {
+        key: "tiket_2hari_biasa",
+        name: "Tiket 2 Hari Biasa",
+        price: 6000,
+        badgeText: "Tiket 2 Hari Biasa - Rp 6.000",
+        img: "assets/tiket_2hari_biasa.webp",
+        isPresale: false
+      },
+      tiket_2hari_stiker: {
+        key: "tiket_2hari_stiker",
+        name: "Tiket 2 Hari + Free Stiker",
         price: 8000,
-        badgeText: "Tiket 2 Hari (Stiker) - Rp 8.000",
-        isBundling: false
+        badgeText: "Tiket 2 Hari + Free Stiker - Rp 8.000",
+        img: "assets/tiket_2hari_stiker.webp",
+        isPresale: false
       },
-      tiket_bundling: {
-        key: "tiket_bundling",
-        name: "Bundling Spesial (Stiker + Ganci)",
+      tiket_presale: {
+        key: "tiket_presale",
+        name: "Presale: Tiket + Stiker + Ganci",
         price: 10000,
-        badgeText: "Bundling Spesial (Stiker + Ganci) - Rp 10.000",
-        isBundling: true
+        badgeText: "Presale: Tiket + Stiker + Ganci - Rp 10.000",
+        img: "assets/tiket_2hari_stikerganci.webp",
+        isPresale: true
       }
     };
 
     // State Aplikasi
     let currentSelectedVariant = "tiket_1hari";
     let currentQuantity = 1;
-    let currentBundlingQuotaRemaining = 95;
+    let currentPresaleQuotaRemaining = 100;
     let selectedProofBase64 = null;
     let selectedProofFileName = "bukti_qris.jpg";
-    let hasLoadedTicketTab = false;
 
     // ==========================================
-    // NOTIFIKASI TOAST MELAYANG KECIL
+    // NOTIFIKASI TOAST MELAYANG
     // ==========================================
     let toastTimeout = null;
     function showFloatingToast(message) {
@@ -1131,51 +1188,52 @@
     }
 
     // ==========================================
-    // 1. SISTEM TAB INTERAKTIF
+    // 1. SISTEM 4 TAB NAVIGASI
     // ==========================================
     function switchMainTab(targetTab) {
-      const tabDeskripsi = document.getElementById("tabContentDeskripsi");
-      const tabTiket = document.getElementById("tabContentTiket");
-      const tabSnk = document.getElementById("tabContentSnk");
+      const tab01 = document.getElementById("tabContentTiket");
+      const tab02 = document.getElementById("tabContentDeskripsi");
+      const tab03 = document.getElementById("tabContentSnk");
+      const tab04 = document.getElementById("tabContentCek");
 
-      const btnDeskripsi = document.getElementById("tabNavDeskripsi");
-      const btnTiket = document.getElementById("tabNavTiket");
-      const btnSnk = document.getElementById("tabNavSnk");
+      const btn01 = document.getElementById("tabBtn01");
+      const btn02 = document.getElementById("tabBtn02");
+      const btn03 = document.getElementById("tabBtn03");
+      const btn04 = document.getElementById("tabBtn04");
 
-      // Reset semua tab
-      tabDeskripsi.classList.add("hidden");
-      tabTiket.classList.add("hidden");
-      tabSnk.classList.add("hidden");
+      // Sembunyikan semua tab
+      tab01.classList.add("hidden");
+      tab02.classList.add("hidden");
+      tab03.classList.add("hidden");
+      tab04.classList.add("hidden");
 
-      [btnDeskripsi, btnTiket, btnSnk].forEach(btn => {
-        btn.classList.remove("border-[#FFDC17]", "text-[#FFDC17]", "font-semibold");
-        btn.classList.add("border-transparent", "text-slate-400", "font-medium");
+      // Reset tombol
+      [btn01, btn02, btn03, btn04].forEach(btn => {
+        btn.classList.remove("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
+        btn.classList.add("border-transparent", "text-slate-400", "font-semibold");
       });
 
-      if (targetTab === "deskripsi") {
-        tabDeskripsi.classList.remove("hidden");
-        btnDeskripsi.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-semibold");
-        btnDeskripsi.classList.remove("border-transparent", "text-slate-400");
-      } else if (targetTab === "tiket") {
-        tabTiket.classList.remove("hidden");
-        btnTiket.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-semibold");
-        btnTiket.classList.remove("border-transparent", "text-slate-400");
-
-        // Panggil refresh kuota otomatis saat Tab Tiket dibuka pertama kali
-        if (!hasLoadedTicketTab) {
-          hasLoadedTicketTab = true;
-          refreshTicketStock(false);
-        }
+      if (targetTab === "tiket") {
+        tab01.classList.remove("hidden");
+        btn01.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
+        btn01.classList.remove("border-transparent", "text-slate-400");
+      } else if (targetTab === "deskripsi") {
+        tab02.classList.remove("hidden");
+        btn02.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
+        btn02.classList.remove("border-transparent", "text-slate-400");
       } else if (targetTab === "snk") {
-        tabSnk.classList.remove("hidden");
-        btnSnk.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-semibold");
-        btnSnk.classList.remove("border-transparent", "text-slate-400");
+        tab03.classList.remove("hidden");
+        btn03.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
+        btn03.classList.remove("border-transparent", "text-slate-400");
+      } else if (targetTab === "cek") {
+        tab04.classList.remove("hidden");
+        btn04.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
+        btn04.classList.remove("border-transparent", "text-slate-400");
       }
 
       lucide.createIcons();
     }
 
-    // Sticky Sidebar CTA: Scroll to tickets
     function scrollToTicketsSection() {
       switchMainTab('tiket');
       const ticketSection = document.getElementById("tabContentTiket");
@@ -1185,7 +1243,7 @@
     }
 
     // ==========================================
-    // 2. FITUR REFRESH STOK TIKET GAYA LOKET.COM
+    // 2. REFRESH STOK TIKET (action: get_quota)
     // ==========================================
     async function refreshTicketStock(isManualClick = false) {
       const refreshIcon = document.getElementById("refreshIcon");
@@ -1202,39 +1260,37 @@
         const res = await response.json();
 
         if (res && res.quotaBundling) {
-          currentBundlingQuotaRemaining = parseInt(res.quotaBundling.sisa, 10);
-          if (isNaN(currentBundlingQuotaRemaining)) currentBundlingQuotaRemaining = 95;
+          currentPresaleQuotaRemaining = parseInt(res.quotaBundling.sisa, 10);
+          if (isNaN(currentPresaleQuotaRemaining)) currentPresaleQuotaRemaining = 100;
 
-          const badge = document.getElementById("badgeQuotaBundling");
-          const cardBundling = document.getElementById("cardVariant3");
-          const btnSelect3 = document.getElementById("btnSelect3");
+          const badge = document.getElementById("badgeQuotaPresale");
+          const cardPresale = document.getElementById("cardVariant4");
+          const btnSelect4 = document.getElementById("btnSelect4");
 
-          if (currentBundlingQuotaRemaining <= 0) {
-            // SOLD OUT: Tampilkan badge merah, redupkan kartu (opacity-60), dan nonaktifkan tombol pilih
+          if (currentPresaleQuotaRemaining <= 0) {
             badge.textContent = "[ SOLD OUT ]";
-            badge.className = "px-2 py-0.5 rounded bg-red-600/30 text-[10px] font-mono font-bold text-red-400 border border-red-500/50";
-            if (cardBundling) cardBundling.classList.add("opacity-60");
-            if (btnSelect3) {
-              btnSelect3.disabled = true;
-              btnSelect3.classList.add("opacity-50", "cursor-not-allowed");
+            badge.className = "px-2.5 py-0.5 rounded-full bg-red-600/30 text-[10px] font-mono font-bold text-red-400 border border-red-500/50";
+            if (cardPresale) cardPresale.classList.add("opacity-60");
+            if (btnSelect4) {
+              btnSelect4.disabled = true;
+              btnSelect4.classList.add("opacity-50", "cursor-not-allowed");
             }
           } else {
-            // Sisa > 0: Tampilkan badge kuning, pastikan kartu dan tombol aktif
-            badge.textContent = `[ Sisa ${currentBundlingQuotaRemaining} Tiket ]`;
-            badge.className = "px-2 py-0.5 rounded bg-[#FFDC17]/20 text-[10px] font-mono font-bold text-[#FFDC17] border border-[#FFDC17]/40";
-            if (cardBundling) cardBundling.classList.remove("opacity-60");
-            if (btnSelect3) {
-              btnSelect3.disabled = false;
-              btnSelect3.classList.remove("opacity-50", "cursor-not-allowed");
+            badge.textContent = `[ Sisa ${currentPresaleQuotaRemaining} / 100 Pcs ]`;
+            badge.className = "px-2.5 py-0.5 rounded-full bg-[#FFDC17]/20 text-[10px] font-mono font-bold text-[#FFDC17] border border-[#FFDC17]/40";
+            if (cardPresale) cardPresale.classList.remove("opacity-60");
+            if (btnSelect4) {
+              btnSelect4.disabled = false;
+              btnSelect4.classList.remove("opacity-50", "cursor-not-allowed");
             }
           }
 
           if (isManualClick) {
-            showFloatingToast("✅ Ketersediaan tiket berhasil diperbarui!");
+            showFloatingToast("Ketersediaan tiket berhasil diperbarui!");
           }
         }
       } catch (err) {
-        console.warn("Gagal sinkronisasi kuota dari server:", err);
+        console.warn("Gagal refresh kuota:", err);
       } finally {
         if (refreshIcon) refreshIcon.classList.remove("animate-spin");
         validateQuotaAndCalculateTotal();
@@ -1242,14 +1298,13 @@
     }
 
     // ==========================================
-    // 3. PEMILIHAN VARIAN TIKET
+    // 3. SELEKSI VARIAN TIKET
     // ==========================================
     function selectTicketVariant(variantKey) {
       if (!VARIANTS[variantKey]) return;
 
-      // Jika varian bundling sold out, jangan izinkan pilih
-      if (variantKey === "tiket_bundling" && currentBundlingQuotaRemaining <= 0) {
-        showFloatingToast("⚠️ Paket Bundling Spesial telah habis (SOLD OUT)!");
+      if (variantKey === "tiket_presale" && currentPresaleQuotaRemaining <= 0) {
+        showFloatingToast("Paket Presale telah habis (SOLD OUT)!");
         return;
       }
 
@@ -1258,36 +1313,36 @@
       const card1 = document.getElementById("cardVariant1");
       const card2 = document.getElementById("cardVariant2");
       const card3 = document.getElementById("cardVariant3");
+      const card4 = document.getElementById("cardVariant4");
 
       const cards = {
         tiket_1hari: card1,
-        tiket_2hari: card2,
-        tiket_bundling: card3
+        tiket_2hari_biasa: card2,
+        tiket_2hari_stiker: card3,
+        tiket_presale: card4
       };
 
       Object.keys(cards).forEach(key => {
         const c = cards[key];
+        if (!c) return;
         if (key === variantKey) {
-          c.classList.add("border-[#FFDC17]", "ring-2", "ring-[#FFDC17]/40", "shadow-glow-yellow");
-          c.classList.remove("border-[#FFDC17]/20");
+          c.classList.add("border-[#FFDC17]", "ring-2", "ring-[#FFDC17]/50", "shadow-glow-gold");
+          c.classList.remove("border-[#FFDC17]/30", "border-[#FFDC17]/40");
         } else {
-          c.classList.remove("border-[#FFDC17]", "ring-2", "ring-[#FFDC17]/40", "shadow-glow-yellow");
-          c.classList.add("border-[#FFDC17]/20");
+          c.classList.remove("border-[#FFDC17]", "ring-2", "ring-[#FFDC17]/50", "shadow-glow-gold");
+          c.classList.add("border-[#FFDC17]/30");
         }
       });
 
-      // Update teks tombol
       document.getElementById("btnSelectText1").textContent = variantKey === "tiket_1hari" ? "✓ Terpilih" : "Pilih Tiket ⌵";
-      document.getElementById("btnSelectText2").textContent = variantKey === "tiket_2hari" ? "✓ Terpilih" : "Pilih Tiket ⌵";
-      document.getElementById("btnSelectText3").textContent = variantKey === "tiket_bundling" ? "✓ Terpilih" : "Pilih Tiket ⌵";
+      document.getElementById("btnSelectText2").textContent = variantKey === "tiket_2hari_biasa" ? "✓ Terpilih" : "Pilih Tiket ⌵";
+      document.getElementById("btnSelectText3").textContent = variantKey === "tiket_2hari_stiker" ? "✓ Terpilih" : "Pilih Tiket ⌵";
+      document.getElementById("btnSelectText4").textContent = variantKey === "tiket_presale" ? "✓ Terpilih" : "Pilih Tiket ⌵";
 
-      // Update badge varian di formulir checkout
       document.getElementById("checkoutSelectedBadge").textContent = VARIANTS[variantKey].badgeText;
 
-      // Evaluasi kuota & hitung total tanpa me-reset varian terpilih
       validateQuotaAndCalculateTotal();
 
-      // Gulir halus ke formulir checkout
       const formContainer = document.getElementById("checkoutFormContainer");
       if (formContainer) {
         formContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1319,7 +1374,6 @@
       const formattedTotal = "Rp " + totalPrice.toLocaleString("id-ID");
 
       document.getElementById("calculatedTotalDisplay").textContent = formattedTotal;
-      // Perbarui nominal di dalam kotak pembayaran QRIS
       const qrisTotalEl = document.getElementById("qrisTotalAmount");
       if (qrisTotalEl) qrisTotalEl.textContent = formattedTotal;
 
@@ -1327,18 +1381,16 @@
       const warningText = document.getElementById("quotaWarningText");
       const submitBtn = document.getElementById("btnSubmitOrder");
 
-      // ATURAN KUOTA KETAT:
-      // DILARANG me-reset varian ke Reguler saat kuota penuh atau saat jumlah tiket diubah.
-      // Jika pesanan melebihi sisa kuota, kunci tombol checkout dan tampilkan pesan merah.
-      if (variant.isBundling) {
-        if (currentBundlingQuotaRemaining <= 0) {
+      // Logika Kuota Ketat Presale
+      if (variant.isPresale) {
+        if (currentPresaleQuotaRemaining <= 0) {
           warningBox.classList.remove("hidden");
-          warningText.textContent = "⚠️ Maaf, kuota Bundling Spesial (95 tiket) telah habis terjual (SOLD OUT).";
+          warningText.textContent = "⚠️ Maaf, kuota Presale (100 tiket) telah habis terjual (SOLD OUT).";
           submitBtn.disabled = true;
           return;
-        } else if (qty > currentBundlingQuotaRemaining) {
+        } else if (qty > currentPresaleQuotaRemaining) {
           warningBox.classList.remove("hidden");
-          warningText.textContent = `⚠️ Pesanan melebihi sisa kuota! Maksimal pemesanan paket ini adalah ${currentBundlingQuotaRemaining} tiket.`;
+          warningText.textContent = `⚠️ Pesanan melebihi sisa kuota! Maksimal pemesanan paket ini adalah ${currentPresaleQuotaRemaining} tiket.`;
           submitBtn.disabled = true;
           return;
         }
@@ -1349,7 +1401,7 @@
     }
 
     // ==========================================
-    // 4. KOMPRESI GAMBAR STRUK PEMBAYARAN KE BASE64
+    // 4. UPLOAD BUKTI TRANSFER QRIS (BASE64)
     // ==========================================
     function handleProofFileSelected(event) {
       const file = event.target.files[0];
@@ -1401,7 +1453,7 @@
     }
 
     // ==========================================
-    // 5. SUBMIT PEMESANAN (ALUR ANTI AUTO-ACC / PENDING ONLY)
+    // 5. SUBMIT PEMESANAN (MURNI PENDING)
     // ==========================================
     async function handleOrderSubmit(e) {
       e.preventDefault();
@@ -1419,13 +1471,13 @@
       }
 
       if (!selectedProofBase64) {
-        alert("Harap unggah screenshot / bukti pembayaran QRIS Anda terlebih dahulu!");
+        alert("Harap unggah tangkapan layar bukti pembayaran QRIS Anda terlebih dahulu!");
         document.getElementById("dropZoneProof").scrollIntoView({ behavior: 'smooth' });
         return;
       }
 
-      if (variant.isBundling && qty > currentBundlingQuotaRemaining) {
-        alert(`Pesanan melebihi sisa kuota! Maksimal pemesanan paket ini adalah ${currentBundlingQuotaRemaining} tiket.`);
+      if (variant.isPresale && qty > currentPresaleQuotaRemaining) {
+        alert(`Pesanan melebihi sisa kuota! Maksimal pemesanan paket ini adalah ${currentPresaleQuotaRemaining} tiket.`);
         return;
       }
 
@@ -1461,13 +1513,13 @@
         const res = await response.json();
 
         if (res && (res.status === "SUCCESS" || res.status === "success" || res.ticketCode)) {
-          // Tampilkan Modal Notifikasi Status PENDING (Anti Auto-ACC) Sesuai Permintaan
+          // Tampilkan modal status PENDING (dilarang auto-ACC)
           document.getElementById("pendingNameText").textContent = nama;
           document.getElementById("pendingEmailText").textContent = email;
           document.getElementById("pendingTicketCode").textContent = res.ticketCode || "#BB26-PENDING";
           document.getElementById("orderPendingModal").classList.remove("hidden");
 
-          // Reset formulir dan preview struk pembayaran
+          // Reset formulir
           document.getElementById("orderForm").reset();
           selectedProofBase64 = null;
           document.getElementById("dropZoneContent").classList.remove("hidden");
@@ -1475,12 +1527,12 @@
           selectTicketVariant("tiket_1hari");
           refreshTicketStock();
         } else {
-          alert("Pemesanan gagal diproses: " + (res.message || "Terjadi kesalahan di server."));
+          alert("Pemesanan gagal diproses: " + (res.message || "Terjadi kendala pada server."));
         }
 
       } catch (err) {
         console.error("Gagal submit order:", err);
-        alert("Gagal mengirimkan pemesanan. Pastikan koneksi internet stabil dan coba kembali.");
+        alert("Gagal mengirimkan pemesanan. Pastikan koneksi internet stabil lalu coba kembali.");
       } finally {
         btn.disabled = false;
         text.classList.remove("hidden");
@@ -1494,13 +1546,99 @@
     }
 
     // ==========================================
-    // 6. STEALTH EASTER EGG ACCESS (5 TAP / KLIK CEPAT)
+    // 6. TAB 04: CEK STATUS PESANAN (action: check_status)
+    // ==========================================
+    async function handleCheckStatusSubmit(e) {
+      e.preventDefault();
+      const inputVal = document.getElementById("checkStatusQueryInput").value.trim();
+      const btn = document.getElementById("btnCheckQuerySubmit");
+      const btnText = document.getElementById("btnCheckQueryText");
+
+      if (!inputVal) return;
+
+      btn.disabled = true;
+      btnText.textContent = "Memeriksa...";
+
+      const resContainer = document.getElementById("checkStatusResultContainer");
+      const boxPending = document.getElementById("checkResultPendingBox");
+      const boxApproved = document.getElementById("checkResultApprovedBox");
+      const boxNotFound = document.getElementById("checkResultNotFoundBox");
+
+      resContainer.classList.remove("hidden");
+      boxPending.classList.add("hidden");
+      boxApproved.classList.add("hidden");
+      boxNotFound.classList.add("hidden");
+
+      try {
+        // Panggil action: check_status dengan fallback check_ticket
+        let response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "cors",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "check_status",
+            query: inputVal,
+            whatsapp: inputVal,
+            email: inputVal
+          })
+        });
+
+        let res = await response.json();
+
+        // Fallback ke check_ticket jika action check_status belum dihandle di Apps Script
+        if (!res || res.status === "error" || res.status === "Action tidak dikenal: check_status") {
+          const fbResponse = await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "cors",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "check_ticket",
+              whatsapp: inputVal,
+              nama: ""
+            })
+          });
+          res = await fbResponse.json();
+        }
+
+        const isApproved = res && (res.status === "APPROVED" || res.statusBayar === "APPROVED");
+        const isPending = res && (res.status === "PENDING" || res.statusBayar === "PENDING" || res.found === true);
+
+        if (isApproved) {
+          document.getElementById("resApprovedCode").textContent = res.kodeTiket || res.ticketCode || "-";
+          document.getElementById("resApprovedName").textContent = res.nama || "Pengunjung";
+          document.getElementById("resApprovedVariant").textContent = res.varian || "Tiket Festival";
+          document.getElementById("resApprovedQty").textContent = res.jumlah || 1;
+          document.getElementById("btnDownloadApprovedPdf").href = res.linkPdf || res.pdfUrl || "https://drive.google.com";
+          boxApproved.classList.remove("hidden");
+        } else if (isPending) {
+          document.getElementById("resPendingName").textContent = res.nama || "Pengunjung";
+          document.getElementById("resPendingVariant").textContent = res.varian || "Tiket Festival";
+          document.getElementById("resPendingQty").textContent = res.jumlah || 1;
+          boxPending.classList.remove("hidden");
+        } else {
+          boxNotFound.classList.remove("hidden");
+        }
+
+      } catch (err) {
+        console.error("Gagal cek status:", err);
+        boxNotFound.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = "Cek Status Pesanan";
+        lucide.createIcons();
+      }
+    }
+
+    // ==========================================
+    // 7. AKSES ADMIN STEALTH (TANPA HARDCODED PIN)
     // ==========================================
     let stealthTapCount = 0;
     let stealthFirstTapTime = 0;
     let stealthLastTapTime = 0;
 
-    function handleStealthTapEvent(e) {
+    function handleStealthTapEvent() {
       const now = Date.now();
 
       if (now - stealthLastTapTime > 1000) {
@@ -1525,11 +1663,9 @@
     function openAdminPinModal() {
       const modal = document.getElementById("adminPinModal");
       const input = document.getElementById("adminSecretPinInput");
-      const err = document.getElementById("adminPinErrorText");
       if (modal && input) {
         modal.classList.remove("hidden");
         input.value = "";
-        if (err) err.classList.add("hidden");
         setTimeout(() => input.focus(), 150);
       }
     }
@@ -1542,41 +1678,20 @@
     function handleAdminPinSubmit(e) {
       e.preventDefault();
       const input = document.getElementById("adminSecretPinInput");
-      const container = document.getElementById("adminPinModalContainer");
-      const err = document.getElementById("adminPinErrorText");
       const pinVal = (input.value || "").trim();
 
-      if (pinVal === "2026") {
-        sessionStorage.setItem("adminAuth", "true");
-        sessionStorage.setItem("admin_authenticated", "true");
+      // KEAMANAN: Hapus hardcoded PIN dari frontend.
+      // Simpan input PIN pengguna ke sessionStorage lalu verifikasi via action "admin_get_pending" di admin.html
+      if (pinVal) {
+        sessionStorage.setItem('adminPin', pinVal);
         window.location.href = "admin.html";
       } else {
-        if (container) {
-          container.classList.remove("animate-shake");
-          void container.offsetWidth;
-          container.classList.add("animate-shake");
-        }
-        if (err) err.classList.remove("hidden");
-        input.value = "";
-        input.focus();
+        alert("Silakan masukkan PIN keamanan!");
       }
     }
 
-    // Pasang listener pada logo navbar & simbol copyright di footer
-    document.addEventListener("DOMContentLoaded", () => {
-      const logoEl = document.getElementById("stealthLogo");
-      const copyrightEl = document.getElementById("stealthCopyright");
-
-      if (logoEl) logoEl.addEventListener("click", handleStealthTapEvent);
-      if (copyrightEl) copyrightEl.addEventListener("click", handleStealthTapEvent);
-
-      selectTicketVariant("tiket_1hari");
-      refreshTicketStock(false);
-      lucide.createIcons();
-    });
-
     // ==========================================
-    // 7. HELPER SHARING & CEK STATUS TIKET
+    // 8. HELPER SHARING & INISIALISASI
     // ==========================================
     function copyPageUrl(btn) {
       navigator.clipboard.writeText(window.location.href).then(() => {
@@ -1593,68 +1708,17 @@
       window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
     }
 
-    // Modal Cek Status Tiket
-    function openCheckTicketModal() {
-      document.getElementById("checkTicketModal").classList.remove("hidden");
-      document.getElementById("checkResultContainer").classList.add("hidden");
+    document.addEventListener("DOMContentLoaded", () => {
+      const logoEl = document.getElementById("stealthLogo");
+      const copyrightEl = document.getElementById("stealthCopyright");
+
+      if (logoEl) logoEl.addEventListener("click", handleStealthTapEvent);
+      if (copyrightEl) copyrightEl.addEventListener("click", handleStealthTapEvent);
+
+      selectTicketVariant("tiket_1hari");
+      refreshTicketStock(false);
       lucide.createIcons();
-    }
-
-    function closeCheckTicketModal() {
-      document.getElementById("checkTicketModal").classList.add("hidden");
-    }
-
-    async function handleCheckTicketSubmit(e) {
-      e.preventDefault();
-      const wa = document.getElementById("checkInputWa").value.trim();
-      const nama = document.getElementById("checkInputName").value.trim();
-      const btn = document.getElementById("btnCheckQuery");
-
-      if (!wa || !nama) return;
-
-      btn.disabled = true;
-      btn.innerHTML = `<span>Memeriksa...</span>`;
-
-      const resBox = document.getElementById("checkResultContainer");
-      const resApproved = document.getElementById("checkResultApproved");
-      const resPending = document.getElementById("checkResultPending");
-      const resNotFound = document.getElementById("checkResultNotFound");
-
-      resBox.classList.remove("hidden");
-      resApproved.classList.add("hidden");
-      resPending.classList.add("hidden");
-      resNotFound.classList.add("hidden");
-
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "cors",
-          redirect: "follow",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "check_ticket", whatsapp: wa, nama: nama })
-        });
-        const res = await response.json();
-
-        if (res && res.status === "APPROVED") {
-          document.getElementById("resCheckCode").textContent = res.kodeTiket || "-";
-          document.getElementById("resCheckVariant").textContent = `${res.varian || "Tiket Reguler"} (${res.jumlah || 1} Pax)`;
-          document.getElementById("btnDownloadCheckPdf").href = res.linkPdf || "https://drive.google.com";
-          resApproved.classList.remove("hidden");
-        } else if (res && res.status === "PENDING") {
-          resPending.classList.remove("hidden");
-        } else {
-          resNotFound.classList.remove("hidden");
-        }
-
-      } catch (err) {
-        console.error("Gagal cek tiket:", err);
-        resNotFound.classList.remove("hidden");
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="search" class="w-4 h-4 stroke-[2.5]"></i><span>Periksa Tiket</span>`;
-        lucide.createIcons();
-      }
-    }
+    });
   </script>
 </body>
 </html>

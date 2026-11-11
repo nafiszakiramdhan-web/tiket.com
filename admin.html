@@ -536,9 +536,10 @@
       return "Rp " + num.toLocaleString("id-ID");
     }
 
-    // ================== 1. VALIDASI SESI MASUK PIN "2026" ==================
+    // ================== 1. VALIDASI SESI MASUK PIN ==================
     function checkSessionAuth() {
-      const isAuth = sessionStorage.getItem("adminAuth") === "true" || sessionStorage.getItem("admin_authenticated") === "true";
+      const savedPin = sessionStorage.getItem("adminPin");
+      const isAuth = !!savedPin || sessionStorage.getItem("adminAuth") === "true" || sessionStorage.getItem("admin_authenticated") === "true";
       const pinModal = document.getElementById("pinAuthModal");
       const dashboard = document.getElementById("mainDashboard");
 
@@ -561,7 +562,8 @@
       const container = document.getElementById("pinModalContainer");
       const enteredPin = (input.value || "").trim();
 
-      if (enteredPin === PIN_KEY) {
+      if (enteredPin) {
+        sessionStorage.setItem("adminPin", enteredPin);
         sessionStorage.setItem("adminAuth", "true");
         sessionStorage.setItem("admin_authenticated", "true");
         err.classList.add("hidden");
@@ -581,6 +583,7 @@
 
     function handleLogout() {
       if (confirm("Kunci kembali dashboard admin?")) {
+        sessionStorage.removeItem("adminPin");
         sessionStorage.removeItem("adminAuth");
         sessionStorage.removeItem("admin_authenticated");
         checkSessionAuth();
@@ -591,6 +594,7 @@
     async function loadOrdersData(isManual = false) {
       const icon = document.getElementById("iconRefresh");
       const tableLoading = document.getElementById("tableLoading");
+      const savedPin = sessionStorage.getItem("adminPin") || "";
 
       if (icon) icon.classList.add("animate-spin");
       tableLoading.classList.remove("hidden");
@@ -601,7 +605,7 @@
           mode: "cors",
           redirect: "follow",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "admin_get_pending" })
+          body: JSON.stringify({ action: "admin_get_pending", pin: savedPin })
         }).then(r => r.json()).catch(() => ({ data: [] }));
 
         const approvedPromise = fetch(SCRIPT_URL, {
@@ -609,7 +613,7 @@
           mode: "cors",
           redirect: "follow",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "download_offline_db" })
+          body: JSON.stringify({ action: "download_offline_db", pin: savedPin })
         }).then(r => r.json()).catch(() => ({ tickets: [] }));
 
         const quotaPromise = fetch(SCRIPT_URL, {
@@ -618,9 +622,18 @@
           redirect: "follow",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ action: "get_quota" })
-        }).then(r => r.json()).catch(() => ({ quotaBundling: { sisa: 95 } }));
+        }).then(r => r.json()).catch(() => ({ quotaBundling: { sisa: 100 } }));
 
         const [resPending, resApproved, resQuota] = await Promise.all([pendingPromise, approvedPromise, quotaPromise]);
+
+        if (resPending && resPending.status === "UNAUTHORIZED") {
+          sessionStorage.removeItem("adminPin");
+          sessionStorage.removeItem("adminAuth");
+          sessionStorage.removeItem("admin_authenticated");
+          alert("PIN Salah! Akses ditolak.");
+          window.location.href = "index.html";
+          return;
+        }
 
         pendingOrdersList = Array.isArray(resPending) ? resPending : (resPending.data || resPending.items || []);
         approvedOrdersList = Array.isArray(resApproved) ? resApproved : (resApproved.tickets || resApproved.data || []);
@@ -835,10 +848,15 @@
       const nama = decodeURIComponent(rawNama);
       const email = decodeURIComponent(rawEmail);
 
+      if (!confirm(`Konfirmasi ACC dan terbitkan tiket resmi untuk pemesan: ${nama} (${email})?`)) {
+        return;
+      }
+
+      const savedPin = sessionStorage.getItem("adminPin") || "";
       const origHtml = btnElement.innerHTML;
       btnElement.disabled = true;
       btnElement.innerHTML = `
-        <svg class="animate-spin h-3.5 w-3.5 text-[#2D2A1A]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <svg class="animate-spin h-3.5 w-3.5 text-[#240638]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>
@@ -853,7 +871,8 @@
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
             action: "admin_acc",
-            rowIndex: parseInt(rowIndex, 10)
+            rowIndex: parseInt(rowIndex, 10),
+            pin: savedPin
           })
         });
 
