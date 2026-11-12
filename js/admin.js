@@ -161,7 +161,7 @@ async function loadOrdersData(isManual = false) {
       if (dashboard) dashboard.classList.add("hidden");
       if (pinModal) pinModal.classList.remove("hidden");
       if (err) {
-        err.textContent = "PIN salah! Masukkan PIN yang benar (Default: 240638).";
+        err.textContent = "PIN salah! Masukkan PIN yang benar.";
         err.classList.remove("hidden");
       }
       if (container) {
