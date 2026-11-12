@@ -87,7 +87,12 @@
         <span>☁️ UPLOAD HASIL SCAN KE CLOUD (<span id="readyUploadBtnBadge">0</span>)</span>
       </button>
 
-      <p id="syncTimeText" class="text-[10px] text-center text-slate-400">Belum pernah sinkronisasi data offline.</p>
+      <div class="flex items-center justify-between px-1 pt-0.5">
+        <p id="syncTimeText" class="text-[10px] text-slate-400">Belum pernah sinkronisasi data offline.</p>
+        <button type="button" id="btnResetDb" onclick="resetLocalScannerDatabase()" class="text-[10px] text-rose-400 hover:text-rose-300 underline font-semibold cursor-pointer">
+          Reset Cache HP
+        </button>
+      </div>
     </div>
   </main>
 
@@ -213,6 +218,20 @@
     }
 
     // ============================================================
+    // 0. RESET / BERSIHKAN CACHE OFFLINE HP
+    // ============================================================
+    function resetLocalScannerDatabase() {
+      if (confirm("Reset / Kosongkan seluruh database tiket di HP ini?\n\nSemua cache offline akan dibersihkan agar sinkronisasi ulang bersih.")) {
+        localStorage.removeItem('offline_tickets');
+        localStorage.removeItem('last_sync_time');
+        refreshStatsUI();
+        const syncText = document.getElementById('syncTimeText');
+        if (syncText) syncText.innerText = "Database offline dikosongkan. Silakan download ulang.";
+        alert("✅ Cache database offline HP berhasil dibersihkan! Silakan klik 'DOWNLOAD DATABASE TIKET' untuk mengambil data terbaru.");
+      }
+    }
+
+    // ============================================================
     // 1. FUNGSI DOWNLOAD DATABASE TIKET APPROVED KE HP
     // ============================================================
     async function syncDatabase() {
@@ -232,21 +251,25 @@
 
         if (res.status === "SUCCESS" && Array.isArray(res.data)) {
           const currentDb = getLocalDatabase();
-          // Preservasi status scan tiket lokal yang belum sempat ter-upload
-          const pendingMap = {};
-          currentDb.forEach(t => {
-            if (t.needsUpload === true || (t.checkin && !t.checkin.toUpperCase().includes("BELUM") && !t.uploaded)) {
-              pendingMap[cleanCode(t.kodeTiket)] = t;
-            }
-          });
+          // Cek apakah ada scan lokal yang belum sempat di-upload
+          const pendingScans = currentDb.filter(t => t.needsUpload === true || (t.checkin && !t.checkin.toUpperCase().includes("BELUM") && !t.uploaded));
+          
+          let overwriteLocal = true;
+          if (pendingScans.length > 0) {
+            overwriteLocal = confirm(`Terdapat ${pendingScans.length} hasil scan di HP yang belum di-upload ke Cloud.\n\nKlik OK untuk menimpa dengan data terbaru Cloud murni (reset scan lokal),\natau Cancel untuk mempertahankan status scan di HP.`);
+          }
 
-          const mergedDb = res.data.map(serverTicket => {
-            const key = cleanCode(serverTicket.kodeTiket);
-            if (pendingMap[key]) {
-              return pendingMap[key]; // pertahankan status scan lokal
-            }
-            return serverTicket;
-          });
+          let mergedDb = res.data;
+          if (!overwriteLocal) {
+            const pendingMap = {};
+            pendingScans.forEach(t => {
+              pendingMap[cleanCode(t.kodeTiket)] = t;
+            });
+            mergedDb = res.data.map(serverTicket => {
+              const key = cleanCode(serverTicket.kodeTiket);
+              return pendingMap[key] || serverTicket;
+            });
+          }
 
           localStorage.setItem('offline_tickets', JSON.stringify(mergedDb));
           const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -287,10 +310,11 @@
       btn.disabled = true;
 
       try {
+        const nowWib = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }).replace(/\./g, ':') + " WIB";
         const payloadScans = readyScans.map(t => ({
           kodeTiket: t.kodeTiket,
-          checkin: t.checkin,
-          waktuScan: t.waktuScan || new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })
+          checkin: t.checkin || "SUDAH MASUK",
+          waktuScan: t.waktuScan || nowWib
         }));
 
         const response = await fetch(SCRIPT_URL, {
@@ -347,26 +371,28 @@
       }
 
       const ticket = db[localIndex];
-      const statusCheckin = (ticket.checkin || "").toUpperCase();
+      const statusCheckin = (ticket.checkin || "").toUpperCase().trim();
       const isTwoDay = (ticket.varian || "").toLowerCase().includes("2 hari");
-      const nowWib = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+      const nowWib = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }).replace(/\./g, ':') + " WIB";
 
       // ALUR TIKET 2 HARI
       if (isTwoDay) {
-        if (statusCheckin === "BELUM MASUK" || statusCheckin === "") {
+        if (statusCheckin === "BELUM MASUK" || statusCheckin === "" || statusCheckin === "-" || statusCheckin.includes("BELUM")) {
           ticket.checkin = "MASUK (HARI 1)";
           ticket.waktuScan = nowWib;
           ticket.needsUpload = true;
+          ticket.uploaded = false;
           db[localIndex] = ticket;
           localStorage.setItem('offline_tickets', JSON.stringify(db));
           refreshStatsUI();
           const merch = ticket.merch && ticket.merch.ada ? ticket.merch.textScanner : "";
           showScanResult("success", "CHECK-IN HARI 1 BERHASIL", `${ticket.nama} • ${ticket.varian}`, merch);
           return;
-        } else if (statusCheckin === "MASUK (HARI 1)") {
+        } else if (statusCheckin.includes("HARI 1") && !statusCheckin.includes("SELESAI") && !statusCheckin.includes("HARI 2")) {
           ticket.checkin = "SELESAI (HARI 2)";
           ticket.waktuScan = nowWib;
           ticket.needsUpload = true;
+          ticket.uploaded = false;
           db[localIndex] = ticket;
           localStorage.setItem('offline_tickets', JSON.stringify(db));
           refreshStatsUI();
@@ -378,15 +404,24 @@
         }
       }
 
-      // ALUR TIKET 1 HARI
-      if (statusCheckin.includes("MASUK") || statusCheckin.includes("SUDAH")) {
-        showScanResult("error", "TIKET SUDAH PERNAH DIGUNAKAN!", `Atas Nama: ${ticket.nama} (${ticket.varian})`);
+      // ALUR TIKET 1 HARI / PRESALE / REGULER
+      // Cek apakah tiket SUDAH pernah dipakai
+      const isAlreadyUsed = statusCheckin === "SUDAH MASUK" || 
+                            statusCheckin === "SELESAI (HARI 2)" ||
+                            (statusCheckin.includes("SUDAH") && !statusCheckin.includes("BELUM")) ||
+                            (statusCheckin.includes("MASUK") && !statusCheckin.includes("BELUM"));
+
+      if (isAlreadyUsed) {
+        const waktuInfo = ticket.waktuScan && ticket.waktuScan !== "-" ? ` (Scan: ${ticket.waktuScan})` : "";
+        showScanResult("error", "TIKET SUDAH PERNAH DIGUNAKAN!", `Atas Nama: ${ticket.nama} • ${ticket.varian}${waktuInfo}`);
         return;
       }
 
+      // CHECK-IN SUKSES
       ticket.checkin = "SUDAH MASUK";
       ticket.waktuScan = nowWib;
       ticket.needsUpload = true;
+      ticket.uploaded = false;
       db[localIndex] = ticket;
       localStorage.setItem('offline_tickets', JSON.stringify(db));
       refreshStatsUI();

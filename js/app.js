@@ -905,6 +905,9 @@ function handleAdminPinSubmit(e) {
   // Simpan input PIN pengguna ke sessionStorage lalu verifikasi via action "admin_get_pending" di admin.html
   if (pinVal) {
     sessionStorage.setItem('adminPin', pinVal);
+    sessionStorage.setItem('adminAuth', 'true');
+    localStorage.setItem('adminPin', pinVal);
+    localStorage.setItem('adminAuth', 'true');
     window.location.href = "admin.html";
   } else {
     alert("Silakan masukkan PIN keamanan!");

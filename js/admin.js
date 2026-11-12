@@ -42,11 +42,15 @@ function formatRupiah(amount) {
 }
 
 // ============================================================
-// 1. VALIDASI SESI MASUK PIN (DINAMIS DARI SESSION STORAGE)
+// 1. VALIDASI SESI MASUK PIN (DINAMIS DARI SESSION / LOCAL STORAGE)
 // ============================================================
 function checkSessionAuth() {
-  const savedPin = sessionStorage.getItem("adminPin") || "";
-  const isAuth = !!savedPin && (sessionStorage.getItem("adminAuth") === "true" || sessionStorage.getItem("admin_authenticated") === "true");
+  const savedPin = sessionStorage.getItem("adminPin") || localStorage.getItem("adminPin") || "";
+  const isAuth = !!savedPin && (
+    sessionStorage.getItem("adminAuth") === "true" || 
+    localStorage.getItem("adminAuth") === "true" || 
+    sessionStorage.getItem("admin_authenticated") === "true"
+  );
   const pinModal = document.getElementById("pinAuthModal");
   const dashboard = document.getElementById("mainDashboard");
 
@@ -76,6 +80,8 @@ function handlePinLogin(e) {
     sessionStorage.setItem("adminPin", enteredPin);
     sessionStorage.setItem("adminAuth", "true");
     sessionStorage.setItem("admin_authenticated", "true");
+    localStorage.setItem("adminPin", enteredPin);
+    localStorage.setItem("adminAuth", "true");
     if (err) err.classList.add("hidden");
     input.value = "";
     checkSessionAuth();
@@ -85,7 +91,10 @@ function handlePinLogin(e) {
       void container.offsetWidth;
       container.classList.add("animate-shake");
     }
-    if (err) err.classList.remove("hidden");
+    if (err) {
+      err.textContent = "Silakan masukkan PIN keamanan!";
+      err.classList.remove("hidden");
+    }
     input.value = "";
     input.focus();
   }
@@ -94,6 +103,8 @@ function handlePinLogin(e) {
 function handleLogout() {
   if (confirm("Kunci kembali dashboard admin?")) {
     sessionStorage.clear();
+    localStorage.removeItem("adminPin");
+    localStorage.removeItem("adminAuth");
     checkSessionAuth();
   }
 }
@@ -104,7 +115,7 @@ function handleLogout() {
 async function loadOrdersData(isManual = false) {
   const icon = document.getElementById("iconRefresh");
   const tableLoading = document.getElementById("tableLoading");
-  const savedPin = sessionStorage.getItem("adminPin") || "";
+  const savedPin = sessionStorage.getItem("adminPin") || localStorage.getItem("adminPin") || "";
 
   if (icon) icon.classList.add("animate-spin");
   if (tableLoading) tableLoading.classList.remove("hidden");
@@ -138,8 +149,30 @@ async function loadOrdersData(isManual = false) {
 
     if ((resPending && resPending.status === "UNAUTHORIZED") || (resApproved && resApproved.status === "UNAUTHORIZED")) {
       sessionStorage.clear();
-      alert("Akses ditolak: PIN salah atau sesi kadaluarsa (UNAUTHORIZED).");
-      window.location.href = "index.html";
+      localStorage.removeItem("adminPin");
+      localStorage.removeItem("adminAuth");
+      
+      const pinModal = document.getElementById("pinAuthModal");
+      const dashboard = document.getElementById("mainDashboard");
+      const err = document.getElementById("pinErrorMsg");
+      const container = document.getElementById("pinModalContainer");
+      const input = document.getElementById("inputPin");
+
+      if (dashboard) dashboard.classList.add("hidden");
+      if (pinModal) pinModal.classList.remove("hidden");
+      if (err) {
+        err.textContent = "PIN salah! Masukkan PIN yang benar (Default: 240638).";
+        err.classList.remove("hidden");
+      }
+      if (container) {
+        container.classList.remove("animate-shake");
+        void container.offsetWidth;
+        container.classList.add("animate-shake");
+      }
+      if (input) {
+        input.value = "";
+        input.focus();
+      }
       return;
     }
 
@@ -646,7 +679,7 @@ async function validateScannedTicket(code) {
           ✓ TIKET VALID: ${scannedNama} (${scannedVarian})
         </div>
       `;
-    } else if (res && res.status === "ALREADY_CHECKED_IN") {
+    } else if (res && (res.status === "ALREADY_CHECKED_IN" || res.status === "ALREADY_USED")) {
       box.innerHTML = `
         <div class="p-2 rounded-lg bg-amber-950/70 text-amber-300 font-bold">
           ⚠️ TIKET SUDAH PERNAH DIGUNAKAN
