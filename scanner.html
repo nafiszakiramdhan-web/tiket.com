@@ -28,18 +28,22 @@
     </div>
 
     <!-- STATS COUNTER -->
-    <div class="grid grid-cols-3 gap-2 text-center text-xs">
-      <div class="bg-[#1A0536] border border-purple-800/80 p-2.5 rounded-xl">
-        <p class="text-slate-400 text-[10px] uppercase font-bold">Koneksi</p>
-        <p id="netStatus" class="font-bold text-emerald-400 mt-0.5">● ONLINE</p>
+    <div class="grid grid-cols-4 gap-1.5 text-center text-xs">
+      <div class="bg-[#1A0536] border border-purple-800/80 p-2 rounded-xl">
+        <p class="text-slate-400 text-[9px] uppercase font-bold">Koneksi</p>
+        <p id="netStatus" class="font-bold text-emerald-400 mt-0.5 text-[11px]">● ONLINE</p>
       </div>
-      <div class="bg-[#1A0536] border border-purple-800/80 p-2.5 rounded-xl">
-        <p class="text-slate-400 text-[10px] uppercase font-bold">Database HP</p>
-        <p id="totalLocalTickets" class="font-bold text-[#FFDC17] mt-0.5">0 Tiket</p>
+      <div class="bg-[#1A0536] border border-purple-800/80 p-2 rounded-xl">
+        <p class="text-slate-400 text-[9px] uppercase font-bold">Database</p>
+        <p id="totalLocalTickets" class="font-bold text-[#FFDC17] mt-0.5 text-[11px]">0 Tiket</p>
       </div>
-      <div class="bg-[#1A0536] border border-purple-800/80 p-2.5 rounded-xl">
-        <p class="text-slate-400 text-[10px] uppercase font-bold">Sudah Masuk</p>
-        <p id="scannedCount" class="font-bold text-cyan-400 mt-0.5">0 Orang</p>
+      <div class="bg-[#1A0536] border border-purple-800/80 p-2 rounded-xl">
+        <p class="text-slate-400 text-[9px] uppercase font-bold">Masuk</p>
+        <p id="scannedCount" class="font-bold text-cyan-400 mt-0.5 text-[11px]">0 Org</p>
+      </div>
+      <div class="bg-[#1A0536] border border-purple-800/80 p-2 rounded-xl">
+        <p class="text-slate-400 text-[9px] uppercase font-bold">Siap Upload</p>
+        <p id="readyUploadCountHeader" class="font-bold text-amber-400 mt-0.5 text-[11px]">0 Tiket</p>
       </div>
     </div>
   </header>
@@ -60,23 +64,29 @@
       <div id="reader" class="bg-black/80 aspect-square flex items-center justify-center"></div>
 
       <!-- HASIL POPUP STATUS SCAN -->
-      <div id="resultBox" class="hidden mt-3 p-3.5 rounded-xl text-center transition-all animate-bounce-short"></div>
+      <div id="resultBox" class="hidden mt-3 p-3.5 rounded-xl text-center transition-all"></div>
     </div>
 
     <!-- INPUT MANUAL KODE TIKET -->
     <div class="bg-[#1A0536] border border-purple-900/80 rounded-xl p-3 flex gap-2">
       <input type="text" id="manualCodeInput" placeholder="Contoh: BB-BUG2Q" class="bg-purple-950/70 border border-purple-700/80 rounded-lg px-3 py-2 text-xs text-white uppercase tracking-widest flex-1 focus:outline-none focus:border-[#FFDC17]">
-      <button id="btnManualCheck" class="bg-[#FFDC17] hover:bg-amber-400 text-[#1A0536] text-xs font-black px-4 py-2 rounded-lg active:scale-95 transition">
+      <button id="btnManualCheck" class="bg-[#FFDC17] hover:bg-amber-400 text-[#1A0536] text-xs font-black px-4 py-2 rounded-lg active:scale-95 transition cursor-pointer">
         Periksa
       </button>
     </div>
 
-    <!-- TOMBOL OFFLINE PWA / SINKRONISASI -->
-    <div class="space-y-2">
-      <button id="btnSyncDb" class="w-full bg-[#FFDC17] hover:bg-yellow-400 text-[#1A0536] font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition">
+    <!-- TOMBOL AKSI UTAMA OFFLINE BATCH -->
+    <div class="space-y-2.5">
+      <button id="btnSyncDb" class="w-full bg-[#FFDC17] hover:bg-yellow-400 text-[#1A0536] font-black text-xs py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition cursor-pointer">
         <i class="fa-solid fa-cloud-arrow-down text-sm"></i>
-        <span>DOWNLOAD / SINKRONKAN DATABASE KE HP</span>
+        <span>📥 DOWNLOAD DATABASE TIKET</span>
       </button>
+
+      <button id="btnUploadScans" class="w-full bg-emerald-500 hover:bg-emerald-400 text-[#092215] font-black text-xs py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition cursor-pointer">
+        <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+        <span>☁️ UPLOAD HASIL SCAN KE CLOUD (<span id="readyUploadBtnBadge">0</span>)</span>
+      </button>
+
       <p id="syncTimeText" class="text-[10px] text-center text-slate-400">Belum pernah sinkronisasi data offline.</p>
     </div>
   </main>
@@ -87,7 +97,7 @@
 
   <!-- LOGIKA JAVASCRIPT SCANNER -->
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRMLG227d09VkqJh__-Prb6HGw_t1JMY14FLLeQHO6kMwq5j1ClzX1kMTfMYOh31zw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRMLG227dO9VkqJh__-Prb6HGw_t1JMY14FLLeQHO6kMwq5jlClzXlkMTfMYOh31zw/exec";
     let html5QrCode = null;
     let isProcessing = false;
     let currentCameraIndex = 0;
@@ -130,16 +140,35 @@
       }
     }
 
-    // Update UI Angka Counter
+    // Update UI Angka Counter & Indikator Siap Upload
     function refreshStatsUI() {
       const db = getLocalDatabase();
       document.getElementById('totalLocalTickets').innerText = `${db.length} Tiket`;
-      const checkedIn = db.filter(t => t.checkin && !t.checkin.includes("BELUM")).length;
-      document.getElementById('scannedCount').innerText = `${checkedIn} Orang`;
+      const checkedIn = db.filter(t => t.checkin && !t.checkin.toUpperCase().includes("BELUM")).length;
+      document.getElementById('scannedCount').innerText = `${checkedIn} Org`;
+
+      // Tiket yang siap di-upload (status sudah scan dan belum di-upload)
+      const readyToUpload = db.filter(t => t.needsUpload === true || (t.checkin && !t.checkin.toUpperCase().includes("BELUM") && !t.uploaded)).length;
+      const headerBadge = document.getElementById('readyUploadCountHeader');
+      const btnBadge = document.getElementById('readyUploadBtnBadge');
+      if (headerBadge) headerBadge.innerText = `${readyToUpload} Tiket`;
+      if (btnBadge) btnBadge.innerText = readyToUpload;
+
       const syncTime = localStorage.getItem('last_sync_time');
       if (syncTime) {
         document.getElementById('syncTimeText').innerText = `Terakhir sinkron: ${syncTime}`;
       }
+    }
+
+    // Helper: Sanitasi XSS (DOM-based)
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     // Tampilkan Kartu Notifikasi Hasil Scan
@@ -147,40 +176,45 @@
       const box = document.getElementById('resultBox');
       box.className = "mt-3 p-3.5 rounded-xl text-center border-2 block ";
 
+      const safeTitle = escapeHtml(title);
+      const safeSubtitle = escapeHtml(subtitle);
+      const safeMerch = escapeHtml(merchText);
+
       if (type === "success") {
         playBeep(true);
         box.className += "bg-emerald-950/90 border-emerald-400 text-white";
         box.innerHTML = `
           <div class="text-2xl mb-1">✅</div>
-          <h3 class="text-sm font-black text-emerald-300 uppercase">${title}</h3>
-          <p class="text-xs font-bold text-white mt-1">${subtitle}</p>
-          ${merchText ? `<div class="mt-2.5 p-2 bg-yellow-400 text-purple-950 font-black text-[11px] rounded-lg tracking-wider">🎁 KLAIM SOUVENIR: ${merchText}</div>` : ''}
+          <h3 class="text-sm font-black text-emerald-300 uppercase">${safeTitle}</h3>
+          <p class="text-xs font-bold text-white mt-1">${safeSubtitle}</p>
+          ${safeMerch ? `<div class="mt-2.5 p-2 bg-yellow-400 text-purple-950 font-black text-[11px] rounded-lg tracking-wider">🎁 KLAIM SOUVENIR: ${safeMerch}</div>` : ''}
         `;
       } else if (type === "warning") {
         playBeep(false);
         box.className += "bg-amber-950/90 border-amber-400 text-amber-200";
         box.innerHTML = `
           <div class="text-2xl mb-1">⚠️</div>
-          <h3 class="text-sm font-black uppercase">${title}</h3>
-          <p class="text-xs mt-1 text-white">${subtitle}</p>
+          <h3 class="text-sm font-black uppercase">${safeTitle}</h3>
+          <p class="text-xs mt-1 text-white">${safeSubtitle}</p>
         `;
       } else {
         playBeep(false);
         box.className += "bg-rose-950/90 border-rose-500 text-rose-200";
         box.innerHTML = `
           <div class="text-2xl mb-1">❌</div>
-          <h3 class="text-sm font-black uppercase">${title}</h3>
-          <p class="text-xs mt-1 text-white">${subtitle}</p>
+          <h3 class="text-sm font-black uppercase">${safeTitle}</h3>
+          <p class="text-xs mt-1 text-white">${safeSubtitle}</p>
         `;
       }
 
-      // Reset auto hide setelah 4 detik
       setTimeout(() => {
         isProcessing = false;
-      }, 3500);
+      }, 3000);
     }
 
-    // FUNGSI SINKRONISASI / DOWNLOAD DATABASE DARI GOOGLE SHEET
+    // ============================================================
+    // 1. FUNGSI DOWNLOAD DATABASE TIKET APPROVED KE HP
+    // ============================================================
     async function syncDatabase() {
       const btn = document.getElementById('btnSyncDb');
       const oldHtml = btn.innerHTML;
@@ -196,25 +230,105 @@
 
         const res = await response.json();
 
-        if (res.status === "SUCCESS") {
-          localStorage.setItem('offline_tickets', JSON.stringify(res.data));
+        if (res.status === "SUCCESS" && Array.isArray(res.data)) {
+          const currentDb = getLocalDatabase();
+          // Preservasi status scan tiket lokal yang belum sempat ter-upload
+          const pendingMap = {};
+          currentDb.forEach(t => {
+            if (t.needsUpload === true || (t.checkin && !t.checkin.toUpperCase().includes("BELUM") && !t.uploaded)) {
+              pendingMap[cleanCode(t.kodeTiket)] = t;
+            }
+          });
+
+          const mergedDb = res.data.map(serverTicket => {
+            const key = cleanCode(serverTicket.kodeTiket);
+            if (pendingMap[key]) {
+              return pendingMap[key]; // pertahankan status scan lokal
+            }
+            return serverTicket;
+          });
+
+          localStorage.setItem('offline_tickets', JSON.stringify(mergedDb));
           const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          localStorage.setItem('last_sync_time', `${nowStr} WIB (${res.total} Tiket)`);
+          localStorage.setItem('last_sync_time', `${nowStr} WIB (${res.total || mergedDb.length} Tiket)`);
           refreshStatsUI();
-          alert(`✅ Berhasil mengunduh ${res.total} data tiket ke HP!\nScanner siap digunakan secara offline.`);
+          alert(`✅ Berhasil mengunduh ${res.total || mergedDb.length} data tiket ke HP!\nScanner siap digunakan secara offline.`);
         } else {
           alert(`Gagal mengunduh: ${res.message || "Aksi ditolak server"}`);
         }
       } catch (err) {
-        alert("Gagal koneksi: Pastikan internet aktif saat download data awal.");
+        alert("Gagal koneksi: Pastikan internet aktif saat download database.");
       } finally {
         btn.innerHTML = oldHtml;
         btn.disabled = false;
       }
     }
 
-    // FUNGSI UTAMA VERIFIKASI KODE TIKET (OFFLINE DULU -> FALLBACK ONLINE)
-    async function verifyTicketCode(rawCode) {
+    // ============================================================
+    // 2. FUNGSI UPLOAD HASIL SCAN KE CLOUD (BATCH)
+    // ============================================================
+    async function uploadScansToCloud() {
+      const db = getLocalDatabase();
+      const readyScans = db.filter(t => t.needsUpload === true || (t.checkin && !t.checkin.toUpperCase().includes("BELUM") && !t.uploaded));
+
+      if (readyScans.length === 0) {
+        alert("ℹ️ Tidak ada data scan baru yang perlu di-upload ke Cloud.");
+        return;
+      }
+
+      if (!navigator.onLine) {
+        alert("⚠️ Perangkat sedang OFFLINE. Sambungkan internet sebelum upload ke Cloud.");
+        return;
+      }
+
+      const btn = document.getElementById('btnUploadScans');
+      const oldHtml = btn.innerHTML;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>MENGUNGGAH KE CLOUD (${readyScans.length})...</span>`;
+      btn.disabled = true;
+
+      try {
+        const payloadScans = readyScans.map(t => ({
+          kodeTiket: t.kodeTiket,
+          checkin: t.checkin,
+          waktuScan: t.waktuScan || new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })
+        }));
+
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "upload_scans", scans: payloadScans })
+        });
+
+        const res = await response.json();
+
+        if (res && res.status === "SUCCESS") {
+          // Tandai tiket di localStorage sebagai sudah ter-upload
+          const uploadedCodes = new Set(payloadScans.map(p => cleanCode(p.kodeTiket)));
+          db.forEach(t => {
+            if (uploadedCodes.has(cleanCode(t.kodeTiket))) {
+              t.needsUpload = false;
+              t.uploaded = true;
+            }
+          });
+
+          localStorage.setItem('offline_tickets', JSON.stringify(db));
+          refreshStatsUI();
+          alert(`✅ Berhasil mengunggah ${res.updated || readyScans.length} data check-in tiket ke Cloud!`);
+        } else {
+          alert(`Gagal upload: ${res.message || "Server menolak batch upload"}`);
+        }
+      } catch (err) {
+        alert("Gagal koneksi saat upload ke cloud: " + err.message);
+      } finally {
+        btn.innerHTML = oldHtml;
+        btn.disabled = false;
+      }
+    }
+
+    // ============================================================
+    // 3. VALIDASI SCAN TIKET SECARA MURNI OFFLINE (INSTAN)
+    // ============================================================
+    function verifyTicketCode(rawCode) {
       if (isProcessing) return;
       isProcessing = true;
 
@@ -227,90 +341,57 @@
       const db = getLocalDatabase();
       const localIndex = db.findIndex(t => cleanCode(t.kodeTiket) === code);
 
-      // JIKA DITEMUKAN DI DATABASE LOKAL HP
-      if (localIndex !== -1) {
-        const ticket = db[localIndex];
-        const statusCheckin = (ticket.checkin || "").toUpperCase();
-        const isTwoDay = (ticket.varian || "").toLowerCase().includes("2 hari");
-
-        if (isTwoDay) {
-          if (statusCheckin === "BELUM MASUK" || statusCheckin === "") {
-            ticket.checkin = "MASUK (HARI 1)";
-            db[localIndex] = ticket;
-            localStorage.setItem('offline_tickets', JSON.stringify(db));
-            refreshStatsUI();
-            sendOnlineUpdate(code); // update background
-            const merch = ticket.merch && ticket.merch.ada ? ticket.merch.textScanner : "";
-            showScanResult("success", "CHECK-IN HARI 1 BERHASIL", `${ticket.nama} • ${ticket.varian}`, merch);
-            return;
-          } else if (statusCheckin === "MASUK (HARI 1)") {
-            ticket.checkin = "SELESAI (HARI 2)";
-            db[localIndex] = ticket;
-            localStorage.setItem('offline_tickets', JSON.stringify(db));
-            refreshStatsUI();
-            sendOnlineUpdate(code);
-            showScanResult("success", "CHECK-IN HARI 2 BERHASIL", `${ticket.nama} • ${ticket.varian}`);
-            return;
-          } else {
-            showScanResult("warning", "TIKET 2 HARI TELAH SELESAI", `Tiket ${ticket.nama} sudah dipakai di kedua hari.`);
-            return;
-          }
-        }
-
-        // Tiket 1 Hari
-        if (statusCheckin.includes("MASUK") || statusCheckin.includes("SUDAH")) {
-          showScanResult("error", "TIKET SUDAH PERNAH DIGUNAKAN!", `Atas Nama: ${ticket.nama} (${ticket.varian})`);
-          return;
-        }
-
-        ticket.checkin = "SUDAH MASUK";
-        db[localIndex] = ticket;
-        localStorage.setItem('offline_tickets', JSON.stringify(db));
-        refreshStatsUI();
-        sendOnlineUpdate(code); // kirim sinkron ke sheet
-        const merch = ticket.merch && ticket.merch.ada ? ticket.merch.textScanner : "";
-        showScanResult("success", "CHECK-IN BERHASIL!", `${ticket.nama} • ${ticket.varian}`, merch);
+      if (localIndex === -1) {
+        showScanResult("error", "TIKET TIDAK DITEMUKAN", `Kode ${code} tidak ada di database HP. Pastikan sudah download database.`);
         return;
       }
 
-      // JIKA TIDAK DITEMUKAN DI HP, FALLBACK CEK KE SERVER GOOGLE SECARA LANGSUNG
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "scan_ticket", kodeTiket: code })
-        });
-        const res = await response.json();
+      const ticket = db[localIndex];
+      const statusCheckin = (ticket.checkin || "").toUpperCase();
+      const isTwoDay = (ticket.varian || "").toLowerCase().includes("2 hari");
+      const nowWib = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
 
-        if (res.status === "SUCCESS") {
-          const merch = res.merch && res.merch.ada ? res.merch.textScanner : "";
-          showScanResult("success", res.message || "CHECK-IN BERHASIL!", `${res.nama} • ${res.pass}`, merch);
-          // Tambahkan ke database lokal agar selanjutnya terbaca offline
-          db.push({ kodeTiket: code, nama: res.nama, varian: res.pass, checkin: "SUDAH MASUK" });
+      // ALUR TIKET 2 HARI
+      if (isTwoDay) {
+        if (statusCheckin === "BELUM MASUK" || statusCheckin === "") {
+          ticket.checkin = "MASUK (HARI 1)";
+          ticket.waktuScan = nowWib;
+          ticket.needsUpload = true;
+          db[localIndex] = ticket;
           localStorage.setItem('offline_tickets', JSON.stringify(db));
           refreshStatsUI();
-        } else if (res.status === "ALREADY_USED") {
-          showScanResult("error", "TIKET SUDAH PERNAH DIGUNAKAN!", res.nama || "Tiket Hangus");
-        } else if (res.status === "NOT_APPROVED") {
-          showScanResult("warning", "TIKET BELUM DI-ACC PANITIA", "Status pembayaran masih PENDING.");
+          const merch = ticket.merch && ticket.merch.ada ? ticket.merch.textScanner : "";
+          showScanResult("success", "CHECK-IN HARI 1 BERHASIL", `${ticket.nama} • ${ticket.varian}`, merch);
+          return;
+        } else if (statusCheckin === "MASUK (HARI 1)") {
+          ticket.checkin = "SELESAI (HARI 2)";
+          ticket.waktuScan = nowWib;
+          ticket.needsUpload = true;
+          db[localIndex] = ticket;
+          localStorage.setItem('offline_tickets', JSON.stringify(db));
+          refreshStatsUI();
+          showScanResult("success", "CHECK-IN HARI 2 BERHASIL", `${ticket.nama} • ${ticket.varian}`);
+          return;
         } else {
-          showScanResult("error", "TIKET TIDAK DITEMUKAN", `Kode ${code} tidak ada di database.`);
+          showScanResult("warning", "TIKET 2 HARI TELAH SELESAI", `Tiket ${ticket.nama} sudah dipakai di kedua hari.`);
+          return;
         }
-      } catch (e) {
-        showScanResult("error", "TIKET TIDAK ADA DI DATABASE HP", "Tekan tombol 'Download Database' saat ada sinyal internet.");
       }
-    }
 
-    // Sinkronisasi background ke Google Sheet jika sedang online
-    async function sendOnlineUpdate(code) {
-      if (!navigator.onLine) return;
-      try {
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "scan_ticket", kodeTiket: code })
-        });
-      } catch (err) {}
+      // ALUR TIKET 1 HARI
+      if (statusCheckin.includes("MASUK") || statusCheckin.includes("SUDAH")) {
+        showScanResult("error", "TIKET SUDAH PERNAH DIGUNAKAN!", `Atas Nama: ${ticket.nama} (${ticket.varian})`);
+        return;
+      }
+
+      ticket.checkin = "SUDAH MASUK";
+      ticket.waktuScan = nowWib;
+      ticket.needsUpload = true;
+      db[localIndex] = ticket;
+      localStorage.setItem('offline_tickets', JSON.stringify(db));
+      refreshStatsUI();
+      const merch = ticket.merch && ticket.merch.ada ? ticket.merch.textScanner : "";
+      showScanResult("success", "CHECK-IN BERHASIL!", `${ticket.nama} • ${ticket.varian}`, merch);
     }
 
     // Inisialisasi Kamera HTML5-QRCode
@@ -319,12 +400,11 @@
         const devices = await Html5Qrcode.getCameras();
         if (devices && devices.length > 0) {
           availableCameras = devices;
-          // Cari kamera belakang
           const backIndex = devices.findIndex(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('belakang'));
           currentCameraIndex = backIndex !== -1 ? backIndex : 0;
           startScanner(availableCameras[currentCameraIndex].id);
         } else {
-          alert("Kamera tidak ditemukan di perangkat ini.");
+          console.log("Kamera tidak ditemukan di perangkat ini.");
         }
       } catch (err) {
         console.error("Gagal inisialisasi kamera:", err);
@@ -362,6 +442,7 @@
     });
 
     document.getElementById('btnSyncDb').addEventListener('click', syncDatabase);
+    document.getElementById('btnUploadScans').addEventListener('click', uploadScansToCloud);
 
     document.getElementById('btnManualCheck').addEventListener('click', () => {
       const input = document.getElementById('manualCodeInput');
@@ -372,11 +453,11 @@
 
     window.addEventListener('online', () => {
       document.getElementById('netStatus').innerText = "● ONLINE";
-      document.getElementById('netStatus').className = "font-bold text-emerald-400 mt-0.5";
+      document.getElementById('netStatus').className = "font-bold text-emerald-400 mt-0.5 text-[11px]";
     });
     window.addEventListener('offline', () => {
       document.getElementById('netStatus').innerText = "○ OFFLINE";
-      document.getElementById('netStatus').className = "font-bold text-amber-400 mt-0.5";
+      document.getElementById('netStatus').className = "font-bold text-amber-400 mt-0.5 text-[11px]";
     });
 
     // Jalankan Saat Halaman Terbuka

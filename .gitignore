@@ -1,4 +1,8 @@
-# Jangan push file kode backend Apps Script (karena sudah ada di script.google.com)
+# Jangan push file konfigurasi clasp dan backend Apps Script
+.clasp.json
+.clasprc.json
+.claspignore
+appsscript.json
 Code.gs
 Kode.gs
 
@@ -17,6 +21,7 @@ config.local.js
 *.backup
 *.csv
 *.xlsx
+*.pdf
 
 # Jangan push file sistem operasi
 .DS_Store

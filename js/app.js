@@ -548,7 +548,6 @@ async function handleCheckStatusSubmit(e) {
         const kategoriTiket = escapeHtml(item.varian || item.kategori || "Tiket Festival");
         const jumlahTiket = escapeHtml(item.jumlah || 1);
         const kodeTiket = escapeHtml(item.kodeTiket || item.ticketCode || "-");
-        const safeLinkPdf = escapeHtml(item.linkPdf || "#");
 
         const card = document.createElement("div");
         card.className = isApproved
@@ -597,13 +596,10 @@ async function handleCheckStatusSubmit(e) {
 
           ${isApproved ? `
             <div class="pt-2">
-              <a
-                href="${safeLinkPdf}"
-                target="_blank"
-                class="inline-flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none text-[#240638] font-bold text-xs uppercase tracking-wider shadow-md"
-              >
-                <span>📥 Unduh E-Ticket (PDF)</span>
-              </a>
+              <div class="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm font-sans flex items-start gap-2.5 shadow-sm">
+                <span class="text-base leading-none">📩</span>
+                <p class="leading-relaxed">E-Ticket PDF resmi telah dikirim otomatis ke email kamu. Silakan cek kotak masuk (Inbox) atau folder Spam.</p>
+              </div>
             </div>
           ` : ''}
         `;
