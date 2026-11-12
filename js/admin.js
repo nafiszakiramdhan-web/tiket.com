@@ -123,7 +123,7 @@ async function loadOrdersData(isManual = false) {
       mode: "cors",
       redirect: "follow",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "download_offline_db", pin: savedPin })
+      body: JSON.stringify({ action: "admin_get_approved", pin: savedPin })
     }).then(r => r.json()).catch(() => ({ tickets: [] }));
 
     const quotaPromise = fetch(SCRIPT_URL, {
@@ -291,7 +291,7 @@ function renderCurrentTabTable() {
 
     const cleanWa = (item.whatsapp || "").toString().replace(/['\s-]/g, "");
     const safeNama = escapeHtml(item.nama || "-");
-    const emailRaw = item.email || (item.nama ? item.nama.toLowerCase().replace(/[^a-z0-9]/g, "") + "@gmail.com" : "-");
+    const emailRaw = (item.email || "-").toString().trim();
     const safeEmail = escapeHtml(emailRaw);
     const safeKodeTiket = escapeHtml(item.kodeTiket || item.ticketCode || "");
     const safeVarian = escapeHtml(item.varian || "Tiket Reguler");
