@@ -540,115 +540,171 @@
                 <div id="quotaWarningBox" class="hidden p-3 rounded-xl bg-red-950/80 border border-red-500/60 text-red-200 text-xs mt-2">
                   <span id="quotaWarningText">⚠️ Pesanan melebihi sisa kuota! Maksimal pemesanan paket ini adalah [SISA] tiket.</span>
                 </div>
+
+                <!-- Tombol Lanjut ke Pembayaran QRIS -->
+                <div id="proceedPaymentWrapper" class="pt-3">
+                  <button 
+                    type="button" 
+                    id="btnProceedToPayment" 
+                    onclick="handleProceedToPayment()"
+                    class="w-full py-4 px-6 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 transition-all text-[#240638] font-bold text-sm uppercase tracking-wider shadow-md flex items-center justify-center gap-2 cursor-pointer select-none"
+                  >
+                    <span id="btnProceedText">Lanjut ke Pembayaran QRIS</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 stroke-[2.5]" id="btnProceedIcon"></i>
+                    <span id="btnProceedSpinner" class="hidden">
+                      <svg class="animate-spin h-4 w-4 text-[#240638]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                      </svg>
+                    </span>
+                  </button>
+                </div>
               </div>
 
-              <!-- ==================== FIELD 5: PEMBAYARAN MURNI QRIS ==================== -->
-              <div class="p-5 sm:p-6 rounded-2xl bg-[#14032B] border border-[#FFDC17]/40 space-y-4 shadow-inner">
-                <div class="flex items-center justify-between border-b border-[#FFDC17]/20 pb-2.5">
-                  <div class="flex items-center gap-2">
-                    <span class="text-[#FFDC17]">✦</span>
-                    <span class="font-mono text-xs uppercase tracking-wider text-[#FFDC17] font-bold">
-                      Metode Pembayaran: QRIS Nasional
+              <!-- ==================== BAGIAN PEMBAYARAN & UPLOAD STRUK ==================== -->
+              <div id="paymentSectionContainer" class="hidden space-y-5 pt-2">
+
+                <!-- KOTAK COUNTDOWN TIMER HOLD KUOTA (KHUSUS PRESALE) -->
+                <div id="holdTimerBox" class="hidden p-4 rounded-2xl bg-amber-950/80 border-2 border-[#FFDC17] text-amber-200 text-center space-y-1.5 shadow-xl">
+                  <div class="flex items-center justify-center gap-2">
+                    <span class="text-xl">⏳</span>
+                    <span class="text-xs uppercase font-mono font-bold tracking-wider text-amber-300">
+                      Sisa Waktu Pembayaran Kuota Presale:
                     </span>
                   </div>
-                  <span class="text-[11px] text-slate-400 font-mono">BCA • Mandiri • GoPay • OVO • Dana</span>
+                  <div id="holdCountdownDisplay" class="font-mono text-3xl sm:text-4xl font-black text-[#FFDC17] tracking-widest">
+                    05:00
+                  </div>
+                  <p class="text-[11px] text-amber-200/90 font-sans">
+                    Selesaikan pembayaran & kirim bukti transfer sebelum timer habis agar kuota tidak dilepaskan kembali ke publik.
+                  </p>
                 </div>
 
-                <!-- Total Nominal yang Harus Dibayar -->
-                <div class="text-center py-3 bg-[#240847] rounded-xl border border-[#FFDC17]/30 select-none">
-                  <span class="text-[11px] uppercase font-mono tracking-wider text-[#E2D9F3] block">Total Nominal yang Harus Dibayar:</span>
-                  <span id="qrisTotalAmount" class="font-display font-extrabold text-3xl sm:text-4xl text-[#FFDC17] tracking-wider block mt-0.5">Rp 4.000</span>
-                  <span class="text-[10px] text-slate-400 font-mono block">Pastikan nominal transfer tepat hingga rupiah terakhir</span>
+                <!-- BANNER KEDALUWARSA KETIKA TIMER HABIS -->
+                <div id="holdExpiredBanner" class="hidden p-5 rounded-2xl bg-rose-950/90 border-2 border-rose-500 text-rose-200 text-center space-y-2 shadow-2xl">
+                  <div class="text-2xl">⚠️</div>
+                  <h4 class="font-bold text-sm text-rose-300 uppercase tracking-wider">Waktu Pembayaran 5 Menit Telah Habis</h4>
+                  <p class="text-xs text-rose-200/90 leading-relaxed">
+                    Pesanan otomatis dibatalkan dan kuota telah dikembalikan ke sistem. Silakan ulangi pemesanan jika kuota masih tersedia.
+                  </p>
+                  <button 
+                    type="button" 
+                    onclick="resetPresaleHoldAndRefresh()"
+                    class="mt-2 px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider active:scale-95 transition-all cursor-pointer shadow-md"
+                  >
+                    Ulangi Pemesanan
+                  </button>
                 </div>
 
-                <!-- Container QRIS: Kotak putih rapi dengan border #FFDC17 -->
-                <div class="text-center p-4 bg-[#240847]/50 rounded-2xl border border-[#FFDC17]/30 space-y-3">
-                  <div class="inline-block p-3 bg-white rounded-2xl border-2 border-[#FFDC17] shadow-2xl">
-                    <img 
-                      id="qrisImg" 
-                      src="assets/qris.jpg" 
-                      onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=QRIS_BINGKAI_BISU_2026'" 
-                      alt="QRIS Pembayaran Resmi Bingkai Bisu 2026" 
-                      class="w-64 h-64 object-contain mx-auto rounded-xl p-2 bg-white"
+                <!-- ==================== FIELD 5: PEMBAYARAN MURNI QRIS ==================== -->
+                <div class="p-5 sm:p-6 rounded-2xl bg-[#14032B] border border-[#FFDC17]/40 space-y-4 shadow-inner">
+                  <div class="flex items-center justify-between border-b border-[#FFDC17]/20 pb-2.5">
+                    <div class="flex items-center gap-2">
+                      <span class="text-[#FFDC17]">✦</span>
+                      <span class="font-mono text-xs uppercase tracking-wider text-[#FFDC17] font-bold">
+                        Metode Pembayaran: QRIS Nasional
+                      </span>
+                    </div>
+                    <span class="text-[11px] text-slate-400 font-mono">BCA • Mandiri • GoPay • OVO • Dana</span>
+                  </div>
+
+                  <!-- Total Nominal yang Harus Dibayar -->
+                  <div class="text-center py-3 bg-[#240847] rounded-xl border border-[#FFDC17]/30 select-none">
+                    <span class="text-[11px] uppercase font-mono tracking-wider text-[#E2D9F3] block">Total Nominal yang Harus Dibayar:</span>
+                    <span id="qrisTotalAmount" class="font-display font-extrabold text-3xl sm:text-4xl text-[#FFDC17] tracking-wider block mt-0.5">Rp 4.000</span>
+                    <span class="text-[10px] text-slate-400 font-mono block">Pastikan nominal transfer tepat hingga rupiah terakhir</span>
+                  </div>
+
+                  <!-- Container QRIS: Kotak putih rapi dengan border #FFDC17 -->
+                  <div class="text-center p-4 bg-[#240847]/50 rounded-2xl border border-[#FFDC17]/30 space-y-3">
+                    <div class="inline-block p-3 bg-white rounded-2xl border-2 border-[#FFDC17] shadow-2xl">
+                      <img 
+                        id="qrisImg" 
+                        src="assets/qris.jpg" 
+                        onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=QRIS_BINGKAI_BISU_2026'" 
+                        alt="QRIS Pembayaran Resmi Bingkai Bisu 2026" 
+                        class="w-64 h-64 object-contain mx-auto rounded-xl p-2 bg-white"
+                      />
+                    </div>
+
+                    <!-- Tombol Unduh QRIS Sesuai Spesifikasi -->
+                    <div>
+                      <a 
+                        href="assets/qris.jpg" 
+                        download="QRIS_Bingkai_Bisu_2026.jpg" 
+                        class="inline-flex items-center justify-center gap-2 mt-2 px-6 py-3 bg-[#FFDC17] text-[#240638] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
+                      >
+                        📥 Simpan / Unduh Gambar QRIS
+                      </a>
+                    </div>
+
+                    <!-- Teks Petunjuk Pembayaran -->
+                    <div class="text-left text-xs text-[#E2D9F3] bg-[#14032B] p-4 rounded-xl border border-[#FFDC17]/20 space-y-1.5 max-w-md mx-auto font-sans leading-relaxed">
+                      <p class="font-semibold text-white text-[11px] uppercase font-mono tracking-wider text-[#FFDC17]">
+                        Petunjuk Pembayaran QRIS:
+                      </p>
+                      <p>1. Klik tombol di atas untuk menyimpan gambar QRIS ke galeri ponsel Anda.</p>
+                      <p>2. Buka aplikasi m-Banking / E-Wallet (BCA Mobile, Livin', GoPay, Dana, OVO, ShopeePay), pilih menu bayar/scan lalu upload QRIS dari galeri.</p>
+                      <p>3. Unggah tangkapan layar (screenshot) bukti transfer pembayaran pada kotak unggah di bawah.</p>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Field 6: Unggah Struk Pembayaran -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
+                    Unggah Bukti Pembayaran / Transfer QRIS <span class="text-red-400">*</span>
+                  </label>
+                  
+                  <div 
+                    id="dropZoneProof" 
+                    onclick="document.getElementById('inputProofFile').click()" 
+                    class="border-2 border-dashed border-[#FFDC17]/40 hover:border-[#FFDC17] rounded-2xl p-6 text-center cursor-pointer transition-all bg-[#14032B]/70 space-y-2 active:scale-[0.99] active:brightness-95 select-none"
+                  >
+                    <input 
+                      type="file" 
+                      id="inputProofFile" 
+                      accept="image/*" 
+                      class="hidden" 
+                      onchange="handleProofFileSelected(event)"
                     />
-                  </div>
-
-                  <!-- Tombol Unduh QRIS Sesuai Spesifikasi -->
-                  <div>
-                    <a 
-                      href="assets/qris.jpg" 
-                      download="QRIS_Bingkai_Bisu_2026.jpg" 
-                      class="inline-flex items-center justify-center gap-2 mt-2 px-6 py-3 bg-[#FFDC17] text-[#240638] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
-                    >
-                      📥 Simpan / Unduh Gambar QRIS
-                    </a>
-                  </div>
-
-                  <!-- Teks Petunjuk Pembayaran -->
-                  <div class="text-left text-xs text-[#E2D9F3] bg-[#14032B] p-4 rounded-xl border border-[#FFDC17]/20 space-y-1.5 max-w-md mx-auto font-sans leading-relaxed">
-                    <p class="font-semibold text-white text-[11px] uppercase font-mono tracking-wider text-[#FFDC17]">
-                      Petunjuk Pembayaran QRIS:
-                    </p>
-                    <p>1. Klik tombol di atas untuk menyimpan gambar QRIS ke galeri ponsel Anda.</p>
-                    <p>2. Buka aplikasi m-Banking / E-Wallet (BCA Mobile, Livin', GoPay, Dana, OVO, ShopeePay), pilih menu bayar/scan lalu upload QRIS dari galeri.</p>
-                    <p>3. Unggah tangkapan layar (screenshot) bukti transfer pembayaran pada kotak unggah di bawah.</p>
-                  </div>
-                </div>
-
-              </div>
-
-              <!-- Field 6: Unggah Struk Pembayaran -->
-              <div class="space-y-2">
-                <label class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
-                  Unggah Bukti Pembayaran / Transfer QRIS <span class="text-red-400">*</span>
-                </label>
-                
-                <div 
-                  id="dropZoneProof" 
-                  onclick="document.getElementById('inputProofFile').click()" 
-                  class="border-2 border-dashed border-[#FFDC17]/40 hover:border-[#FFDC17] rounded-2xl p-6 text-center cursor-pointer transition-all bg-[#14032B]/70 space-y-2 active:scale-[0.99] active:brightness-95 select-none"
-                >
-                  <input 
-                    type="file" 
-                    id="inputProofFile" 
-                    accept="image/*" 
-                    class="hidden" 
-                    onchange="handleProofFileSelected(event)"
-                  />
-                  <div id="dropZoneContent">
-                    <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-[#FFDC17]"></i>
-                    <p class="text-xs text-slate-200 font-medium pt-1">
-                      Klik untuk memilih file tangkapan layar / bukti transfer QRIS
-                    </p>
-                    <span class="text-[10px] text-slate-400 font-mono block">Format JPG, PNG, WEBP (Maksimal 5 MB)</span>
-                  </div>
-                  <!-- Pratinjau Bukti -->
-                  <div id="proofPreviewBox" class="hidden flex items-center justify-center gap-3 pt-2">
-                    <img id="proofPreviewImg" src="" alt="Pratinjau Bukti" class="max-h-24 rounded-xl border border-[#FFDC17]/40" />
-                    <div class="text-left">
-                      <span id="proofFileName" class="text-xs font-mono text-white block">bukti_qris.jpg</span>
-                      <span id="proofFileSize" class="text-[10px] font-mono text-[#FFDC17] block">0 KB</span>
-                      <span class="text-[10px] text-emerald-400 font-bold">✓ Siap diunggah</span>
+                    <div id="dropZoneContent">
+                      <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-[#FFDC17]"></i>
+                      <p class="text-xs text-slate-200 font-medium pt-1">
+                        Klik untuk memilih file tangkapan layar / bukti transfer QRIS
+                      </p>
+                      <span class="text-[10px] text-slate-400 font-mono block">Format JPG, PNG, WEBP (Maksimal 5 MB)</span>
+                    </div>
+                    <!-- Pratinjau Bukti -->
+                    <div id="proofPreviewBox" class="hidden flex items-center justify-center gap-3 pt-2">
+                      <img id="proofPreviewImg" src="" alt="Pratinjau Bukti" class="max-h-24 rounded-xl border border-[#FFDC17]/40" />
+                      <div class="text-left">
+                        <span id="proofFileName" class="text-xs font-mono text-white block">bukti_qris.jpg</span>
+                        <span id="proofFileSize" class="text-[10px] font-mono text-[#FFDC17] block">0 KB</span>
+                        <span class="text-[10px] text-emerald-400 font-bold">✓ Siap diunggah</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- Tombol Submit (Murni Pending, Anti Auto-ACC) -->
-              <button 
-                type="submit" 
-                id="btnSubmitOrder" 
-                class="w-full py-4 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none text-[#240638] font-bold text-base uppercase tracking-wider shadow-glow-gold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <i data-lucide="ticket" class="w-5 h-5 stroke-[2.5]"></i>
-                <span id="btnSubmitText">BAYAR & KONFIRMASI TIKET</span>
-                <span id="btnSubmitSpinner" class="hidden">
-                  <svg class="animate-spin h-5 w-5 text-[#240638]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                  </svg>
-                </span>
-              </button>
+                <!-- Tombol Submit (Murni Pending, Anti Auto-ACC) -->
+                <button 
+                  type="submit" 
+                  id="btnSubmitOrder" 
+                  class="w-full py-4 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none text-[#240638] font-bold text-base uppercase tracking-wider shadow-glow-gold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i data-lucide="ticket" class="w-5 h-5 stroke-[2.5]"></i>
+                  <span id="btnSubmitText">BAYAR & KONFIRMASI TIKET</span>
+                  <span id="btnSubmitSpinner" class="hidden">
+                    <svg class="animate-spin h-5 w-5 text-[#240638]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                  </span>
+                </button>
+
+              </div>
 
             </form>
 

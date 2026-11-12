@@ -69,6 +69,90 @@ let currentQuantity = 1;
 let currentPresaleQuotaRemaining = 100;
 let selectedProofBase64 = null;
 let selectedProofFileName = "bukti_qris.jpg";
+let currentHoldId = null;
+let holdTimerInterval = null;
+let holdRemainingSeconds = 300;
+
+// ============================================================
+// COUNTDOWN TIMER KUNCI KUOTA PRESALE (5 MENIT)
+// ============================================================
+function formatCountdown(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function startHoldTimer(durationSeconds = 300) {
+  stopHoldTimer();
+  holdRemainingSeconds = durationSeconds;
+
+  const timerBox = document.getElementById("holdTimerBox");
+  const expiredBanner = document.getElementById("holdExpiredBanner");
+  const countdownEl = document.getElementById("holdCountdownDisplay");
+
+  if (timerBox) timerBox.classList.remove("hidden");
+  if (expiredBanner) expiredBanner.classList.add("hidden");
+  if (countdownEl) countdownEl.textContent = formatCountdown(holdRemainingSeconds);
+
+  holdTimerInterval = setInterval(() => {
+    holdRemainingSeconds--;
+    if (countdownEl) countdownEl.textContent = formatCountdown(Math.max(0, holdRemainingSeconds));
+
+    if (holdRemainingSeconds <= 0) {
+      handleHoldExpired();
+    }
+  }, 1000);
+}
+
+function stopHoldTimer() {
+  if (holdTimerInterval) {
+    clearInterval(holdTimerInterval);
+    holdTimerInterval = null;
+  }
+}
+
+function handleHoldExpired() {
+  stopHoldTimer();
+  currentHoldId = null;
+
+  const timerBox = document.getElementById("holdTimerBox");
+  const expiredBanner = document.getElementById("holdExpiredBanner");
+  const dropZone = document.getElementById("dropZoneProof");
+  const submitBtn = document.getElementById("btnSubmitOrder");
+
+  if (timerBox) timerBox.classList.add("hidden");
+  if (expiredBanner) expiredBanner.classList.remove("hidden");
+
+  // Kunci form upload dan tombol submit
+  if (dropZone) dropZone.classList.add("pointer-events-none", "opacity-50");
+  if (submitBtn) submitBtn.disabled = true;
+
+  refreshTicketStock();
+}
+
+function resetPresaleHoldAndRefresh() {
+  stopHoldTimer();
+  currentHoldId = null;
+
+  const timerBox = document.getElementById("holdTimerBox");
+  const expiredBanner = document.getElementById("holdExpiredBanner");
+  const dropZone = document.getElementById("dropZoneProof");
+  const submitBtn = document.getElementById("btnSubmitOrder");
+  const paymentSection = document.getElementById("paymentSectionContainer");
+  const proceedBtn = document.getElementById("btnProceedToPayment");
+
+  if (timerBox) timerBox.classList.add("hidden");
+  if (expiredBanner) expiredBanner.classList.add("hidden");
+  if (dropZone) dropZone.classList.remove("pointer-events-none", "opacity-50");
+  if (submitBtn) submitBtn.disabled = false;
+  if (paymentSection) paymentSection.classList.add("hidden");
+  if (proceedBtn) {
+    proceedBtn.disabled = false;
+    proceedBtn.classList.remove("hidden");
+  }
+
+  refreshTicketStock();
+}
 
 // ============================================================
 // NOTIFIKASI TOAST MELAYANG
@@ -171,8 +255,8 @@ async function refreshTicketStock(isManualClick = false) {
     });
     const res = await response.json();
 
-    if (res && res.quotaBundling) {
-      currentPresaleQuotaRemaining = parseInt(res.quotaBundling.sisa, 10);
+    if (res && (res.sisaKuota !== undefined || res.quotaBundling)) {
+      currentPresaleQuotaRemaining = res.sisaKuota !== undefined ? parseInt(res.sisaKuota, 10) : parseInt(res.quotaBundling.sisa, 10);
       if (isNaN(currentPresaleQuotaRemaining)) currentPresaleQuotaRemaining = 100;
 
       const badge = document.getElementById("badgeQuotaPresale");
@@ -184,20 +268,24 @@ async function refreshTicketStock(isManualClick = false) {
           badge.textContent = "[ SOLD OUT ]";
           badge.className = "px-2.5 py-0.5 rounded-full bg-red-600/30 text-[10px] font-mono font-bold text-red-400 border border-red-500/50";
         }
-        if (cardPresale) cardPresale.classList.add("opacity-60");
+        if (cardPresale) cardPresale.classList.add("opacity-60", "pointer-events-none");
         if (btnSelect4) {
           btnSelect4.disabled = true;
           btnSelect4.classList.add("opacity-50", "cursor-not-allowed");
+          const b4Text = document.getElementById("btnSelectText4");
+          if (b4Text) b4Text.textContent = "SOLD OUT";
         }
       } else {
         if (badge) {
-          badge.textContent = `[ Sisa ${currentPresaleQuotaRemaining} / 100 Pcs ]`;
+          badge.textContent = `Tersisa ${currentPresaleQuotaRemaining} / 100 Kuota`;
           badge.className = "px-2.5 py-0.5 rounded-full bg-[#FFDC17]/20 text-[10px] font-mono font-bold text-[#FFDC17] border border-[#FFDC17]/40";
         }
-        if (cardPresale) cardPresale.classList.remove("opacity-60");
+        if (cardPresale) cardPresale.classList.remove("opacity-60", "pointer-events-none");
         if (btnSelect4) {
           btnSelect4.disabled = false;
           btnSelect4.classList.remove("opacity-50", "cursor-not-allowed");
+          const b4Text = document.getElementById("btnSelectText4");
+          if (b4Text && currentSelectedVariant !== "tiket_presale") b4Text.textContent = "Pilih Tiket ⌵";
         }
       }
 
@@ -262,6 +350,14 @@ function selectTicketVariant(variantKey) {
   const badgeEl = document.getElementById("checkoutSelectedBadge");
   if (badgeEl) badgeEl.textContent = VARIANTS[variantKey].badgeText;
 
+  // Jika sebelumnya ada hold kuota atau section pembayaran terbuka, reset agar sesuai varian baru
+  if (currentHoldId) {
+    resetPresaleHoldAndRefresh();
+  } else {
+    const paymentSection = document.getElementById("paymentSectionContainer");
+    if (paymentSection) paymentSection.classList.add("hidden");
+  }
+
   validateQuotaAndCalculateTotal();
 
   const formContainer = document.getElementById("checkoutFormContainer");
@@ -287,6 +383,11 @@ function handleQuantityChange() {
   if (val > 10) val = 10;
   currentQuantity = val;
   qtyInput.value = val;
+
+  if (currentHoldId) {
+    resetPresaleHoldAndRefresh();
+  }
+
   validateQuotaAndCalculateTotal();
 }
 
@@ -389,7 +490,117 @@ function handleProofFileSelected(event) {
 }
 
 // ============================================================
-// 5. SUBMIT PEMESANAN (MURNI PENDING DENGAN INTEGRITAS HARGA)
+// 5. PROSES LANJUT KE PEMBAYARAN QRIS & KUNCI KUOTA PRESALE
+// ============================================================
+async function handleProceedToPayment() {
+  const nama = (document.getElementById("inputName")?.value || "").trim();
+  const email = (document.getElementById("inputEmail")?.value || "").trim();
+  const whatsapp = (document.getElementById("inputWa")?.value || "").trim();
+  const rawQty = parseInt(document.getElementById("ticketQty")?.value, 10) || 1;
+  const qty = Math.max(1, Math.min(10, rawQty));
+
+  if (!nama || !email || !whatsapp) {
+    alert("Harap lengkapi Nama Lengkap, Alamat Email, dan Nomor WhatsApp sebelum lanjut ke pembayaran!");
+    const nameInput = document.getElementById("inputName");
+    if (nameInput) nameInput.focus();
+    return;
+  }
+
+  const safeVariantKey = VARIANTS[currentSelectedVariant] ? currentSelectedVariant : "tiket_1hari";
+  const variant = VARIANTS[safeVariantKey];
+
+  const paymentSection = document.getElementById("paymentSectionContainer");
+  const proceedBtn = document.getElementById("btnProceedToPayment");
+  const proceedText = document.getElementById("btnProceedText");
+  const proceedIcon = document.getElementById("btnProceedIcon");
+  const proceedSpinner = document.getElementById("btnProceedSpinner");
+  const timerBox = document.getElementById("holdTimerBox");
+  const expiredBanner = document.getElementById("holdExpiredBanner");
+  const dropZone = document.getElementById("dropZoneProof");
+  const submitBtn = document.getElementById("btnSubmitOrder");
+
+  // Jika varian Presale, panggil hold_quota ke backend Apps Script terlebih dahulu
+  if (variant.isPresale) {
+    if (proceedBtn) proceedBtn.disabled = true;
+    if (proceedText) proceedText.textContent = "Mengunci Kuota Presale...";
+    if (proceedIcon) proceedIcon.classList.add("hidden");
+    if (proceedSpinner) proceedSpinner.classList.remove("hidden");
+
+    try {
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "cors",
+        redirect: "follow",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "hold_quota",
+          jumlah: qty,
+          varian: variant.name,
+          total: variant.price * qty
+        })
+      });
+
+      const res = await response.json();
+
+      if (res && res.status === "OUT_OF_STOCK") {
+        alert(res.message || "Maaf, kuota Presale habis atau sedang dipesan pengunjung lain!");
+        refreshTicketStock();
+        return;
+      }
+
+      if (res && res.status === "SUCCESS" && res.holdId) {
+        currentHoldId = res.holdId;
+        const expireSec = res.expiresInSeconds || 300;
+
+        if (paymentSection) paymentSection.classList.remove("hidden");
+        if (dropZone) dropZone.classList.remove("pointer-events-none", "opacity-50");
+        if (submitBtn) submitBtn.disabled = false;
+        if (expiredBanner) expiredBanner.classList.add("hidden");
+
+        startHoldTimer(expireSec);
+
+        if (res.sisaKuota !== undefined) {
+          currentPresaleQuotaRemaining = res.sisaKuota;
+          const badge = document.getElementById("badgeQuotaPresale");
+          if (badge) badge.textContent = `Tersisa ${currentPresaleQuotaRemaining} / 100 Kuota`;
+        }
+
+        setTimeout(() => {
+          paymentSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+
+      } else {
+        alert(res?.message || "Gagal mengunci kuota tiket. Silakan coba beberapa saat lagi.");
+        return;
+      }
+    } catch (err) {
+      alert("Gagal koneksi ke server saat mengunci kuota: " + err.message);
+      return;
+    } finally {
+      if (proceedBtn) proceedBtn.disabled = false;
+      if (proceedText) proceedText.textContent = "Lanjut ke Pembayaran QRIS";
+      if (proceedIcon) proceedIcon.classList.remove("hidden");
+      if (proceedSpinner) proceedSpinner.classList.add("hidden");
+      if (window.lucide) lucide.createIcons();
+    }
+  } else {
+    // Non-Presale: Buka langsung tanpa kuota hold
+    currentHoldId = null;
+    stopHoldTimer();
+    if (timerBox) timerBox.classList.add("hidden");
+    if (expiredBanner) expiredBanner.classList.add("hidden");
+    if (dropZone) dropZone.classList.remove("pointer-events-none", "opacity-50");
+    if (submitBtn) submitBtn.disabled = false;
+    if (paymentSection) paymentSection.classList.remove("hidden");
+
+    setTimeout(() => {
+      paymentSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  }
+}
+
+// ============================================================
+// 6. SUBMIT PEMESANAN (MURNI PENDING DENGAN INTEGRITAS HARGA)
 // ============================================================
 async function handleOrderSubmit(e) {
   e.preventDefault();
@@ -439,7 +650,8 @@ async function handleOrderSubmit(e) {
     jumlah: qty,
     total: total,
     fileData: selectedProofBase64,
-    namaFile: selectedProofFileName
+    namaFile: selectedProofFileName,
+    holdId: currentHoldId
   };
 
   try {
@@ -453,7 +665,17 @@ async function handleOrderSubmit(e) {
 
     const res = await response.json();
 
+    if (res && res.status === "EXPIRED") {
+      stopHoldTimer();
+      alert(res.message || "Waktu pembayaran 5 menit telah habis. Silakan ulangi pemesanan.");
+      resetPresaleHoldAndRefresh();
+      return;
+    }
+
     if (res && (res.status === "SUCCESS" || res.status === "success" || res.ticketCode)) {
+      stopHoldTimer();
+      currentHoldId = null;
+
       // Tampilkan modal status PENDING dengan data yang aman
       const elName = document.getElementById("pendingNameText");
       const elEmail = document.getElementById("pendingEmailText");
@@ -474,6 +696,7 @@ async function handleOrderSubmit(e) {
       if (dropContent) dropContent.classList.remove("hidden");
       if (previewBox) previewBox.classList.add("hidden");
 
+      resetPresaleHoldAndRefresh();
       selectTicketVariant("tiket_1hari");
       refreshTicketStock();
     } else {
