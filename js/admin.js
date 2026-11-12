@@ -468,7 +468,7 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
   }
 
   try {
-    const savedPin = sessionStorage.getItem("adminPin") || "";
+    const savedPin = sessionStorage.getItem("adminPin") || localStorage.getItem("adminPin") || "";
 
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
@@ -486,8 +486,10 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
 
     if (result && result.status === "UNAUTHORIZED") {
       sessionStorage.clear();
-      alert("Akses ditolak: PIN tidak valid atau sesi berakhir (UNAUTHORIZED).");
-      window.location.href = "index.html";
+      localStorage.removeItem("adminPin");
+      localStorage.removeItem("adminAuth");
+      showAccToast("Akses ditolak: PIN salah atau sesi berakhir.", "error");
+      checkSessionAuth();
       return;
     }
 
