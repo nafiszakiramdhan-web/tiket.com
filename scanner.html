@@ -24,7 +24,17 @@
         <span class="text-xl">📷</span>
         <h1 class="text-base font-extrabold tracking-wider text-[#FFDC17]">SCANNER GATE HETERO</h1>
       </div>
-      <a href="admin.html" class="text-xs bg-purple-950 border border-purple-600 px-3 py-1.5 rounded-lg text-purple-200 hover:text-white">Panel Admin &rarr;</a>
+      <div class="flex items-center gap-2">
+        <a href="https://wa.me/6281285589413?text=Halo%20CS%20Panitia%20Bingkai%20Bisu%202026,%20saya%20petugas%20Gate%20Scanner%20butuh%20bantuan" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="text-[11px] bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 px-2.5 py-1.5 rounded-lg text-white font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition"
+           title="Hubungi CS Panitia via WhatsApp">
+          <i class="fa-brands fa-whatsapp text-sm"></i>
+          <span>CS Panitia</span>
+        </a>
+        <a href="admin.html" class="text-xs bg-purple-950 border border-purple-600 px-3 py-1.5 rounded-lg text-purple-200 hover:text-white">Panel Admin &rarr;</a>
+      </div>
     </div>
 
     <!-- STATS COUNTER -->
@@ -62,9 +72,6 @@
 
       <!-- VIEWPORT KAMERA -->
       <div id="reader" class="bg-black/80 aspect-square flex items-center justify-center"></div>
-
-      <!-- HASIL POPUP STATUS SCAN -->
-      <div id="resultBox" class="hidden mt-3 p-3.5 rounded-xl text-center transition-all"></div>
     </div>
 
     <!-- INPUT MANUAL KODE TIKET -->
@@ -176,45 +183,108 @@
         .replace(/'/g, "&#039;");
     }
 
-    // Tampilkan Kartu Notifikasi Hasil Scan
-    function showScanResult(type, title, subtitle, merchText = "") {
-      const box = document.getElementById('resultBox');
-      box.className = "mt-3 p-3.5 rounded-xl text-center border-2 block ";
+    // Helper: Jeda & Lanjutkan Kamera Scanner
+    function pauseScanner() {
+      if (html5QrCode) {
+        try {
+          html5QrCode.pause(true, false);
+        } catch (e) {
+          console.warn("Gagal pause scanner:", e);
+        }
+      }
+    }
+
+    function resumeScanner() {
+      if (html5QrCode) {
+        try {
+          html5QrCode.resume();
+        } catch (e) {
+          console.warn("Gagal resume scanner:", e);
+        }
+      }
+    }
+
+    // Tampilkan Modal Overlay Hasil Scan
+    function showScanResult(type, title, subtitle, merchText = "", ticket = null) {
+      pauseScanner();
+
+      const modal = document.getElementById('scanResultModal');
+      const card = document.getElementById('scanResultCard');
+      const icon = document.getElementById('scanResultIcon');
+      const titleEl = document.getElementById('scanResultTitle');
+      const namaEl = document.getElementById('scanResultNama');
+      const varianEl = document.getElementById('scanResultVarian');
+      const kodeEl = document.getElementById('scanResultKode');
+      const merchContainer = document.getElementById('scanResultMerchContainer');
+      const merchTextEl = document.getElementById('scanResultMerchText');
+      const extraContainer = document.getElementById('scanResultExtraContainer');
+      const extraTextEl = document.getElementById('scanResultExtraText');
+      const btnDismiss = document.getElementById('btnDismissScanModal');
 
       const safeTitle = escapeHtml(title);
       const safeSubtitle = escapeHtml(subtitle);
       const safeMerch = escapeHtml(merchText);
 
-      if (type === "success") {
-        playBeep(true);
-        box.className += "bg-emerald-950/90 border-emerald-400 text-white";
-        box.innerHTML = `
-          <div class="text-2xl mb-1">✅</div>
-          <h3 class="text-sm font-black text-emerald-300 uppercase">${safeTitle}</h3>
-          <p class="text-xs font-bold text-white mt-1">${safeSubtitle}</p>
-          ${safeMerch ? `<div class="mt-2.5 p-2 bg-yellow-400 text-purple-950 font-black text-[11px] rounded-lg tracking-wider">🎁 KLAIM SOUVENIR: ${safeMerch}</div>` : ''}
-        `;
-      } else if (type === "warning") {
-        playBeep(false);
-        box.className += "bg-amber-950/90 border-amber-400 text-amber-200";
-        box.innerHTML = `
-          <div class="text-2xl mb-1">⚠️</div>
-          <h3 class="text-sm font-black uppercase">${safeTitle}</h3>
-          <p class="text-xs mt-1 text-white">${safeSubtitle}</p>
-        `;
+      // Data Pemesan & Tiket
+      if (ticket) {
+        namaEl.innerText = ticket.nama || "-";
+        varianEl.innerText = ticket.varian || "-";
+        kodeEl.innerText = ticket.kodeTiket || "-";
       } else {
-        playBeep(false);
-        box.className += "bg-rose-950/90 border-rose-500 text-rose-200";
-        box.innerHTML = `
-          <div class="text-2xl mb-1">❌</div>
-          <h3 class="text-sm font-black uppercase">${safeTitle}</h3>
-          <p class="text-xs mt-1 text-white">${safeSubtitle}</p>
-        `;
+        namaEl.innerText = safeSubtitle || "-";
+        varianEl.innerText = "-";
+        kodeEl.innerText = "-";
       }
 
-      setTimeout(() => {
-        isProcessing = false;
-      }, 3000);
+      // Merchandise
+      if (safeMerch) {
+        merchTextEl.innerText = safeMerch;
+        merchContainer.classList.remove('hidden');
+      } else {
+        merchContainer.classList.add('hidden');
+      }
+
+      // Reset base card styling
+      card.className = "w-full max-w-sm rounded-2xl p-6 text-center border-2 shadow-2xl relative transition-all";
+
+      if (type === "success") {
+        playBeep(true);
+        icon.innerText = "✅";
+        titleEl.innerText = safeTitle || "CHECK-IN BERHASIL";
+        titleEl.className = "text-base font-black uppercase tracking-wider mb-3 text-emerald-400";
+        card.classList.add("bg-[#0f2419]", "border-emerald-400", "shadow-emerald-500/20");
+        extraContainer.classList.add("hidden");
+        btnDismiss.className = "w-full py-3.5 px-4 rounded-xl font-black text-sm uppercase tracking-wider bg-emerald-400 hover:bg-emerald-300 text-[#092215] shadow-lg active:scale-95 transition cursor-pointer flex items-center justify-center gap-2";
+      } else if (type === "warning") {
+        playBeep(false);
+        icon.innerText = "⚠️";
+        titleEl.innerText = safeTitle || "PERINGATAN";
+        titleEl.className = "text-base font-black uppercase tracking-wider mb-3 text-amber-400";
+        card.classList.add("bg-[#261904]", "border-amber-400", "shadow-amber-500/20");
+        extraTextEl.innerText = safeSubtitle;
+        extraContainer.classList.remove("hidden");
+        btnDismiss.className = "w-full py-3.5 px-4 rounded-xl font-black text-sm uppercase tracking-wider bg-amber-400 hover:bg-amber-300 text-[#261904] shadow-lg active:scale-95 transition cursor-pointer flex items-center justify-center gap-2";
+      } else {
+        playBeep(false);
+        icon.innerText = "❌";
+        titleEl.innerText = safeTitle || "CHECK-IN GAGAL";
+        titleEl.className = "text-base font-black uppercase tracking-wider mb-3 text-rose-400";
+        card.classList.add("bg-[#290812]", "border-rose-500", "shadow-rose-500/20");
+        extraTextEl.innerText = safeSubtitle;
+        extraContainer.classList.remove("hidden");
+        btnDismiss.className = "w-full py-3.5 px-4 rounded-xl font-black text-sm uppercase tracking-wider bg-rose-500 hover:bg-rose-400 text-white shadow-lg active:scale-95 transition cursor-pointer flex items-center justify-center gap-2";
+      }
+
+      if (modal) modal.classList.remove('hidden');
+      if (btnDismiss) btnDismiss.focus();
+    }
+
+    // Tutup Modal & Lanjutkan Kamera Scanner
+    function dismissScanResultModal() {
+      const modal = document.getElementById('scanResultModal');
+      if (modal) modal.classList.add('hidden');
+      isProcessing = false;
+      resumeScanner();
     }
 
     // ============================================================
@@ -378,7 +448,8 @@
       // ALUR TIKET 2 HARI
       if (isTwoDay) {
         if (statusCheckin === "BELUM MASUK" || statusCheckin === "" || statusCheckin === "-" || statusCheckin.includes("BELUM")) {
-          ticket.checkin = "MASUK (HARI 1)";
+          pauseScanner();
+          ticket.checkin = "Sudah digunakan hari ini";
           ticket.waktuScan = nowWib;
           ticket.needsUpload = true;
           ticket.uploaded = false;
@@ -386,9 +457,23 @@
           localStorage.setItem('offline_tickets', JSON.stringify(db));
           refreshStatsUI();
           const merch = ticket.merch && ticket.merch.ada ? ticket.merch.textScanner : "";
-          showScanResult("success", "CHECK-IN HARI 1 BERHASIL", `${ticket.nama} • ${ticket.varian}`, merch);
+          showScanResult("success", "Sudah digunakan hari ini, bisa digunakan besok lagi!", `${ticket.nama} • ${ticket.varian}`, merch, ticket);
           return;
-        } else if (statusCheckin.includes("HARI 1") && !statusCheckin.includes("SELESAI") && !statusCheckin.includes("HARI 2")) {
+        } else if (statusCheckin.includes("HARI INI") || statusCheckin.includes("HARI 1")) {
+          // Proteksi jika tiket sudah dipakai hari ini agar tidak terpotong Hari 2 secara tidak sengaja
+          const todayDateStr = new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' });
+          const lastScanDate = (ticket.waktuScan || "").split(',')[0].trim();
+          const isSameDayScan = lastScanDate && lastScanDate === todayDateStr;
+
+          if (isSameDayScan) {
+            const allowDay2 = confirm(`⚠️ Tiket ini SUDAH DIGUNAKAN HARI INI (${ticket.waktuScan}).\n\nKlik OK jika ingin memproses Check-In untuk HARI 2 sekarang,\natau Cancel jika tiket baru dipakai hari pertama.`);
+            if (!allowDay2) {
+              showScanResult("warning", "Sudah digunakan hari ini, bisa digunakan besok lagi!", `Tiket ${ticket.nama} sudah check-in hari ini (${ticket.waktuScan}).`, "", ticket);
+              return;
+            }
+          }
+
+          pauseScanner();
           ticket.checkin = "SELESAI (HARI 2)";
           ticket.waktuScan = nowWib;
           ticket.needsUpload = true;
@@ -396,10 +481,10 @@
           db[localIndex] = ticket;
           localStorage.setItem('offline_tickets', JSON.stringify(db));
           refreshStatsUI();
-          showScanResult("success", "CHECK-IN HARI 2 BERHASIL", `${ticket.nama} • ${ticket.varian}`);
+          showScanResult("success", "CHECK-IN HARI 2 BERHASIL (SELESAI)", `${ticket.nama} • ${ticket.varian}`, "", ticket);
           return;
         } else {
-          showScanResult("warning", "TIKET 2 HARI TELAH SELESAI", `Tiket ${ticket.nama} sudah dipakai di kedua hari.`);
+          showScanResult("warning", "TIKET 2 HARI TELAH SELESAI", `Tiket ${ticket.nama} sudah dipakai di kedua hari.`, "", ticket);
           return;
         }
       }
@@ -413,11 +498,12 @@
 
       if (isAlreadyUsed) {
         const waktuInfo = ticket.waktuScan && ticket.waktuScan !== "-" ? ` (Scan: ${ticket.waktuScan})` : "";
-        showScanResult("error", "TIKET SUDAH PERNAH DIGUNAKAN!", `Atas Nama: ${ticket.nama} • ${ticket.varian}${waktuInfo}`);
+        showScanResult("error", "TIKET SUDAH PERNAH DIGUNAKAN!", `Tiket sudah pernah check-in.${waktuInfo}`, "", ticket);
         return;
       }
 
       // CHECK-IN SUKSES
+      pauseScanner();
       ticket.checkin = "SUDAH MASUK";
       ticket.waktuScan = nowWib;
       ticket.needsUpload = true;
@@ -426,7 +512,7 @@
       localStorage.setItem('offline_tickets', JSON.stringify(db));
       refreshStatsUI();
       const merch = ticket.merch && ticket.merch.ada ? ticket.merch.textScanner : "";
-      showScanResult("success", "CHECK-IN BERHASIL!", `${ticket.nama} • ${ticket.varian}`, merch);
+      showScanResult("success", "CHECK-IN BERHASIL!", `${ticket.nama} • ${ticket.varian}`, merch, ticket);
     }
 
     // Inisialisasi Kamera HTML5-QRCode
@@ -479,12 +565,39 @@
     document.getElementById('btnSyncDb').addEventListener('click', syncDatabase);
     document.getElementById('btnUploadScans').addEventListener('click', uploadScansToCloud);
 
-    document.getElementById('btnManualCheck').addEventListener('click', () => {
-      const input = document.getElementById('manualCodeInput');
-      if (input.value.trim()) {
-        verifyTicketCode(input.value.trim());
+    // Tombol OKE / SELANJUTNYA pada Modal Hasil Scan
+    document.getElementById('btnDismissScanModal').addEventListener('click', dismissScanResultModal);
+
+    // Keyboard shortcut (Enter / Spasi / Escape) untuk menutup modal konfirmasi
+    window.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('scanResultModal');
+      if (modal && !modal.classList.contains('hidden')) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+          e.preventDefault();
+          dismissScanResultModal();
+        }
       }
     });
+
+    const manualInput = document.getElementById('manualCodeInput');
+    document.getElementById('btnManualCheck').addEventListener('click', () => {
+      if (manualInput && manualInput.value.trim()) {
+        verifyTicketCode(manualInput.value.trim());
+        manualInput.value = "";
+      }
+    });
+
+    if (manualInput) {
+      manualInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (manualInput.value.trim()) {
+            verifyTicketCode(manualInput.value.trim());
+            manualInput.value = "";
+          }
+        }
+      });
+    }
 
     window.addEventListener('online', () => {
       document.getElementById('netStatus').innerText = "● ONLINE";
@@ -501,5 +614,59 @@
       initCamera();
     });
   </script>
+
+  <!-- MODAL / OVERLAY HASIL SCAN (MENUTUP KAMERA / VIEWPORT HINGGA DIKONFIRMASI PANITIA) -->
+  <div id="scanResultModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 transition-all">
+    <div id="scanResultCard" class="w-full max-w-sm rounded-2xl p-6 text-center border-2 shadow-2xl relative transition-all">
+      <!-- Status Icon & Title -->
+      <div id="scanResultIcon" class="text-4xl mb-2">✅</div>
+      <h3 id="scanResultTitle" class="text-base font-black uppercase tracking-wider mb-3">CHECK-IN BERHASIL</h3>
+      
+      <!-- Detail Container -->
+      <div class="bg-purple-950/80 border border-purple-800/80 rounded-xl p-4 text-left space-y-2.5 mb-5 text-xs">
+        <div>
+          <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Nama Pemesan</span>
+          <p id="scanResultNama" class="font-bold text-white text-sm truncate">-</p>
+        </div>
+        <div class="border-t border-purple-800/60 pt-2 flex justify-between items-center">
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Kategori Tiket</span>
+            <p id="scanResultVarian" class="font-semibold text-yellow-300">-</p>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Kode Tiket</span>
+            <p id="scanResultKode" class="font-mono font-bold text-slate-200 text-xs">-</p>
+          </div>
+        </div>
+        <!-- Info Merchandise jika ada -->
+        <div id="scanResultMerchContainer" class="hidden border-t border-purple-800/60 pt-2">
+          <span class="text-[10px] text-amber-400 uppercase font-black tracking-wider block">🎁 Info Merchandise / Souvenir</span>
+          <div id="scanResultMerchText" class="mt-1.5 p-2.5 bg-yellow-400 text-purple-950 font-black text-xs rounded-lg text-center tracking-wide shadow-sm">
+            -
+          </div>
+        </div>
+        <!-- Extra info (pesan error / status scan) -->
+        <div id="scanResultExtraContainer" class="hidden border-t border-purple-800/60 pt-2 text-[11px] text-slate-300 text-center">
+          <p id="scanResultExtraText">-</p>
+        </div>
+      </div>
+
+      <!-- Action Button OKE / SELANJUTNYA -->
+      <button id="btnDismissScanModal" type="button" class="w-full py-3.5 px-4 rounded-xl font-black text-sm uppercase tracking-wider bg-[#FFDC17] hover:bg-yellow-400 text-[#1A0536] shadow-lg active:scale-95 transition cursor-pointer flex items-center justify-center gap-2">
+        <span>OKE / SELANJUTNYA</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- TOMBOL FLOATING CS WHATSAPP (MUDAH DIAKSES) -->
+  <a href="https://wa.me/6281285589413?text=Halo%20CS%20Panitia%20Bingkai%20Bisu%202026,%20saya%20petugas%20Gate%20Scanner%20butuh%20bantuan"
+     target="_blank"
+     rel="noopener noreferrer"
+     class="fixed bottom-5 right-5 z-40 bg-emerald-600 hover:bg-emerald-500 text-white p-3 sm:px-4 sm:py-2.5 rounded-full shadow-2xl flex items-center gap-2 font-bold text-xs active:scale-95 transition-all border-2 border-emerald-300"
+     title="Hubungi Customer Service WhatsApp Panitia">
+    <i class="fa-brands fa-whatsapp text-xl"></i>
+    <span class="hidden sm:inline">CS Panitia</span>
+  </a>
 </body>
 </html>
