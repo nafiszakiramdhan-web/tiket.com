@@ -555,9 +555,9 @@ function hideAccToast() {
 }
 
 // ============================================================
-// 8. MODAL PRATINJAU BUKTI PEMBAYARAN
+// 8. MODAL PRATINJAU BUKTI PEMBAYARAN (ENDPOINT TEROTENTIKASI PIN)
 // ============================================================
-function openReceiptModal(idx) {
+async function openReceiptModal(idx) {
   const list = currentTab === "pending" ? pendingOrdersList : approvedOrdersList;
   const item = list[idx];
   if (!item) return;
@@ -572,23 +572,6 @@ function openReceiptModal(idx) {
   const accBtn = document.getElementById("btnModalAcc");
   const buktiUrl = item.linkBukti || item.fileUrl || "";
 
-  if (openBtn) openBtn.href = buktiUrl || "#";
-
-  if (img && fallback) {
-    if (buktiUrl && buktiUrl !== "-") {
-      img.src = buktiUrl;
-      img.classList.remove("hidden");
-      fallback.classList.add("hidden");
-      img.onerror = () => {
-        img.classList.add("hidden");
-        fallback.classList.remove("hidden");
-      };
-    } else {
-      img.classList.add("hidden");
-      fallback.classList.remove("hidden");
-    }
-  }
-
   if (accBtn) {
     if (currentTab === "approved" || (item.statusBayar || "").toUpperCase() === "APPROVED") {
       accBtn.classList.add("hidden");
@@ -602,7 +585,75 @@ function openReceiptModal(idx) {
 
   const modal = document.getElementById("receiptModal");
   if (modal) modal.classList.remove("hidden");
+
+  // Tampilkan indikator loading saat memuat bukti Base64 secara terotentikasi
+  if (img && fallback) {
+    img.src = "";
+    img.classList.add("hidden");
+    fallback.classList.remove("hidden");
+    fallback.innerHTML = `
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#FFDC17] border-t-transparent mb-2"></div>
+      <p class="text-xs text-[#E2D9F3]">Mengambil bukti transfer secara aman dari server...</p>
+    `;
+  }
   if (window.lucide) lucide.createIcons();
+
+  if (!buktiUrl || buktiUrl === "-") {
+    if (fallback) {
+      fallback.innerHTML = `
+        <i data-lucide="image-off" class="w-8 h-8 mx-auto text-[#FFDC17]/60"></i>
+        <p class="text-xs text-slate-300 mt-2">Tidak ada berkas bukti pembayaran terlampir.</p>
+      `;
+      if (window.lucide) lucide.createIcons();
+    }
+    return;
+  }
+
+  const savedPin = (sessionStorage.getItem("adminPin") || "").trim();
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "cors",
+      redirect: "follow",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "admin_get_proof",
+        pin: savedPin,
+        fileId: buktiUrl,
+        rowIndex: item.rowIndex
+      })
+    });
+
+    const res = await response.json();
+
+    if (res && res.status === "SUCCESS" && res.dataUrl) {
+      if (img && fallback) {
+        img.src = res.dataUrl;
+        img.classList.remove("hidden");
+        fallback.classList.add("hidden");
+      }
+      if (openBtn) {
+        openBtn.href = res.dataUrl;
+      }
+    } else {
+      if (fallback) {
+        fallback.innerHTML = `
+          <i data-lucide="image-off" class="w-8 h-8 mx-auto text-[#FFDC17]/60"></i>
+          <p class="text-xs text-slate-300 mt-2">${escapeHtml(res.message || "Gagal memuat bukti pembayaran.")}</p>
+        `;
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+  } catch (err) {
+    if (fallback) {
+      fallback.innerHTML = `
+        <i data-lucide="alert-circle" class="w-8 h-8 mx-auto text-red-400"></i>
+        <p class="text-xs text-red-300 mt-2">Kendala jaringan saat memuat gambar: ${escapeHtml(err.message || err)}</p>
+      `;
+      if (window.lucide) lucide.createIcons();
+    }
+  }
 }
 
 function closeReceiptModal() {
