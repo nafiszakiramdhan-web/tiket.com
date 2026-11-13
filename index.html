@@ -142,28 +142,12 @@
           </p>
         </div>
 
-        <!-- POSTER UTAMA MOBILE (Tampil di atas rincian Lokasi & Waktu pada tampilan HP) -->
-        <div class="block lg:hidden w-full my-2">
-          <div class="w-full max-h-[380px] rounded-2xl overflow-hidden border-2 border-[#FFDC17]/40 shadow-glow-plum relative group bg-[#16032B] flex items-center justify-center p-2">
-            <img 
-              src="assets/banner.webp" 
-              onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop'" 
-              alt="Official Poster Pameran Foto Bingkai Bisu 2026"
-              class="w-full h-auto max-h-[360px] object-contain object-top rounded-xl" 
-            />
-            <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-[#E2D9F3] bg-[#1A0536]/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-[#FFDC17]/30 select-none shadow">
-              <span class="font-mono text-[#FFDC17] font-bold text-[11px]">✦ #bingkaibisu2026</span>
-              <span class="font-serif italic text-[11px]">Hetero Space Banyumas</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Editorial Subtitle (EB Garamond Italic) -->
-        <p class="font-editorial italic text-base sm:text-lg text-[#E2D9F3] leading-relaxed max-w-2xl border-l-2 border-[#FFDC17]/60 pl-4">
-          "Menyuarakan kedalaman narasi yang kerap tenggelam dalam kesenyapan, terbingkai secara jujur lewat mata lensa kuratorial pewarta."
+        <!-- Slogan Singkat Artistik & Tegas -->
+        <p class="font-editorial italic text-base sm:text-xl text-[#FFDC17] leading-relaxed max-w-2xl border-l-2 border-[#FFDC17] pl-4 py-1">
+          "Setiap bingkai adalah foto sisi sejarah dan menolak sunyi."
         </p>
 
-        <!-- BANNER / BADGE HARGA MENONJOL (Di bawah judul, tepat di atas kotak Lokasi/Waktu) -->
+        <!-- BANNER / BADGE HARGA MENONJOL (Di bawah slogan, tepat di atas poster mobile & kotak Lokasi/Waktu) -->
         <div class="flex items-center justify-between flex-wrap gap-3 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#FFDC17]/20 via-[#240847] to-[#FFDC17]/10 border-2 border-[#FFDC17]/50 shadow-glow-gold">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-[#FFDC17] text-[#240638] flex items-center justify-center font-bold text-lg shadow-md flex-shrink-0">
@@ -186,6 +170,22 @@
             <span>PILIH TIKET</span>
             <span class="text-sm font-bold">↓</span>
           </button>
+        </div>
+
+        <!-- POSTER UTAMA MOBILE (Tampil sebelum rincian Venue & Waktu pada tampilan HP) -->
+        <div class="block lg:hidden w-full my-2">
+          <div class="w-full max-h-[380px] rounded-2xl overflow-hidden border-2 border-[#FFDC17]/40 shadow-glow-plum relative group bg-[#16032B] flex items-center justify-center p-2">
+            <img 
+              src="assets/banner.webp" 
+              onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop'" 
+              alt="Official Poster Pameran Foto Bingkai Bisu 2026"
+              class="w-full h-auto max-h-[360px] object-contain object-top rounded-xl" 
+            />
+            <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-[#E2D9F3] bg-[#1A0536]/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-[#FFDC17]/30 select-none shadow">
+              <span class="font-mono text-[#FFDC17] font-bold text-[11px]">✦ #bingkaibisu2026</span>
+              <span class="font-serif italic text-[11px]">Hetero Space Banyumas</span>
+            </div>
+          </div>
         </div>
 
         <!-- Metadata Grid: Lokasi & Waktu -->
@@ -274,7 +274,7 @@
         </div>
 
         <!-- Touch-Swipeable Tabs Container (Mendukung Geser Kiri-Kanan di HP) -->
-        <div id="tabsSwipeContainer" class="space-y-6 pt-1">
+        <div id="tabsSwipeContainer" class="space-y-6 pt-1" style="touch-action: pan-y;">
 
         <!-- ==================== TAB 01: PILIH TIKET & CHECKOUT ==================== -->
         <div id="tabContentTiket" class="space-y-6">
@@ -766,12 +766,19 @@
               </h2>
             </div>
             
-            <p class="font-sans text-[#E2D9F3] text-sm sm:text-base leading-relaxed">
-              Pameran Foto Jurnalistik <strong class="text-white">"Bingkai Bisu"</strong> merupakan panggung kuratorial utama yang diselenggarakan oleh Komunitas Fixlens Fotografi 2026. Menghadirkan arsip dan jepretan visual jujur, pameran ini menyingkap realitas sosial, isu humaniora, dan dinamika akar rumput yang kerap luput dari perbincangan publik.
-            </p>
+            <!-- Narasi Filosofi Lengkap Pameran -->
+            <div class="space-y-4 font-sans text-[#E2D9F3] text-sm sm:text-base leading-relaxed">
+              <p>
+                <strong class="text-[#FFDC17] font-serif text-lg sm:text-xl font-bold">“Bingkai Bisu”</strong>, Kata <strong class="text-white font-semibold">bingkai</strong> dimaknai sebagai sudut pandang dalam melihat dan menggambarkan suatu peristiwa, sedangkan <strong class="text-white font-semibold">bisu</strong> merepresentasikan suara, fakta, atau persoalan yang belum tersampaikan dan belum mendapatkan perhatian yang semestinya.
+              </p>
+              
+              <p>
+                Melalui kegiatan ini, jurnalistik dipandang tidak hanya sebagai sarana penyampaian informasi, tetapi juga sebagai media untuk mengungkap realitas, menyuarakan aspirasi, serta mengangkat kisah-kisah di balik berbagai peristiwa. Setiap peristiwa memiliki cerita yang perlu didengar, setiap persoalan memiliki fakta yang perlu diungkap, dan setiap sudut kehidupan memiliki makna yang layak untuk diberitakan.
+              </p>
+            </div>
 
-            <blockquote class="font-editorial italic text-base sm:text-lg text-[#FFDC17] leading-relaxed border-l-2 border-[#FFDC17] pl-4 py-1 my-3 bg-[#14032B]/50 rounded-r-xl">
-              "Setiap bingkai foto adalah saksi sejarah yang menolak sunyi, merawat ingatan kolektif melalui kejujuran mata lensa dan ketajaman rasa."
+            <blockquote class="font-editorial italic text-base sm:text-lg text-[#FFDC17] leading-relaxed border-l-2 border-[#FFDC17] pl-4 py-2 my-3 bg-[#14032B]/60 rounded-r-xl">
+              "Setiap bingkai adalah foto sisi sejarah dan menolak sunyi."
             </blockquote>
 
             <!-- 3 Sorotan Program -->

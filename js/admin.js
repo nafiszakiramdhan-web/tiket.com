@@ -611,10 +611,49 @@ function closeReceiptModal() {
 }
 
 // ============================================================
-// 9. MODAL SCANNER KAMERA GATE
+// 9. MODAL SCANNER KAMERA GATE & OVERLAY RINCIAN LENGKAP
 // ============================================================
+let isAdminScanLocked = false;
+
+function getMerchFromVariant(variantName) {
+  const v = (variantName || "").toLowerCase();
+  if (v.includes("stiker") && (v.includes("ganci") || v.includes("presale"))) {
+    return {
+      ada: true,
+      text: "Free Stiker Vinyl + Gantungan Kunci Akrilik",
+      textScanner: "1x Official Stiker + 1x Ganci Akrilik",
+      badge: "STIKER & GANCI"
+    };
+  } else if (v.includes("stiker")) {
+    return {
+      ada: true,
+      text: "Free Official Stiker Vinyl",
+      textScanner: "1x Official Vinyl Sticker",
+      badge: "FREE STIKER"
+    };
+  }
+  return {
+    ada: false,
+    text: "Tanpa Merchandise Fisik",
+    textScanner: "Tanpa Merchandise",
+    badge: "REGULER"
+  };
+}
+
+function formatKodeTiket(code) {
+  if (!code) return "#BB26-XXXX";
+  const c = code.toString().trim().toUpperCase();
+  if (c.startsWith("#")) return c;
+  if (c.startsWith("BB26-")) return "#" + c;
+  return "#BB26-" + c.replace(/^BB26-?/, "");
+}
+
 function openAdminScannerModal() {
   const modal = document.getElementById("adminScannerModal");
+  const overlay = document.getElementById("adminScanDetailOverlay");
+  if (overlay) overlay.classList.add("hidden");
+  isAdminScanLocked = false;
+
   if (modal) modal.classList.remove("hidden");
   startAdminQrScanner();
   if (window.lucide) lucide.createIcons();
@@ -622,12 +661,35 @@ function openAdminScannerModal() {
 
 function closeAdminScannerModal() {
   const modal = document.getElementById("adminScannerModal");
+  const overlay = document.getElementById("adminScanDetailOverlay");
+  if (overlay) overlay.classList.add("hidden");
   if (modal) modal.classList.add("hidden");
+  isAdminScanLocked = false;
+
   if (html5QrScanner) {
     html5QrScanner.stop().catch(() => {}).finally(() => {
       html5QrScanner = null;
     });
   }
+}
+
+function resumeAdminScanner() {
+  const overlay = document.getElementById("adminScanDetailOverlay");
+  if (overlay) overlay.classList.add("hidden");
+
+  const box = document.getElementById("adminScanResultBox");
+  if (box) {
+    box.innerHTML = `Arahkan kamera ke QR Code E-Ticket pengunjung`;
+  }
+
+  if (html5QrScanner) {
+    try {
+      html5QrScanner.resume();
+    } catch (e) {
+      console.warn("Gagal resume scanner:", e);
+    }
+  }
+  isAdminScanLocked = false;
 }
 
 function startAdminQrScanner() {
@@ -637,6 +699,18 @@ function startAdminQrScanner() {
     { facingMode: "environment" },
     { fps: 10, qrbox: { width: 250, height: 250 } },
     (decodedText) => {
+      // KUNCI DAN JEDA KAMERA SEKETIKA AGAR TIDAK SCAN GANDA DALAM MILIDETIK
+      if (isAdminScanLocked) return;
+      isAdminScanLocked = true;
+
+      if (html5QrScanner) {
+        try {
+          html5QrScanner.pause(true, false);
+        } catch (e) {
+          console.warn("Gagal pause scanner:", e);
+        }
+      }
+
       const box = document.getElementById("adminScanResultBox");
       if (box) {
         box.innerHTML = `
@@ -654,6 +728,12 @@ function startAdminQrScanner() {
 }
 
 async function validateScannedTicket(code) {
+  const cleanCode = (code || "").replace(/[^A-Z0-9]/g, "").toUpperCase();
+  const local = approvedOrdersList.find(t => {
+    const tc = (t.kodeTiket || t.ticketCode || "").replace(/[^A-Z0-9]/g, "").toUpperCase();
+    return tc === cleanCode || (cleanCode && tc.replace(/^BB26/, "") === cleanCode.replace(/^BB26/, ""));
+  });
+
   try {
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
@@ -663,34 +743,110 @@ async function validateScannedTicket(code) {
       body: JSON.stringify({ action: "scan_ticket", kodeTiket: code })
     });
     const res = await response.json();
-    const box = document.getElementById("adminScanResultBox");
-    if (!box) return;
 
-    if (res && res.status === "SUCCESS") {
-      const scannedNama = escapeHtml(res.data ? (res.data.nama || "-") : "-");
-      const scannedVarian = escapeHtml(res.data ? (res.data.varian || "Tiket") : "Tiket");
-      box.innerHTML = `
-        <div class="p-2 rounded-lg bg-emerald-950/70 text-emerald-300 font-bold">
-          ✓ TIKET VALID: ${scannedNama} (${scannedVarian})
-        </div>
-      `;
-    } else if (res && (res.status === "ALREADY_CHECKED_IN" || res.status === "ALREADY_USED")) {
-      box.innerHTML = `
-        <div class="p-2 rounded-lg bg-amber-950/70 text-amber-300 font-bold">
-          ⚠️ TIKET SUDAH PERNAH DIGUNAKAN
-        </div>
-      `;
+    const overlay = document.getElementById("adminScanDetailOverlay");
+    const iconEl = document.getElementById("adminScanIcon");
+    const titleEl = document.getElementById("adminScanTitle");
+    const subtitleEl = document.getElementById("adminScanSubtitle");
+    const kodeEl = document.getElementById("adminScanKode");
+    const namaEl = document.getElementById("adminScanNama");
+    const contactEl = document.getElementById("adminScanContact");
+    const qtyEl = document.getElementById("adminScanQty");
+    const varianEl = document.getElementById("adminScanVarian");
+    const souvenirContent = document.getElementById("adminScanSouvenirContent");
+    const souvenirIcon = document.getElementById("adminScanSouvenirIcon");
+    const souvenirText = document.getElementById("adminScanSouvenirText");
+
+    const attendeeName = local ? local.nama : (res ? (res.nama || "-") : "-");
+    const contactInfo = local ? (local.wa || local.email || "-") : "-";
+    const qtyVal = local ? (local.jumlah || 1) : 1;
+    const ticketVarian = local ? (local.varian || local.paket || "-") : (res ? (res.varian || res.pass || "Tiket Festival") : "Tiket Festival");
+    const displayKode = formatKodeTiket(local ? local.kodeTiket : code);
+
+    if (kodeEl) kodeEl.textContent = displayKode;
+    if (namaEl) namaEl.textContent = attendeeName;
+    if (contactEl) contactEl.textContent = contactInfo;
+    if (qtyEl) qtyEl.textContent = `${qtyVal} Orang`;
+    if (varianEl) varianEl.textContent = ticketVarian;
+
+    // Evaluasi Hak Souvenir
+    const merch = (res && res.merch && res.merch.ada) ? res.merch : getMerchFromVariant(ticketVarian);
+    if (merch && merch.ada) {
+      if (souvenirContent) {
+        souvenirContent.className = "p-3 rounded-xl bg-yellow-400 text-[#240638] font-black text-xs text-center tracking-wide shadow-md flex items-center justify-center gap-1.5";
+      }
+      if (souvenirIcon) souvenirIcon.textContent = "🎁";
+      if (souvenirText) souvenirText.textContent = `BERIKAN SOUVENIR KE CUSTOMER: ${merch.textScanner || merch.text}`;
     } else {
-      box.innerHTML = `
-        <div class="p-2 rounded-lg bg-red-950/70 text-red-300 font-bold">
-          ❌ TIKET TIDAK VALID
-        </div>
-      `;
+      if (souvenirContent) {
+        souvenirContent.className = "p-2.5 rounded-xl bg-slate-800/80 text-slate-300 font-bold text-xs text-center tracking-wide flex items-center justify-center gap-1.5";
+      }
+      if (souvenirIcon) souvenirIcon.textContent = "ℹ️";
+      if (souvenirText) souvenirText.textContent = "Tanpa Souvenir";
     }
+
+    if (overlay) {
+      overlay.classList.remove("border-emerald-500", "border-amber-500", "border-red-500");
+
+      if (res && res.status === "SUCCESS") {
+        const isDay1 = res.message && (res.message.includes("hari ini") || res.message.includes("besok"));
+        if (iconEl) iconEl.textContent = "✅";
+        if (titleEl) {
+          titleEl.textContent = isDay1
+            ? "✅ VALID HARI KE-1 (Sudah digunakan hari ini, bisa digunakan besok lagi!)"
+            : "✅ TIKET VALID - SILAKAN MASUK";
+        }
+        if (subtitleEl) subtitleEl.textContent = res.message || "Check-in gate berhasil dikonfirmasi.";
+        overlay.classList.add("border-emerald-500");
+
+        if (local) {
+          local.statusCheckin = isDay1 ? "Sudah digunakan hari ini" : "SUDAH MASUK";
+          local.waktuScan = res.waktu || new Date().toLocaleString();
+        }
+      } else if (res && (res.status === "ALREADY_CHECKED_IN" || res.status === "ALREADY_USED")) {
+        if (iconEl) iconEl.textContent = "⚠️";
+        if (titleEl) titleEl.textContent = "⚠️ TIKET SUDAH DIGUNAKAN";
+        if (subtitleEl) subtitleEl.textContent = res.message || "Tiket ini telah dipakai untuk check-in sebelumnya.";
+        overlay.classList.add("border-amber-500");
+      } else {
+        if (iconEl) iconEl.textContent = "❌";
+        if (titleEl) titleEl.textContent = "❌ TIKET TIDAK VALID / TIDAK DITEMUKAN";
+        if (subtitleEl) subtitleEl.textContent = (res && res.message) ? res.message : "Data tiket tidak ditemukan di sistem.";
+        overlay.classList.add("border-red-500");
+      }
+
+      overlay.classList.remove("hidden");
+    }
+
+    if (window.lucide) lucide.createIcons();
   } catch (err) {
     console.error("Scan error:", err);
+    const overlay = document.getElementById("adminScanDetailOverlay");
+    const iconEl = document.getElementById("adminScanIcon");
+    const titleEl = document.getElementById("adminScanTitle");
+    const subtitleEl = document.getElementById("adminScanSubtitle");
+
+    if (overlay) {
+      overlay.classList.remove("border-emerald-500", "border-amber-500");
+      overlay.classList.add("border-red-500");
+      if (iconEl) iconEl.textContent = "❌";
+      if (titleEl) titleEl.textContent = "❌ GAGAL MEMERIKSA TIKET";
+      if (subtitleEl) subtitleEl.textContent = "Koneksi ke server bermasalah: " + (err.message || err);
+      overlay.classList.remove("hidden");
+    }
   }
 }
+
+// Shortcut Keyboard untuk menutup overlay scanner
+window.addEventListener("keydown", (e) => {
+  const overlay = document.getElementById("adminScanDetailOverlay");
+  if (overlay && !overlay.classList.contains("hidden")) {
+    if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
+      e.preventDefault();
+      resumeAdminScanner();
+    }
+  }
+});
 
 // ============================================================
 // INISIALISASI

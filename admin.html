@@ -423,14 +423,87 @@
   </div>
 
 
-  <!-- ==================== MODAL GATE SCANNER (INTEGRASI KAMERA) ==================== -->
+  <!-- ==================== MODAL GATE SCANNER (INTEGRASI KAMERA & OVERLAY RINCIAN LENGKAP) ==================== -->
   <div 
     id="adminScannerModal" 
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden transition-all duration-300"
     role="dialog"
     aria-modal="true"
   >
-    <div class="w-full max-w-md bg-[#2A0859] border-2 border-[#FFDC17] rounded-3xl p-6 sm:p-7 shadow-glow-yellow space-y-4 relative">
+    <div class="w-full max-w-md bg-[#2A0859] border-2 border-[#FFDC17] rounded-3xl p-6 sm:p-7 shadow-glow-yellow space-y-4 relative overflow-hidden">
+      
+      <!-- OVERLAY HASIL SCAN RINCIAN LENGKAP (SAMA SEPERTI PWA SCANNER) -->
+      <div 
+        id="adminScanDetailOverlay" 
+        class="hidden absolute inset-0 z-20 bg-[#1A0536]/95 backdrop-blur-md rounded-3xl p-6 sm:p-7 flex flex-col justify-between border-2 border-emerald-500 shadow-2xl transition-all duration-300 overflow-y-auto"
+      >
+        <div class="space-y-3.5">
+          <!-- Status Icon & Title -->
+          <div class="text-center space-y-1">
+            <div id="adminScanIcon" class="text-4xl">✅</div>
+            <h4 id="adminScanTitle" class="text-base sm:text-lg font-black uppercase tracking-wider text-white">
+              TIKET VALID - SILAKAN MASUK
+            </h4>
+            <p id="adminScanSubtitle" class="text-xs text-[#E2D9F3] font-sans">
+              Check-in gate berhasil dikonfirmasi
+            </p>
+          </div>
+
+          <!-- Rincian Tiket Card -->
+          <div class="bg-[#240847] border border-[#FFDC17]/30 rounded-2xl p-4 text-left space-y-2.5 text-xs shadow-inner">
+            <!-- Kode Tiket -->
+            <div class="flex items-center justify-between border-b border-[#FFDC17]/20 pb-2">
+              <span class="text-[10px] text-slate-400 uppercase font-mono font-bold tracking-wider">Kode Tiket</span>
+              <span id="adminScanKode" class="font-mono font-bold text-sm text-[#FFDC17]">#BB26-XXXX</span>
+            </div>
+
+            <!-- Biodata Pemesan -->
+            <div class="space-y-1">
+              <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Nama Lengkap</span>
+              <p id="adminScanNama" class="font-bold text-white text-sm truncate">-</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#FFDC17]/20">
+              <div>
+                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">WhatsApp / Email</span>
+                <p id="adminScanContact" class="font-mono text-slate-200 text-xs truncate">-</p>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Jumlah Tiket</span>
+                <p id="adminScanQty" class="font-mono font-bold text-[#FFDC17] text-xs">1 Orang</p>
+              </div>
+            </div>
+
+            <!-- Kategori Paket -->
+            <div class="border-t border-[#FFDC17]/20 pt-2">
+              <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Kategori Paket Tiket</span>
+              <p id="adminScanVarian" class="font-semibold text-yellow-300 text-xs mt-0.5">-</p>
+            </div>
+
+            <!-- Kotak Instruksi Souvenir Mencolok -->
+            <div id="adminScanSouvenirBox" class="border-t border-[#FFDC17]/20 pt-2.5">
+              <div id="adminScanSouvenirContent" class="p-3 rounded-xl bg-yellow-400 text-[#240638] font-black text-xs text-center tracking-wide shadow-md flex items-center justify-center gap-1.5">
+                <span id="adminScanSouvenirIcon" class="text-base leading-none">🎁</span>
+                <span id="adminScanSouvenirText">BERIKAN SOUVENIR KE CUSTOMER: 1x Official Stiker + 1x Ganci Akrilik</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Scan Tiket Berikutnya -->
+        <div class="pt-3">
+          <button 
+            type="button" 
+            onclick="resumeAdminScanner()" 
+            id="btnNextAdminScan"
+            class="w-full py-3.5 px-4 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider bg-[#FFDC17] hover:bg-[#ECC90E] text-[#240638] shadow-glow-yellow active:scale-95 transition cursor-pointer flex items-center justify-center gap-2"
+          >
+            <span>Scan Tiket Berikutnya</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 stroke-[3]"></i>
+          </button>
+        </div>
+      </div>
+
       <div class="flex items-center justify-between border-b border-[#FFDC17]/20 pb-3">
         <div class="flex items-center gap-2">
           <i data-lucide="scan-line" class="w-5 h-5 text-[#FFDC17]"></i>
