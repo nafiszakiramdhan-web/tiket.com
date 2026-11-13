@@ -10,9 +10,22 @@
   <style>
     body { background-color: #0b0217; color: #ffffff; font-family: ui-sans-serif, system-ui, sans-serif; }
     .gold-border { border: 2px solid #FFDC17; box-shadow: 0 0 15px rgba(255, 220, 23, 0.25); }
-    #reader { width: 100% !important; border: none !important; border-radius: 1rem; overflow: hidden; }
-    #reader video { border-radius: 1rem; object-fit: cover; width: 100% !important; }
+    #reader { 
+      width: 100% !important; 
+      min-height: 280px !important; 
+      border: none !important; 
+      border-radius: 1rem; 
+      overflow: hidden; 
+      position: relative;
+    }
+    #reader video { 
+      border-radius: 1rem; 
+      object-fit: cover; 
+      width: 100% !important; 
+      min-height: 280px !important;
+    }
     #reader__scan_region { background: transparent !important; }
+    #reader__dashboard { display: none !important; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-between p-4 selection:bg-[#FFDC17] selection:text-[#1A0536]">
@@ -70,8 +83,13 @@
         </button>
       </div>
 
-      <!-- VIEWPORT KAMERA -->
-      <div id="reader" class="bg-black/80 aspect-square flex items-center justify-center"></div>
+      <!-- VIEWPORT KAMERA (DIMENSI JELAS & RESPONSIVE) -->
+      <div id="reader" class="bg-black/90 aspect-square min-h-[280px] w-full flex items-center justify-center relative overflow-hidden rounded-2xl shadow-inner">
+        <div id="cameraLoadingHint" class="text-xs text-slate-400 flex flex-col items-center gap-2 p-4 text-center">
+          <i class="fa-solid fa-camera fa-fade text-2xl text-[#FFDC17]"></i>
+          <span>Mengaktifkan kamera belakang...</span>
+        </div>
+      </div>
     </div>
 
     <!-- INPUT MANUAL KODE TIKET -->
@@ -460,19 +478,19 @@
           showScanResult("success", "Sudah digunakan hari ini, bisa digunakan besok lagi!", `${ticket.nama} • ${ticket.varian}`, merch, ticket);
           return;
         } else if (statusCheckin.includes("HARI INI") || statusCheckin.includes("HARI 1")) {
-          // Proteksi jika tiket sudah dipakai hari ini agar tidak terpotong Hari 2 secara tidak sengaja
+          // Cek tanggal scan: apakah dipindai ulang di hari yang sama?
           const todayDateStr = new Date().toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' });
           const lastScanDate = (ticket.waktuScan || "").split(',')[0].trim();
           const isSameDayScan = lastScanDate && lastScanDate === todayDateStr;
 
           if (isSameDayScan) {
-            const allowDay2 = confirm(`⚠️ Tiket ini SUDAH DIGUNAKAN HARI INI (${ticket.waktuScan}).\n\nKlik OK jika ingin memproses Check-In untuk HARI 2 sekarang,\natau Cancel jika tiket baru dipakai hari pertama.`);
-            if (!allowDay2) {
-              showScanResult("warning", "Sudah digunakan hari ini, bisa digunakan besok lagi!", `Tiket ${ticket.nama} sudah check-in hari ini (${ticket.waktuScan}).`, "", ticket);
-              return;
-            }
+            // Tolak dengan pesan bahwa tiket hari ini sudah terpakai
+            pauseScanner();
+            showScanResult("error", "TIKET HARI INI SUDAH TERPAKAI!", `Tiket ${ticket.nama} sudah digunakan hari ini (${ticket.waktuScan}). Bisa digunakan kembali besok untuk Hari ke-2!`, "", ticket);
+            return;
           }
 
+          // Pemindaian pada Hari ke-2
           pauseScanner();
           ticket.checkin = "SELESAI (HARI 2)";
           ticket.waktuScan = nowWib;
@@ -515,52 +533,117 @@
       showScanResult("success", "CHECK-IN BERHASIL!", `${ticket.nama} • ${ticket.varian}`, merch, ticket);
     }
 
-    // Inisialisasi Kamera HTML5-QRCode
+    // Inisialisasi Kamera HTML5-QRCode (Kamera Belakang Responsif & Bersih)
     async function initCamera() {
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+      }
+
+      const qrConfig = {
+        fps: 15,
+        qrbox: (viewfinderWidth, viewfinderHeight) => {
+          const edge = Math.min(viewfinderWidth, viewfinderHeight);
+          return { width: Math.floor(edge * 0.75), height: Math.floor(edge * 0.75) };
+        },
+        aspectRatio: 1.0
+      };
+
+      // 1. Coba mulai langsung menggunakan kamera belakang via standard environment constraint
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          qrConfig,
+          (decodedText) => verifyTicketCode(decodedText),
+          () => {}
+        );
+        // Dapatkan daftar kamera setelah izin aktif agar tombol "Ganti Kamera" terisi
+        try {
+          const devs = await Html5Qrcode.getCameras();
+          if (devs && devs.length > 0) {
+            availableCameras = devs;
+          }
+        } catch (e) {}
+        return;
+      } catch (envErr) {
+        console.warn("Gagal start facingMode environment, beralih ke getCameras() fallback:", envErr);
+      }
+
+      // 2. Fallback: Request daftar kamera dan cari kamera belakang berdasarkan label device
       try {
         const devices = await Html5Qrcode.getCameras();
         if (devices && devices.length > 0) {
           availableCameras = devices;
-          const backIndex = devices.findIndex(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('belakang'));
-          currentCameraIndex = backIndex !== -1 ? backIndex : 0;
-          startScanner(availableCameras[currentCameraIndex].id);
+          const backIndex = devices.findIndex(d => {
+            const lbl = (d.label || "").toLowerCase();
+            return lbl.includes('back') || lbl.includes('belakang') || lbl.includes('rear') || lbl.includes('environment');
+          });
+          currentCameraIndex = backIndex !== -1 ? backIndex : (devices.length > 1 ? 1 : 0);
+          await html5QrCode.start(
+            availableCameras[currentCameraIndex].id,
+            qrConfig,
+            (decodedText) => verifyTicketCode(decodedText),
+            () => {}
+          );
         } else {
-          console.log("Kamera tidak ditemukan di perangkat ini.");
+          alert("Kamera tidak ditemukan. Pastikan izin kamera telah diberikan di browser.");
         }
       } catch (err) {
-        console.error("Gagal inisialisasi kamera:", err);
+        console.error("Gagal total inisialisasi kamera:", err);
+        const hint = document.getElementById("cameraLoadingHint");
+        if (hint) {
+          hint.innerHTML = `<span class="text-rose-400">Gagal mengaktifkan kamera: ${escapeHtml(err.message || "Izin ditolak")}</span><br><button onclick="initCamera()" class="mt-2 text-[10px] bg-purple-900 px-3 py-1 rounded text-amber-300">Coba Lagi</button>`;
+        }
       }
     }
 
-    function startScanner(cameraId) {
-      if (html5QrCode) {
-        html5QrCode.stop().then(() => startScannerInstance(cameraId)).catch(() => startScannerInstance(cameraId));
-      } else {
-        startScannerInstance(cameraId);
+    // Fungsi Ganti Kamera (Depan / Belakang)
+    async function switchCamera() {
+      if (!html5QrCode) return;
+      if (!availableCameras || availableCameras.length <= 1) {
+        try {
+          const devs = await Html5Qrcode.getCameras();
+          if (devs && devs.length > 1) {
+            availableCameras = devs;
+          } else {
+            alert("Hanya 1 kamera yang terdeteksi di perangkat.");
+            return;
+          }
+        } catch (e) {
+          alert("Tidak dapat mendeteksi kamera lain.");
+          return;
+        }
       }
-    }
 
-    function startScannerInstance(cameraId) {
-      html5QrCode = new Html5Qrcode("reader");
-      html5QrCode.start(
-        cameraId,
-        { fps: 12, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
-        (decodedText) => verifyTicketCode(decodedText),
-        (errorMessage) => {}
-      ).catch(err => {
-        console.log("Kamera sedang sibuk / gagal start: ", err);
-      });
+      currentCameraIndex = (currentCameraIndex + 1) % availableCameras.length;
+      const targetCamId = availableCameras[currentCameraIndex].id;
+
+      try {
+        await html5QrCode.stop();
+      } catch (e) {}
+
+      const qrConfig = {
+        fps: 15,
+        qrbox: (viewfinderWidth, viewfinderHeight) => {
+          const edge = Math.min(viewfinderWidth, viewfinderHeight);
+          return { width: Math.floor(edge * 0.75), height: Math.floor(edge * 0.75) };
+        },
+        aspectRatio: 1.0
+      };
+
+      try {
+        await html5QrCode.start(
+          targetCamId,
+          qrConfig,
+          (decodedText) => verifyTicketCode(decodedText),
+          () => {}
+        );
+      } catch (err) {
+        console.error("Gagal switch kamera:", err);
+      }
     }
 
     // EVENT LISTENERS
-    document.getElementById('btnSwitchCam').addEventListener('click', () => {
-      if (availableCameras.length > 1) {
-        currentCameraIndex = (currentCameraIndex + 1) % availableCameras.length;
-        startScanner(availableCameras[currentCameraIndex].id);
-      } else {
-        alert("Hanya 1 kamera yang terdeteksi di perangkat.");
-      }
-    });
+    document.getElementById('btnSwitchCam').addEventListener('click', switchCamera);
 
     document.getElementById('btnSyncDb').addEventListener('click', syncDatabase);
     document.getElementById('btnUploadScans').addEventListener('click', uploadScansToCloud);

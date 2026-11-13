@@ -42,19 +42,14 @@ function formatRupiah(amount) {
 }
 
 // ============================================================
-// 1. VALIDASI SESI MASUK PIN (DINAMIS DARI SESSION / LOCAL STORAGE)
+// 1. VALIDASI SESI MASUK PIN (KONSISTEN VIA SESSION STORAGE "adminPin")
 // ============================================================
 function checkSessionAuth() {
-  const savedPin = sessionStorage.getItem("adminPin") || localStorage.getItem("adminPin") || "";
-  const isAuth = !!savedPin && (
-    sessionStorage.getItem("adminAuth") === "true" || 
-    localStorage.getItem("adminAuth") === "true" || 
-    sessionStorage.getItem("admin_authenticated") === "true"
-  );
+  const savedPin = (sessionStorage.getItem("adminPin") || "").trim();
   const pinModal = document.getElementById("pinAuthModal");
   const dashboard = document.getElementById("mainDashboard");
 
-  if (isAuth) {
+  if (savedPin) {
     if (pinModal) pinModal.classList.add("hidden");
     if (dashboard) dashboard.classList.remove("hidden");
     loadOrdersData();
@@ -78,10 +73,6 @@ function handlePinLogin(e) {
 
   if (enteredPin) {
     sessionStorage.setItem("adminPin", enteredPin);
-    sessionStorage.setItem("adminAuth", "true");
-    sessionStorage.setItem("admin_authenticated", "true");
-    localStorage.setItem("adminPin", enteredPin);
-    localStorage.setItem("adminAuth", "true");
     if (err) err.classList.add("hidden");
     input.value = "";
     checkSessionAuth();
@@ -102,9 +93,8 @@ function handlePinLogin(e) {
 
 function handleLogout() {
   if (confirm("Kunci kembali dashboard admin?")) {
+    sessionStorage.removeItem("adminPin");
     sessionStorage.clear();
-    localStorage.removeItem("adminPin");
-    localStorage.removeItem("adminAuth");
     checkSessionAuth();
   }
 }
@@ -115,7 +105,12 @@ function handleLogout() {
 async function loadOrdersData(isManual = false) {
   const icon = document.getElementById("iconRefresh");
   const tableLoading = document.getElementById("tableLoading");
-  const savedPin = sessionStorage.getItem("adminPin") || localStorage.getItem("adminPin") || "";
+  const savedPin = (sessionStorage.getItem("adminPin") || "").trim();
+
+  if (!savedPin) {
+    checkSessionAuth();
+    return;
+  }
 
   if (icon) icon.classList.add("animate-spin");
   if (tableLoading) tableLoading.classList.remove("hidden");
@@ -148,9 +143,8 @@ async function loadOrdersData(isManual = false) {
     const [resPending, resApproved, resQuota] = await Promise.all([pendingPromise, approvedPromise, quotaPromise]);
 
     if ((resPending && resPending.status === "UNAUTHORIZED") || (resApproved && resApproved.status === "UNAUTHORIZED")) {
+      sessionStorage.removeItem("adminPin");
       sessionStorage.clear();
-      localStorage.removeItem("adminPin");
-      localStorage.removeItem("adminAuth");
       
       const pinModal = document.getElementById("pinAuthModal");
       const dashboard = document.getElementById("mainDashboard");
@@ -468,7 +462,7 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
   }
 
   try {
-    const savedPin = sessionStorage.getItem("adminPin") || localStorage.getItem("adminPin") || "";
+    const savedPin = (sessionStorage.getItem("adminPin") || "").trim();
 
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
@@ -485,9 +479,8 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
     const result = await response.json();
 
     if (result && result.status === "UNAUTHORIZED") {
+      sessionStorage.removeItem("adminPin");
       sessionStorage.clear();
-      localStorage.removeItem("adminPin");
-      localStorage.removeItem("adminAuth");
       showAccToast("Akses ditolak: PIN salah atau sesi berakhir.", "error");
       checkSessionAuth();
       return;
