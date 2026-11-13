@@ -68,6 +68,21 @@ function checkSessionAuth() {
   if (window.lucide) lucide.createIcons();
 }
 
+function toggleAdminPasswordVisibility() {
+  const passInput = document.getElementById("inputAdminPassword");
+  const icon = document.getElementById("iconTogglePassword");
+  if (!passInput) return;
+  if (passInput.type === "password") {
+    passInput.type = "text";
+    if (icon) icon.setAttribute("data-lucide", "eye-off");
+  } else {
+    passInput.type = "password";
+    if (icon) icon.setAttribute("data-lucide", "eye");
+  }
+  if (window.lucide) lucide.createIcons();
+}
+window.toggleAdminPasswordVisibility = toggleAdminPasswordVisibility;
+
 async function handleAdminLogin(e) {
   e.preventDefault();
   const userInput = document.getElementById("inputAdminUsername");
@@ -590,6 +605,13 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
       return;
     }
 
+    if (result && result.status === "ALREADY_APPROVED") {
+      showAccToast(result.message || "Pesanan ini sudah lebih dulu di-ACC oleh admin lain.", "warning");
+      closeReceiptModal();
+      loadOrdersData();
+      return;
+    }
+
     if (result && result.status === "SUCCESS") {
       showAccToast(`Tiket ${result.kodeTiket || ""} (${item.nama || ""}) berhasil di-ACC! File PDF telah otomatis terkirim ke email: ${result.targetEmail || item.email || "-"}`, "success");
       closeReceiptModal();
@@ -612,7 +634,7 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
 }
 
 // ============================================================
-// 7. TOAST NOTIFIKASI ACC (SUCCESS / ERROR)
+// 7. TOAST NOTIFIKASI ACC (SUCCESS / ERROR / WARNING)
 // ============================================================
 let toastTimer = null;
 function showAccToast(message, type = "success") {
@@ -630,6 +652,13 @@ function showAccToast(message, type = "success") {
       if (icon) {
         icon.className = "w-10 h-10 rounded-xl bg-[#FFDC17] text-[#2D2A1A] flex items-center justify-center flex-shrink-0 shadow-md";
         icon.innerHTML = `<i data-lucide="check" class="w-6 h-6 stroke-[3]"></i>`;
+      }
+    } else if (type === "warning") {
+      if (title) title.textContent = "Peringatan Anti-Bentrok";
+      toast.className = "fixed top-6 right-6 z-50 max-w-md w-full bg-[#2A0859] border-2 border-amber-400 rounded-2xl p-4 shadow-glow-yellow transform translate-y-0 opacity-100 transition-all duration-400 pointer-events-auto";
+      if (icon) {
+        icon.className = "w-10 h-10 rounded-xl bg-amber-400 text-[#2D2A1A] flex items-center justify-center flex-shrink-0 shadow-md";
+        icon.innerHTML = `<i data-lucide="alert-triangle" class="w-6 h-6 stroke-[2.5]"></i>`;
       }
     } else {
       if (title) title.textContent = "Terjadi Kesalahan";

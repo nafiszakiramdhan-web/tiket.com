@@ -108,9 +108,18 @@
               required
               placeholder="Ketik password..." 
               autocomplete="current-password"
-              class="w-full text-sm font-sans py-3 px-4 pl-10 rounded-xl bg-[#081B59] border border-[#FFDC17]/40 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] transition duration-200"
+              class="w-full text-sm font-sans py-3 px-4 pl-10 pr-11 rounded-xl bg-[#081B59] border border-[#FFDC17]/40 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] transition duration-200"
             />
             <i data-lucide="lock" class="w-4 h-4 text-[#FFDC17]/70 absolute left-3.5 top-3.5"></i>
+            <button 
+              type="button" 
+              id="btnToggleAdminPassword"
+              onclick="toggleAdminPasswordVisibility()"
+              class="absolute right-3 top-3 text-slate-400 hover:text-[#FFDC17] active:scale-95 transition-all p-0.5 focus:outline-none cursor-pointer"
+              title="Lihat / Sembunyikan Password"
+            >
+              <i id="iconTogglePassword" data-lucide="eye" class="w-4 h-4"></i>
+            </button>
           </div>
           <p id="loginErrorMsg" class="text-xs text-red-400 font-semibold mt-2 hidden"></p>
         </div>
