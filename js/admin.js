@@ -806,9 +806,10 @@ let isAdminScanLocked = false;
 
 function getMerchFromVariant(variantName) {
   const v = (variantName || "").toLowerCase();
-  if (v.includes("stiker") && (v.includes("ganci") || v.includes("presale"))) {
+  if (v.includes("ganci") || (v.includes("bundling") && v.includes("stiker"))) {
     return {
       ada: true,
+      namaSouvenir: "Official Stiker + Ganci Akrilik",
       text: "Free Stiker Vinyl + Gantungan Kunci Akrilik",
       textScanner: "1x Official Stiker + 1x Ganci Akrilik",
       badge: "STIKER & GANCI"
@@ -816,13 +817,15 @@ function getMerchFromVariant(variantName) {
   } else if (v.includes("stiker")) {
     return {
       ada: true,
+      namaSouvenir: "Official Vinyl Stiker",
       text: "Free Official Stiker Vinyl",
-      textScanner: "1x Official Vinyl Sticker",
+      textScanner: "1x Official Vinyl Stiker",
       badge: "FREE STIKER"
     };
   }
   return {
     ada: false,
+    namaSouvenir: "",
     text: "Tanpa Merchandise Fisik",
     textScanner: "Tanpa Merchandise",
     badge: "REGULER"
@@ -947,25 +950,28 @@ async function validateScannedTicket(code) {
     const souvenirText = document.getElementById("adminScanSouvenirText");
 
     const attendeeName = local ? local.nama : (res ? (res.nama || "-") : "-");
-    const contactInfo = local ? (local.wa || local.email || "-") : "-";
-    const qtyVal = local ? (local.jumlah || 1) : 1;
+    const contactInfo = local ? (local.wa || local.email || "-") : (res ? (res.contact || res.whatsapp || res.email || "-") : "-");
+    const qtyVal = (res && res.jumlah) ? res.jumlah : (local ? (local.jumlah || 1) : 1);
     const ticketVarian = local ? (local.varian || local.paket || "-") : (res ? (res.varian || res.pass || "Tiket Festival") : "Tiket Festival");
-    const displayKode = formatKodeTiket(local ? local.kodeTiket : code);
+    const displayKode = formatKodeTiket(local ? local.kodeTiket : (res ? (res.kodeTiket || code) : code));
 
     if (kodeEl) kodeEl.textContent = displayKode;
     if (namaEl) namaEl.textContent = attendeeName;
     if (contactEl) contactEl.textContent = contactInfo;
     if (qtyEl) qtyEl.textContent = `${qtyVal} Orang`;
+    const qtyBadgeNumEl = document.getElementById("adminScanQtyNum");
+    if (qtyBadgeNumEl) qtyBadgeNumEl.textContent = qtyVal;
     if (varianEl) varianEl.textContent = ticketVarian;
 
-    // Evaluasi Hak Souvenir
+    // Evaluasi Hak Souvenir: [Qty]x [Nama Souvenir] atau "Tanpa Souvenir"
     const merch = (res && res.merch && res.merch.ada) ? res.merch : getMerchFromVariant(ticketVarian);
     if (merch && merch.ada) {
+      const souvenirItemName = merch.namaSouvenir || (merch.textScanner ? merch.textScanner.replace(/^\d+x\s*/i, "") : (merch.text || "Official Merchandise"));
       if (souvenirContent) {
         souvenirContent.className = "p-3 rounded-xl bg-yellow-400 text-[#240638] font-black text-xs text-center tracking-wide shadow-md flex items-center justify-center gap-1.5";
       }
       if (souvenirIcon) souvenirIcon.textContent = "🎁";
-      if (souvenirText) souvenirText.textContent = `BERIKAN SOUVENIR KE CUSTOMER: ${merch.textScanner || merch.text}`;
+      if (souvenirText) souvenirText.textContent = `BERIKAN SOUVENIR: ${qtyVal}x ${souvenirItemName}`;
     } else {
       if (souvenirContent) {
         souvenirContent.className = "p-2.5 rounded-xl bg-slate-800/80 text-slate-300 font-bold text-xs text-center tracking-wide flex items-center justify-center gap-1.5";
@@ -978,24 +984,31 @@ async function validateScannedTicket(code) {
       overlay.classList.remove("border-emerald-500", "border-amber-500", "border-red-500");
 
       if (res && res.status === "SUCCESS") {
-        const isDay1 = res.message && (res.message.includes("hari ini") || res.message.includes("besok"));
         if (iconEl) iconEl.textContent = "✅";
         if (titleEl) {
-          titleEl.textContent = isDay1
-            ? "✅ VALID HARI KE-1 (Sudah digunakan hari ini, bisa digunakan besok lagi!)"
-            : "✅ TIKET VALID - SILAKAN MASUK";
+          titleEl.textContent = res.message || "✅ TIKET VALID - SILAKAN MASUK";
         }
-        if (subtitleEl) subtitleEl.textContent = res.message || "Check-in gate berhasil dikonfirmasi.";
+        if (subtitleEl) {
+          subtitleEl.textContent = res.day === 1 
+            ? "Hari ke-1 tercatat. Tiket dapat digunakan kembali besok." 
+            : (res.day === 2 ? "Hari ke-2 selesai digunakan." : "Check-in gate berhasil dikonfirmasi.");
+        }
         overlay.classList.add("border-emerald-500");
 
         if (local) {
-          local.statusCheckin = isDay1 ? "Sudah digunakan hari ini" : "SUDAH MASUK";
+          local.statusCheckin = res.day === 1 ? "MASUK HARI 1" : (res.day === 2 ? "SELESAI HARI 2" : "SUDAH MASUK");
           local.waktuScan = res.waktu || new Date().toLocaleString();
         }
-      } else if (res && (res.status === "ALREADY_CHECKED_IN" || res.status === "ALREADY_USED")) {
+      } else if (res && (res.status === "ALREADY_CHECKED_IN" || res.status === "ALREADY_USED" || res.status === "ALREADY_USED_TODAY")) {
         if (iconEl) iconEl.textContent = "⚠️";
-        if (titleEl) titleEl.textContent = "⚠️ TIKET SUDAH DIGUNAKAN";
-        if (subtitleEl) subtitleEl.textContent = res.message || "Tiket ini telah dipakai untuk check-in sebelumnya.";
+        if (titleEl) {
+          titleEl.textContent = res.message || (res.status === "ALREADY_USED_TODAY" ? "⚠️ TIKET SUDAH DIPAKAI HARI INI" : "⚠️ TIKET SUDAH DIGUNAKAN");
+        }
+        if (subtitleEl) {
+          subtitleEl.textContent = res.status === "ALREADY_USED_TODAY" 
+            ? "Bisa digunakan kembali besok untuk Hari ke-2!" 
+            : "Tiket ini telah dipakai sebelumnya.";
+        }
         overlay.classList.add("border-amber-500");
       } else {
         if (iconEl) iconEl.textContent = "❌";
