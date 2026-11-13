@@ -42,57 +42,126 @@ function formatRupiah(amount) {
 }
 
 // ============================================================
-// 1. VALIDASI SESI MASUK PIN (KONSISTEN VIA SESSION STORAGE "adminPin")
+// 1. VALIDASI SESI MASUK MULTI-ADMIN (SESSION STORAGE "adminUser" & "adminPass")
 // ============================================================
 function checkSessionAuth() {
-  const savedPin = (sessionStorage.getItem("adminPin") || "").trim();
+  const savedUser = (sessionStorage.getItem("adminUser") || "").trim();
+  const savedPass = (sessionStorage.getItem("adminPass") || "").trim();
+  const savedName = (sessionStorage.getItem("adminName") || "").trim();
   const pinModal = document.getElementById("pinAuthModal");
   const dashboard = document.getElementById("mainDashboard");
+  const badge = document.getElementById("activeAdminNameBadge");
 
-  if (savedPin) {
+  if (savedUser && savedPass) {
     if (pinModal) pinModal.classList.add("hidden");
     if (dashboard) dashboard.classList.remove("hidden");
+    if (badge) badge.textContent = savedName || savedUser;
     loadOrdersData();
   } else {
     if (pinModal) pinModal.classList.remove("hidden");
     if (dashboard) dashboard.classList.add("hidden");
     setTimeout(() => {
-      const input = document.getElementById("inputPin");
+      const input = document.getElementById("inputAdminUsername");
       if (input) input.focus();
     }, 150);
   }
   if (window.lucide) lucide.createIcons();
 }
 
-function handlePinLogin(e) {
+async function handleAdminLogin(e) {
   e.preventDefault();
-  const input = document.getElementById("inputPin");
-  const err = document.getElementById("pinErrorMsg");
+  const userInput = document.getElementById("inputAdminUsername");
+  const passInput = document.getElementById("inputAdminPassword");
+  const err = document.getElementById("loginErrorMsg");
   const container = document.getElementById("pinModalContainer");
-  const enteredPin = (input.value || "").trim();
+  const btn = document.getElementById("btnLoginSubmit");
 
-  if (enteredPin) {
-    sessionStorage.setItem("adminPin", enteredPin);
-    if (err) err.classList.add("hidden");
-    input.value = "";
-    checkSessionAuth();
-  } else {
-    if (container) {
-      container.classList.remove("animate-shake");
-      void container.offsetWidth;
-      container.classList.add("animate-shake");
-    }
+  const username = (userInput ? userInput.value : "").trim();
+  const password = (passInput ? passInput.value : "").trim();
+
+  if (!username || !password) {
     if (err) {
-      err.textContent = "Silakan masukkan PIN keamanan!";
+      err.textContent = "Harap masukkan username dan password!";
       err.classList.remove("hidden");
     }
-    input.value = "";
-    input.focus();
+    return;
   }
+
+  const origBtnHtml = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `
+      <svg class="animate-spin h-4 w-4 text-[#2D2A1A]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+      <span>Memverifikasi...</span>
+    `;
+  }
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "cors",
+      redirect: "follow",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "admin_login",
+        username: username,
+        password: password
+      })
+    }).then(r => r.json());
+
+    if (res && res.status === "SUCCESS") {
+      sessionStorage.setItem("adminUser", res.adminUser || username);
+      sessionStorage.setItem("adminPass", password);
+      sessionStorage.setItem("adminName", res.adminName || username);
+      sessionStorage.setItem("adminPin", password);
+
+      if (err) err.classList.add("hidden");
+      if (userInput) userInput.value = "";
+      if (passInput) passInput.value = "";
+
+      checkSessionAuth();
+    } else {
+      if (container) {
+        container.classList.remove("animate-shake");
+        void container.offsetWidth;
+        container.classList.add("animate-shake");
+      }
+      if (err) {
+        err.textContent = (res && res.message) ? res.message : "Username atau Password salah!";
+        err.classList.remove("hidden");
+      }
+      if (passInput) {
+        passInput.value = "";
+        passInput.focus();
+      }
+    }
+  } catch (netErr) {
+    if (err) {
+      err.textContent = "Kendala koneksi ke server: " + (netErr.message || netErr);
+      err.classList.remove("hidden");
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origBtnHtml;
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+}
+
+// Fallback untuk backward compatibility jika dipanggil handlePinLogin
+function handlePinLogin(e) {
+  handleAdminLogin(e);
 }
 
 function handleLogout() {
   if (confirm("Kunci kembali dashboard admin?")) {
+    sessionStorage.removeItem("adminUser");
+    sessionStorage.removeItem("adminPass");
+    sessionStorage.removeItem("adminName");
     sessionStorage.removeItem("adminPin");
     sessionStorage.clear();
     checkSessionAuth();
@@ -105,12 +174,17 @@ function handleLogout() {
 async function loadOrdersData(isManual = false) {
   const icon = document.getElementById("iconRefresh");
   const tableLoading = document.getElementById("tableLoading");
-  const savedPin = (sessionStorage.getItem("adminPin") || "").trim();
+  const savedUser = (sessionStorage.getItem("adminUser") || "").trim();
+  const savedPass = (sessionStorage.getItem("adminPass") || "").trim();
+  const savedName = (sessionStorage.getItem("adminName") || "").trim();
 
-  if (!savedPin) {
+  if (!savedUser || !savedPass) {
     checkSessionAuth();
     return;
   }
+
+  const badge = document.getElementById("activeAdminNameBadge");
+  if (badge) badge.textContent = savedName || savedUser;
 
   if (icon) icon.classList.add("animate-spin");
   if (tableLoading) tableLoading.classList.remove("hidden");
@@ -121,7 +195,13 @@ async function loadOrdersData(isManual = false) {
       mode: "cors",
       redirect: "follow",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "admin_get_pending", pin: savedPin })
+      body: JSON.stringify({
+        action: "admin_get_pending",
+        username: savedUser,
+        password: savedPass,
+        adminName: savedName,
+        pin: savedPass
+      })
     }).then(r => r.json()).catch(() => ({ data: [] }));
 
     const approvedPromise = fetch(SCRIPT_URL, {
@@ -129,7 +209,13 @@ async function loadOrdersData(isManual = false) {
       mode: "cors",
       redirect: "follow",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "admin_get_approved", pin: savedPin })
+      body: JSON.stringify({
+        action: "admin_get_approved",
+        username: savedUser,
+        password: savedPass,
+        adminName: savedName,
+        pin: savedPass
+      })
     }).then(r => r.json()).catch(() => ({ tickets: [] }));
 
     const quotaPromise = fetch(SCRIPT_URL, {
@@ -143,19 +229,23 @@ async function loadOrdersData(isManual = false) {
     const [resPending, resApproved, resQuota] = await Promise.all([pendingPromise, approvedPromise, quotaPromise]);
 
     if ((resPending && resPending.status === "UNAUTHORIZED") || (resApproved && resApproved.status === "UNAUTHORIZED")) {
+      const errMsg = (resPending && resPending.message) || (resApproved && resApproved.message) || "Sesi login berakhir. Silakan login kembali.";
+      sessionStorage.removeItem("adminUser");
+      sessionStorage.removeItem("adminPass");
+      sessionStorage.removeItem("adminName");
       sessionStorage.removeItem("adminPin");
       sessionStorage.clear();
       
       const pinModal = document.getElementById("pinAuthModal");
       const dashboard = document.getElementById("mainDashboard");
-      const err = document.getElementById("pinErrorMsg");
+      const err = document.getElementById("loginErrorMsg");
       const container = document.getElementById("pinModalContainer");
-      const input = document.getElementById("inputPin");
+      const input = document.getElementById("inputAdminUsername");
 
       if (dashboard) dashboard.classList.add("hidden");
       if (pinModal) pinModal.classList.remove("hidden");
       if (err) {
-        err.textContent = "PIN salah! Masukkan PIN yang benar.";
+        err.textContent = errMsg;
         err.classList.remove("hidden");
       }
       if (container) {
@@ -399,6 +489,12 @@ function renderCurrentTabTable() {
             <i data-lucide="file-text" class="w-3 h-3 stroke-[2.5]"></i>
             <span>Buka PDF</span>
           </a>
+          ${item.adminAcc && item.adminAcc !== '-' ? `
+            <div class="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-yellow-400/10 border border-yellow-400/20 text-[10px] text-amber-300 font-mono">
+              <i data-lucide="user-check" class="w-3 h-3 text-amber-300"></i>
+              <span>ACC: ${escapeHtml(item.adminAcc)}</span>
+            </div>
+          ` : ''}
         ` : `
           <button
             type="button"
@@ -462,7 +558,9 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
   }
 
   try {
-    const savedPin = (sessionStorage.getItem("adminPin") || "").trim();
+    const savedUser = (sessionStorage.getItem("adminUser") || "").trim();
+    const savedPass = (sessionStorage.getItem("adminPass") || "").trim();
+    const savedName = (sessionStorage.getItem("adminName") || "").trim();
 
     const response = await fetch(SCRIPT_URL, {
       method: "POST",
@@ -472,16 +570,22 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
       body: JSON.stringify({
         action: "admin_acc",
         rowIndex: item.rowIndex,
-        pin: savedPin
+        username: savedUser,
+        password: savedPass,
+        adminName: savedName,
+        pin: savedPass
       })
     });
 
     const result = await response.json();
 
     if (result && result.status === "UNAUTHORIZED") {
+      sessionStorage.removeItem("adminUser");
+      sessionStorage.removeItem("adminPass");
+      sessionStorage.removeItem("adminName");
       sessionStorage.removeItem("adminPin");
       sessionStorage.clear();
-      showAccToast("Akses ditolak: PIN salah atau sesi berakhir.", "error");
+      showAccToast("Akses ditolak: " + (result.message || "Sesi login berakhir."), "error");
       checkSessionAuth();
       return;
     }
@@ -609,7 +713,9 @@ async function openReceiptModal(idx) {
     return;
   }
 
-  const savedPin = (sessionStorage.getItem("adminPin") || "").trim();
+  const savedUser = (sessionStorage.getItem("adminUser") || "").trim();
+  const savedPass = (sessionStorage.getItem("adminPass") || "").trim();
+  const savedName = (sessionStorage.getItem("adminName") || "").trim();
 
   try {
     const response = await fetch(SCRIPT_URL, {
@@ -619,7 +725,10 @@ async function openReceiptModal(idx) {
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
         action: "admin_get_proof",
-        pin: savedPin,
+        username: savedUser,
+        password: savedPass,
+        adminName: savedName,
+        pin: savedPass,
         fileId: buktiUrl,
         rowIndex: item.rowIndex
       })

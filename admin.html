@@ -60,7 +60,7 @@
   <!-- Top Accent Bar: Vivid Yellow -->
   <div class="h-1.5 w-full bg-[#FFDC17] shadow-glow-yellow"></div>
 
-  <!-- ==================== PIN AUTHENTICATION MODAL ==================== -->
+  <!-- ==================== ADMIN AUTHENTICATION MODAL (MULTI-ADMIN USERNAME & PASSWORD) ==================== -->
   <div 
     id="pinAuthModal" 
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#081B59]/95 backdrop-blur-md"
@@ -74,31 +74,54 @@
       </div>
 
       <div>
-        <h2 class="font-display font-bold text-3xl text-white">Akses Admin</h2>
-        <p class="text-xs text-slate-300 mt-1">Masukkan PIN keamanan untuk membuka panel verifikasi tiket.</p>
+        <h2 class="font-display font-bold text-3xl text-white">Login Admin</h2>
+        <p class="text-xs text-slate-300 mt-1">Masukkan Username dan Password untuk membuka panel verifikasi tiket.</p>
       </div>
 
-      <form id="pinForm" class="space-y-4" onsubmit="handlePinLogin(event)">
-        <div>
-          <input 
-            type="password" 
-            id="inputPin" 
-            maxlength="10" 
-            placeholder="Ketik PIN..." 
-            autocomplete="current-password"
-            class="w-full text-center text-2xl tracking-[0.3em] font-mono py-3.5 px-4 rounded-xl bg-[#081B59] border border-[#FFDC17]/40 text-white placeholder-slate-600 focus:outline-none focus:border-[#FFDC17] transition duration-200"
-            autofocus
-          />
-          <p id="pinErrorMsg" class="text-xs text-red-400 font-semibold mt-2 hidden">
-            PIN Salah!
-          </p>
+      <form id="adminLoginForm" class="space-y-4 text-left" onsubmit="handleAdminLogin(event)">
+        <div class="space-y-1">
+          <label for="inputAdminUsername" class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
+            Username <span class="text-red-400">*</span>
+          </label>
+          <div class="relative">
+            <input 
+              type="text" 
+              id="inputAdminUsername" 
+              required
+              placeholder="Ketik username..." 
+              autocomplete="username"
+              class="w-full text-sm font-sans py-3 px-4 pl-10 rounded-xl bg-[#081B59] border border-[#FFDC17]/40 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] transition duration-200"
+              autofocus
+            />
+            <i data-lucide="user" class="w-4 h-4 text-[#FFDC17]/70 absolute left-3.5 top-3.5"></i>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label for="inputAdminPassword" class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
+            Password <span class="text-red-400">*</span>
+          </label>
+          <div class="relative">
+            <input 
+              type="password" 
+              id="inputAdminPassword" 
+              required
+              placeholder="Ketik password..." 
+              autocomplete="current-password"
+              class="w-full text-sm font-sans py-3 px-4 pl-10 rounded-xl bg-[#081B59] border border-[#FFDC17]/40 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] transition duration-200"
+            />
+            <i data-lucide="lock" class="w-4 h-4 text-[#FFDC17]/70 absolute left-3.5 top-3.5"></i>
+          </div>
+          <p id="loginErrorMsg" class="text-xs text-red-400 font-semibold mt-2 hidden"></p>
         </div>
 
         <button 
           type="submit" 
-          class="w-full py-3.5 rounded-xl font-sans font-black text-sm uppercase tracking-wider text-[#2D2A1A] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-glow-yellow"
+          id="btnLoginSubmit"
+          class="w-full py-3.5 rounded-xl font-sans font-black text-sm uppercase tracking-wider text-[#2D2A1A] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-glow-yellow flex items-center justify-center gap-2"
         >
-          Buka Dashboard
+          <span>Masuk Dashboard</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 stroke-[3]"></i>
         </button>
       </form>
     </div>
@@ -151,6 +174,13 @@
 
         <!-- Action Buttons Right (Dengan Tactile Button Feedback) -->
         <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+
+          <!-- Active Admin Profile Badge -->
+          <div id="adminUserBadgeContainer" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#2A0859] border border-[#FFDC17]/30 text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-slate-300 hidden sm:inline">Admin:</span>
+            <span id="activeAdminNameBadge" class="font-bold text-[#FFDC17] max-w-[140px] truncate">Admin</span>
+          </div>
           
           <!-- Tombol Segarkan Data -->
           <button 
