@@ -114,10 +114,10 @@
   <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-10 flex-1">
 
     <!-- ==================== HERO SECTION (ROYAL BAROQUE NOIR SPLIT) ==================== -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
       
       <!-- Kolom Kiri: Detail Event -->
-      <div class="lg:col-span-7 space-y-6">
+      <div class="lg:col-span-7 space-y-5">
         
         <!-- Category Pill & Starlet -->
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#240847] border border-[#FFDC17]/30 text-xs sm:text-sm text-[#E2D9F3] select-none">
@@ -127,7 +127,7 @@
         </div>
 
         <!-- Judul Pameran dengan Kotak Miring Ganda & Bintang Kilau -->
-        <div class="relative pt-2 pb-1">
+        <div class="relative pt-1 pb-1">
           <!-- Kotak miring ganda baroque di belakang judul -->
           <div class="inline-block relative">
             <div class="absolute -inset-2 bg-gradient-to-r from-[#FFDC17]/20 via-[#240847] to-[#FFDC17]/10 rounded-xl transform -rotate-2 border border-[#FFDC17]/40 pointer-events-none"></div>
@@ -142,12 +142,53 @@
           </p>
         </div>
 
+        <!-- POSTER UTAMA MOBILE (Tampil di atas rincian Lokasi & Waktu pada tampilan HP) -->
+        <div class="block lg:hidden w-full my-2">
+          <div class="w-full max-h-[380px] rounded-2xl overflow-hidden border-2 border-[#FFDC17]/40 shadow-glow-plum relative group bg-[#16032B] flex items-center justify-center p-2">
+            <img 
+              src="assets/banner.webp" 
+              onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop'" 
+              alt="Official Poster Pameran Foto Bingkai Bisu 2026"
+              class="w-full h-auto max-h-[360px] object-contain object-top rounded-xl" 
+            />
+            <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-[#E2D9F3] bg-[#1A0536]/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-[#FFDC17]/30 select-none shadow">
+              <span class="font-mono text-[#FFDC17] font-bold text-[11px]">✦ #bingkaibisu2026</span>
+              <span class="font-serif italic text-[11px]">Hetero Space Banyumas</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Editorial Subtitle (EB Garamond Italic) -->
-        <p class="font-editorial italic text-lg sm:text-xl text-[#E2D9F3] leading-relaxed max-w-2xl border-l-2 border-[#FFDC17]/60 pl-4">
+        <p class="font-editorial italic text-base sm:text-lg text-[#E2D9F3] leading-relaxed max-w-2xl border-l-2 border-[#FFDC17]/60 pl-4">
           "Menyuarakan kedalaman narasi yang kerap tenggelam dalam kesenyapan, terbingkai secara jujur lewat mata lensa kuratorial pewarta."
         </p>
 
-        <!-- Metadata Grid -->
+        <!-- BANNER / BADGE HARGA MENONJOL (Di bawah judul, tepat di atas kotak Lokasi/Waktu) -->
+        <div class="flex items-center justify-between flex-wrap gap-3 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#FFDC17]/20 via-[#240847] to-[#FFDC17]/10 border-2 border-[#FFDC17]/50 shadow-glow-gold">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#FFDC17] text-[#240638] flex items-center justify-center font-bold text-lg shadow-md flex-shrink-0">
+              🏷️
+            </div>
+            <div>
+              <span class="text-[10px] sm:text-xs uppercase font-mono tracking-widest text-[#FFDC17] font-bold block">TIKET MASUK RESMI</span>
+              <div class="flex items-baseline gap-2">
+                <span class="text-xs text-[#E2D9F3]">Mulai dari</span>
+                <span class="font-display text-2xl sm:text-3xl text-[#FFDC17] leading-none drop-shadow">Rp 4.000</span>
+                <span class="text-[11px] text-slate-300 font-mono">/ orang</span>
+              </div>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            onclick="scrollToTicketsSection()" 
+            class="px-4 py-2 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 text-[#240638] font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-1.5 transition select-none cursor-pointer"
+          >
+            <span>PILIH TIKET</span>
+            <span class="text-sm font-bold">↓</span>
+          </button>
+        </div>
+
+        <!-- Metadata Grid: Lokasi & Waktu -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
           <!-- Lokasi -->
           <div class="flex items-start gap-3.5 p-4 rounded-2xl bg-[#240847] border border-[#FFDC17]/30 select-none shadow-glow-plum">
@@ -171,17 +212,17 @@
         </div>
       </div>
 
-      <!-- Kolom Kanan: Banner Hero .WEBP -->
-      <div class="lg:col-span-5">
-        <div class="aspect-[16/9] sm:aspect-[4/3] w-full rounded-2xl overflow-hidden border-2 border-[#FFDC17]/40 shadow-glow-plum relative group bg-[#240847]">
+      <!-- Kolom Kanan Desktop: Poster Utama .WEBP (Object-Contain agar teks tidak terpotong) -->
+      <div class="hidden lg:block lg:col-span-5">
+        <div class="w-full max-h-[480px] rounded-2xl overflow-hidden border-2 border-[#FFDC17]/40 shadow-glow-plum relative group bg-[#16032B] flex items-center justify-center p-3">
           <img 
             src="assets/banner.webp" 
             onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop'" 
             alt="Official Banner Pameran Foto Bingkai Bisu 2026"
-            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" 
+            class="w-full h-auto max-h-[450px] object-contain object-top rounded-xl group-hover:scale-[1.02] transition-transform duration-500" 
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-[#0D021D] via-transparent to-transparent opacity-60"></div>
-          <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-[#E2D9F3] bg-[#1A0536]/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#FFDC17]/30 select-none">
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0D021D] via-transparent to-transparent opacity-40 pointer-events-none"></div>
+          <div class="absolute bottom-5 left-5 right-5 flex items-center justify-between text-xs text-[#E2D9F3] bg-[#1A0536]/90 backdrop-blur-md px-4 py-2 rounded-xl border border-[#FFDC17]/30 select-none shadow-lg">
             <span class="font-mono text-[#FFDC17] font-bold">✦ #bingkaibisu2026</span>
             <span class="font-serif italic">Hetero Space Banyumas</span>
           </div>
@@ -196,8 +237,8 @@
       <!-- ==================== KOLOM KIRI (65% / 8 COLS): 4 TAB NAVIGASI ==================== -->
       <div class="lg:col-span-8 space-y-6">
 
-        <!-- 4 Tab Header Bar -->
-        <div class="border-b border-[#FFDC17]/25 flex items-center gap-1 sm:gap-2 overflow-x-auto pb-0 select-none scrollbar-none">
+        <!-- 4 Tab Header Bar (Sticky di HP & Desktop dengan Auto-Scroll) -->
+        <div id="tabNavBar" class="sticky top-20 z-30 bg-[#0D021D]/95 backdrop-blur-md pt-2 pb-0 border-b border-[#FFDC17]/25 flex items-center gap-1 sm:gap-2 overflow-x-auto select-none scrollbar-none">
           <button 
             type="button" 
             id="tabBtn01" 
@@ -231,6 +272,9 @@
             04. CEK STATUS PESANAN
           </button>
         </div>
+
+        <!-- Touch-Swipeable Tabs Container (Mendukung Geser Kiri-Kanan di HP) -->
+        <div id="tabsSwipeContainer" class="space-y-6 pt-1">
 
         <!-- ==================== TAB 01: PILIH TIKET & CHECKOUT ==================== -->
         <div id="tabContentTiket" class="space-y-6">
@@ -882,6 +926,8 @@
 
           </div>
         </div>
+        <!-- /#tabsSwipeContainer -->
+        </div>
 
       </div>
 
@@ -1109,25 +1155,121 @@
   </div>
 
 
-  <!-- ========================================================================= -->
-  <!-- TOMBOL CUSTOMER SERVICE (CS) WHATSAPP                                     -->
-  <!-- PENTING: Silakan ganti nomor '628XXXXXXXXXX' di bawah ini dengan nomor    -->
-  <!-- WhatsApp resmi Customer Service Panitia Bingkai Bisu 2026.               -->
-  <!-- ========================================================================= -->
-  <a 
-    href="https://wa.me/628XXXXXXXXXX?text=Halo%20CS%20Panitia%20Bingkai%20Bisu%202026,%20saya%20butuh%20bantuan%20terkait%20pemesanan%20tiket" 
-    target="_blank" 
-    rel="noopener noreferrer"
-    id="btnCustomerServiceWA"
-    class="fixed bottom-6 right-6 z-40 bg-[#25D366] hover:bg-[#20ba59] text-white p-3.5 sm:px-4 sm:py-3 rounded-full shadow-2xl flex items-center gap-2.5 font-bold text-xs active:scale-95 transition-all select-none cursor-pointer border-2 border-white/20 hover:shadow-green-500/30"
-    title="Hubungi Customer Service WhatsApp Panitia"
+  <!-- ==================== MODAL OVERLAY CEK STATUS PESANAN CEPAT ==================== -->
+  <div 
+    id="modalCekPesanan" 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden transition-all duration-300"
+    role="dialog"
+    aria-modal="true"
   >
-    <!-- Ikon Resmi WhatsApp (SVG) -->
-    <svg class="w-6 h-6 fill-current flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-    </svg>
-    <span class="hidden sm:inline font-sans tracking-wide">Bantuan CS</span>
-  </a>
+    <div 
+      class="w-full max-w-lg bg-[#240847] border border-[#FFDC17]/40 rounded-3xl p-6 sm:p-7 shadow-glow-gold space-y-5 max-h-[90vh] overflow-y-auto"
+    >
+      <div class="flex items-center justify-between border-b border-[#FFDC17]/25 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-[#FFDC17] text-[#240638] flex items-center justify-center shadow-md font-bold text-lg">
+            🎫
+          </div>
+          <div>
+            <h3 class="font-serif font-bold text-xl text-white">Cek Status Pesanan</h3>
+            <p class="text-[11px] text-[#E2D9F3]">Masukkan Nomor WhatsApp atau Email</p>
+          </div>
+        </div>
+        <button 
+          type="button" 
+          onclick="closeModalCekPesanan()" 
+          class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center text-lg active:scale-95 transition cursor-pointer"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form onsubmit="handleModalCheckStatusSubmit(event)" class="space-y-4">
+        <div class="space-y-1.5">
+          <label for="modalCheckStatusQueryInput" class="block text-xs font-bold uppercase font-mono tracking-wider text-[#E2D9F3]">
+            Nomor WhatsApp atau Email Pemesan <span class="text-red-400">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="modalCheckStatusQueryInput" 
+            required 
+            placeholder="Contoh: 081234567890 atau nama@email.com"
+            class="w-full px-4 py-3 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 text-white placeholder-slate-500 focus:outline-none focus:border-[#FFDC17] focus:ring-1 focus:ring-[#FFDC17] text-sm transition-all"
+          />
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button 
+            type="button" 
+            onclick="closeModalCekPesanan()" 
+            class="w-1/3 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-slate-300 active:scale-95 transition cursor-pointer"
+          >
+            Tutup
+          </button>
+          <button 
+            type="submit" 
+            id="btnModalCheckQuerySubmit" 
+            class="w-2/3 py-3 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 text-[#240638] font-bold text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2 transition cursor-pointer"
+          >
+            <i data-lucide="search" class="w-4 h-4 stroke-[2.5]"></i>
+            <span id="btnModalCheckQueryText">Cari Pesanan</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Container Hasil di Modal -->
+      <div id="modalCheckStatusResultContainer" class="hidden pt-3 border-t border-[#FFDC17]/20 space-y-4">
+        <div id="modalCheckStatusCardsList" class="space-y-4"></div>
+        <div id="modalCheckResultNotFoundBox" class="hidden p-4 rounded-xl bg-red-950/70 border border-red-500/50 space-y-1 text-left">
+          <div class="flex items-center gap-2 text-red-300 font-bold text-xs uppercase">
+            <span>❌</span>
+            <span>DATA PESANAN TIDAK DITEMUKAN</span>
+          </div>
+          <p class="text-[11px] text-[#E2D9F3]">
+            Pastikan Nomor WhatsApp atau Alamat Email sesuai saat pemesanan.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- TOMBOL FLOATING AKSES CEPAT (CEK PESANAN & CS WHATSAPP)                   -->
+  <!-- ========================================================================= -->
+  <div class="fixed bottom-5 right-4 sm:right-6 z-40 flex items-center gap-2 sm:gap-2.5">
+    
+    <!-- Tombol Cek Pesanan Cepat Melayang -->
+    <button 
+      type="button" 
+      onclick="openModalCekPesanan()" 
+      id="btnFloatingCekPesanan"
+      class="bg-[#240847]/95 hover:bg-[#340b66] text-[#FFDC17] border-2 border-[#FFDC17]/70 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full shadow-2xl flex items-center gap-2 font-bold text-xs active:scale-95 transition-all select-none cursor-pointer backdrop-blur-md shadow-glow-plum"
+      title="Cek Status Tiket / Pesanan Langsung di Tempat"
+    >
+      <span class="text-base leading-none">🎫</span>
+      <span class="font-sans tracking-wide">Cek Pesanan</span>
+    </button>
+
+    <!-- Tombol Customer Service WhatsApp -->
+    <!-- PENTING: Silakan ganti nomor '628XXXXXXXXXX' di bawah ini dengan nomor    -->
+    <!-- WhatsApp resmi Customer Service Panitia Bingkai Bisu 2026.               -->
+    <a 
+      href="https://wa.me/628XXXXXXXXXX?text=Halo%20CS%20Panitia%20Bingkai%20Bisu%202026,%20saya%20butuh%20bantuan%20terkait%20pemesanan%20tiket" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      id="btnCustomerServiceWA"
+      class="bg-[#25D366] hover:bg-[#20ba59] text-white px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full shadow-2xl flex items-center gap-2 font-bold text-xs active:scale-95 transition-all select-none cursor-pointer border-2 border-white/20 hover:shadow-green-500/30"
+      title="Hubungi Customer Service WhatsApp Panitia"
+    >
+      <!-- Ikon Resmi WhatsApp (SVG) -->
+      <svg class="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+      </svg>
+      <span class="hidden sm:inline font-sans tracking-wide">Bantuan CS</span>
+    </a>
+
+  </div>
 
   <!-- ==================== LOGIKA JAVASCRIPT EKSTERNAL ==================== -->
   <script src="js/app.js"></script>

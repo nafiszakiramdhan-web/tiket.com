@@ -175,9 +175,15 @@ function showFloatingToast(message) {
 }
 
 // ============================================================
-// 1. SISTEM 4 TAB NAVIGASI
+// 1. SISTEM 4 TAB NAVIGASI & TOUCH SWIPE (GESER LAYAR HP)
 // ============================================================
+const MAIN_TABS = ["tiket", "deskripsi", "snk", "cek"];
+let activeMainTab = "tiket";
+
 function switchMainTab(targetTab) {
+  if (!MAIN_TABS.includes(targetTab)) targetTab = "tiket";
+  activeMainTab = targetTab;
+
   const tab01 = document.getElementById("tabContentTiket");
   const tab02 = document.getElementById("tabContentDeskripsi");
   const tab03 = document.getElementById("tabContentSnk");
@@ -194,40 +200,102 @@ function switchMainTab(targetTab) {
   if (tab03) tab03.classList.add("hidden");
   if (tab04) tab04.classList.add("hidden");
 
-  // Reset tombol
+  // Reset tombol tab
   [btn01, btn02, btn03, btn04].forEach(btn => {
     if (!btn) return;
     btn.classList.remove("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
     btn.classList.add("border-transparent", "text-slate-400", "font-semibold");
   });
 
+  let activeBtn = null;
   if (targetTab === "tiket") {
     if (tab01) tab01.classList.remove("hidden");
-    if (btn01) {
-      btn01.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
-      btn01.classList.remove("border-transparent", "text-slate-400");
-    }
+    activeBtn = btn01;
   } else if (targetTab === "deskripsi") {
     if (tab02) tab02.classList.remove("hidden");
-    if (btn02) {
-      btn02.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
-      btn02.classList.remove("border-transparent", "text-slate-400");
-    }
+    activeBtn = btn02;
   } else if (targetTab === "snk") {
     if (tab03) tab03.classList.remove("hidden");
-    if (btn03) {
-      btn03.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
-      btn03.classList.remove("border-transparent", "text-slate-400");
-    }
+    activeBtn = btn03;
   } else if (targetTab === "cek") {
     if (tab04) tab04.classList.remove("hidden");
-    if (btn04) {
-      btn04.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
-      btn04.classList.remove("border-transparent", "text-slate-400");
+    activeBtn = btn04;
+  }
+
+  if (activeBtn) {
+    activeBtn.classList.add("border-[#FFDC17]", "text-[#FFDC17]", "font-bold");
+    activeBtn.classList.remove("border-transparent", "text-slate-400");
+    // Selaraskan posisi tombol navigasi tab di layar (auto-scroll center)
+    try {
+      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    } catch (_) {
+      // Abaikan jika tidak didukung browser
     }
   }
 
   if (window.lucide) lucide.createIcons();
+}
+
+/**
+ * Inisialisasi gestur sentuh (touch swipe kiri/kanan) pada tab konten di perangkat HP/touchscreen.
+ */
+function initTabsSwipe() {
+  const container = document.getElementById("tabsSwipeContainer");
+  if (!container) return;
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+  let isSwipeCancelled = false;
+
+  container.addEventListener("touchstart", (e) => {
+    if (e.touches.length > 1) {
+      isSwipeCancelled = true;
+      return;
+    }
+
+    // Jangan picu swipe jika pengguna sedang berinteraksi di formulir, tombol, atau area dropzone
+    const target = e.target;
+    if (
+      target.closest("input, textarea, select, button, a, #dropZoneProof, #checkoutFormContainer, .variant-card")
+    ) {
+      isSwipeCancelled = true;
+      return;
+    }
+
+    isSwipeCancelled = false;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }, { passive: true });
+
+  container.addEventListener("touchend", (e) => {
+    if (isSwipeCancelled) return;
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const timeElapsed = Date.now() - touchStartTime;
+
+    const diffX = touchEndX - touchStartX;
+    const diffY = touchEndY - touchStartY;
+
+    // Deteksi swipe horizontal dengan threshold minimal 50px dan gerakan dominan X
+    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY) * 1.3 && timeElapsed < 650) {
+      const currentIdx = MAIN_TABS.indexOf(activeMainTab);
+      if (diffX < 0) {
+        // Geser ke kiri -> Pindah ke tab berikutnya
+        if (currentIdx >= 0 && currentIdx < MAIN_TABS.length - 1) {
+          switchMainTab(MAIN_TABS[currentIdx + 1]);
+        }
+      } else {
+        // Geser ke kanan -> Pindah ke tab sebelumnya
+        if (currentIdx > 0) {
+          switchMainTab(MAIN_TABS[currentIdx - 1]);
+        }
+      }
+    }
+  }, { passive: true });
 }
 
 function scrollToTicketsSection() {
@@ -853,6 +921,145 @@ function handleCheckStatus(query) {
 }
 
 // ============================================================
+// MODAL AKSES CEPAT: CEK STATUS PESANAN (OVERLAY LANGSUNG)
+// ============================================================
+function openModalCekPesanan() {
+  const modal = document.getElementById("modalCekPesanan");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  const input = document.getElementById("modalCheckStatusQueryInput");
+  if (input) {
+    setTimeout(() => input.focus(), 150);
+  }
+}
+
+function closeModalCekPesanan() {
+  const modal = document.getElementById("modalCekPesanan");
+  if (modal) modal.classList.add("hidden");
+}
+
+async function handleModalCheckStatusSubmit(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const inputEl = document.getElementById("modalCheckStatusQueryInput");
+  const inputNilai = inputEl ? inputEl.value : "";
+  const query = inputNilai.trim();
+  const btn = document.getElementById("btnModalCheckQuerySubmit");
+  const btnText = document.getElementById("btnModalCheckQueryText");
+
+  if (!query) return;
+
+  if (btn) btn.disabled = true;
+  if (btnText) btnText.textContent = "Mencari...";
+
+  const resContainer = document.getElementById("modalCheckStatusResultContainer");
+  const cardsList = document.getElementById("modalCheckStatusCardsList");
+  const boxNotFound = document.getElementById("modalCheckResultNotFoundBox");
+
+  if (resContainer) resContainer.classList.remove("hidden");
+  if (cardsList) {
+    cardsList.innerHTML = "";
+    cardsList.classList.remove("hidden");
+  }
+  if (boxNotFound) boxNotFound.classList.add("hidden");
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "cors",
+      redirect: "follow",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "check_status",
+        query: query
+      })
+    });
+
+    const res = await response.json();
+
+    if (res && res.status === "SUCCESS" && res.data && res.data.length > 0) {
+      if (boxNotFound) boxNotFound.classList.add("hidden");
+      cardsList.innerHTML = "";
+
+      res.data.forEach((item) => {
+        const isApproved = (item.status || "").toUpperCase() === "APPROVED";
+        const namaPemesan = escapeHtml(item.nama || "-");
+        const kategoriTiket = escapeHtml(item.varian || item.kategori || "Tiket Festival");
+        const jumlahTiket = escapeHtml(item.jumlah || 1);
+        const kodeTiket = escapeHtml(item.kodeTiket || item.ticketCode || "-");
+
+        const card = document.createElement("div");
+        card.className = isApproved
+          ? "p-4 rounded-2xl bg-[#18042E] border border-emerald-500/50 space-y-2.5 text-left shadow-lg"
+          : "p-4 rounded-2xl bg-[#18042E] border border-amber-500/50 space-y-2.5 text-left shadow-md";
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-white/10 pb-2">
+            <div>
+              <span class="text-[9px] font-mono tracking-wider text-slate-400 block uppercase">Kode Tiket</span>
+              <span class="font-mono text-xs sm:text-sm font-bold text-[#FFDC17]">${kodeTiket}</span>
+            </div>
+            <div>
+              ${isApproved ? `
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold text-[10px] sm:text-xs border border-emerald-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>TERVERIFIKASI</span>
+                </span>
+              ` : `
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-mono font-bold text-[10px] sm:text-xs border border-amber-500/30">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                  <span>MENUNGGU VERIFIKASI</span>
+                </span>
+              `}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs text-[#E2D9F3] pt-0.5">
+            <div>
+              <span class="text-[10px] text-slate-400 block">Nama Pemesan:</span>
+              <strong class="text-white text-xs block truncate">${namaPemesan}</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block">Kategori:</span>
+              <strong class="text-white text-xs block truncate">${kategoriTiket}</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block">Jumlah Tiket:</span>
+              <strong class="text-[#FFDC17] font-mono text-xs block">${jumlahTiket} Tiket</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block">Kode:</span>
+              <strong class="text-[#FFDC17] font-mono text-xs block">${kodeTiket}</strong>
+            </div>
+          </div>
+
+          ${isApproved ? `
+            <div class="pt-1">
+              <div class="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs font-sans flex items-start gap-2 shadow-sm">
+                <span class="text-sm leading-none">📩</span>
+                <p class="leading-relaxed text-[11px]">E-Ticket PDF resmi telah dikirim ke email kamu. Cek inbox atau folder spam.</p>
+              </div>
+            </div>
+          ` : ''}
+        `;
+
+        cardsList.appendChild(card);
+      });
+    } else {
+      if (cardsList) cardsList.innerHTML = "";
+      if (boxNotFound) boxNotFound.classList.remove("hidden");
+    }
+  } catch (err) {
+    console.error("Gagal cek status modal:", err);
+    if (cardsList) cardsList.innerHTML = "";
+    if (boxNotFound) boxNotFound.classList.remove("hidden");
+  } finally {
+    if (btn) btn.disabled = false;
+    if (btnText) btnText.textContent = "Cari Pesanan";
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+// ============================================================
 // 7. AKSES ADMIN STEALTH (TANPA HARDCODED PIN)
 // ============================================================
 let stealthTapCount = 0;
@@ -936,6 +1143,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoEl) logoEl.addEventListener("click", handleStealthTapEvent);
   if (copyrightEl) copyrightEl.addEventListener("click", handleStealthTapEvent);
 
+  initTabsSwipe();
   selectTicketVariant("tiket_1hari");
   refreshTicketStock(false);
   if (window.lucide) lucide.createIcons();
