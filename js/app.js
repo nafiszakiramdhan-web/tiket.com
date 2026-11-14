@@ -48,16 +48,16 @@ const VARIANTS = Object.freeze({
   tiket_1hari: {
     key: "tiket_1hari",
     name: "Tiket 1 Hari",
-    price: 4000,
-    badgeText: "Tiket 1 Hari - Rp 4.000",
+    price: 2000,
+    badgeText: "Tiket 1 Hari - Rp 2.000",
     img: "assets/Tiket_1hari.webp",
     isPresale: false
   },
   tiket_2hari_biasa: {
     key: "tiket_2hari_biasa",
     name: "Tiket 2 Hari Biasa",
-    price: 6000,
-    badgeText: "Tiket 2 Hari Biasa - Rp 6.000",
+    price: 4000,
+    badgeText: "Tiket 2 Hari Biasa - Rp 4.000",
     img: "assets/tiket_2hari_biasa.webp",
     isPresale: false
   },

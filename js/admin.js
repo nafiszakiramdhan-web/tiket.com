@@ -809,9 +809,9 @@ function getMerchFromVariant(variantName) {
   if (v.includes("ganci") || (v.includes("bundling") && v.includes("stiker"))) {
     return {
       ada: true,
-      namaSouvenir: "Official Stiker + Ganci Akrilik",
-      text: "Free Stiker Vinyl + Gantungan Kunci Akrilik",
-      textScanner: "1x Official Stiker + 1x Ganci Akrilik",
+      namaSouvenir: "Official Stiker + Ganci",
+      text: "Free Stiker Vinyl + Ganci",
+      textScanner: "1x Official Stiker + 1x Ganci",
       badge: "STIKER & GANCI"
     };
   } else if (v.includes("stiker")) {
