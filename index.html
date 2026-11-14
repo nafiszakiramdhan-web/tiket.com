@@ -495,6 +495,15 @@
               </div>
             </div>
 
+            <!-- Announcement Banner Cek Folder Spam -->
+            <div class="p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-[#14032B] via-[#2A0859] to-[#14032B] border border-[#FFDC17]/40 shadow-sm flex items-start gap-3">
+              <span class="text-xl flex-shrink-0 leading-none">📢</span>
+              <div class="text-xs sm:text-[13px] text-[#E2D9F3] leading-relaxed">
+                <strong class="text-[#FFDC17] block font-sans font-semibold mb-0.5">Info Pengiriman E-Ticket:</strong>
+                <span>Setelah pesanan di-ACC oleh Admin, E-Ticket PDF akan dikirim otomatis ke email Anda. Jika email tidak ditemukan di Kotak Masuk (Inbox), silakan periksa folder <strong class="text-white font-bold underline decoration-[#FFDC17]">Spam</strong> atau <strong class="text-white font-bold underline decoration-[#FFDC17]">Promosi</strong>.</span>
+              </div>
+            </div>
+
             <!-- Formulir Pemesanan -->
             <form id="orderForm" class="space-y-5" onsubmit="handleOrderSubmit(event)">
 
@@ -748,6 +757,14 @@
                   </span>
                 </button>
 
+                <!-- Announcement Banner Bawah Formulir -->
+                <div class="p-3.5 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 flex items-start gap-2.5">
+                  <span class="text-base flex-shrink-0 leading-none">📢</span>
+                  <p class="text-xs text-[#E2D9F3] leading-relaxed">
+                    <strong class="text-[#FFDC17]">Info Pengiriman E-Ticket:</strong> Setelah pesanan di-ACC oleh Admin, E-Ticket PDF akan dikirim otomatis ke email Anda. Jika email tidak ditemukan di Kotak Masuk (Inbox), silakan periksa folder <strong class="text-white underline decoration-[#FFDC17]">Spam</strong> atau <strong class="text-white underline decoration-[#FFDC17]">Promosi</strong>.
+                  </p>
+                </div>
+
               </div>
 
             </form>
@@ -961,28 +978,6 @@
             <span>DAPATKAN TIKET</span>
           </button>
 
-          <!-- Divider Halus -->
-          <div class="border-t border-[#FFDC17]/20"></div>
-
-          <!-- Info Penyelenggara -->
-          <div class="space-y-3">
-            <span class="text-[11px] font-mono uppercase tracking-widest text-[#FFDC17] block">Penyelenggara Resmi</span>
-            <div class="flex items-center gap-3 bg-[#14032B] p-3.5 rounded-xl border border-[#FFDC17]/25">
-              <img 
-                src="assets/LOGO_FIXFEST_TEKS_BAWAH_PUTIH.png" 
-                alt="Logo Fixlens Fotografi" 
-                class="h-9 w-auto object-contain"
-              />
-              <div class="text-left">
-                <span class="text-xs font-bold text-white block">FIXLENS Festival 2026</span>
-                <span class="text-[10px] text-[#E2D9F3] block">Kurasi Visual Humanis Banyumas</span>
-              </div>
-            </div>
-            <p class="font-editorial italic text-xs text-[#E2D9F3] text-center pt-1">
-              "Merawat ingatan bersama melalui kejujuran bingkai jurnalistik."
-            </p>
-          </div>
-
           <!-- Bagikan Event -->
           <div class="space-y-2 pt-2 border-t border-[#FFDC17]/20">
             <span class="text-[11px] font-mono uppercase tracking-widest text-[#FFDC17] block">Bagikan Event</span>
@@ -990,31 +985,31 @@
               <button 
                 type="button" 
                 onclick="copyPageUrl(this)" 
-                class="py-2.5 px-2 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 hover:border-[#FFDC17] text-[#E2D9F3] hover:text-white text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
+                class="h-10 px-2 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 hover:border-[#FFDC17] text-[#E2D9F3] hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
                 title="Salin Tautan"
               >
-                <i data-lucide="link" class="w-3.5 h-3.5"></i>
+                <i data-lucide="link" class="w-3.5 h-3.5 flex-shrink-0"></i>
                 <span class="text-[11px]">Salin</span>
               </button>
 
               <button 
                 type="button" 
                 onclick="shareToWhatsApp()" 
-                class="py-2.5 px-2 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 hover:border-[#FFDC17] text-[#E2D9F3] hover:text-white text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
+                class="h-10 px-2 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 hover:border-[#FFDC17] text-[#E2D9F3] hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
                 title="Bagikan ke WhatsApp"
               >
-                <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                <i data-lucide="message-circle" class="w-3.5 h-3.5 flex-shrink-0"></i>
                 <span class="text-[11px]">WA</span>
               </button>
 
               <a 
                 href="https://instagram.com" 
                 target="_blank" 
-                rel="noopener"
-                class="py-2.5 px-2 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 hover:border-[#FFDC17] text-[#E2D9F3] hover:text-white text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
+                rel="noopener noreferrer"
+                class="h-10 px-2 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 hover:border-[#FFDC17] text-[#E2D9F3] hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none"
                 title="Buka Instagram"
               >
-                <i data-lucide="instagram" class="w-3.5 h-3.5"></i>
+                <i data-lucide="instagram" class="w-3.5 h-3.5 flex-shrink-0"></i>
                 <span class="text-[11px]">IG</span>
               </a>
             </div>
@@ -1152,6 +1147,14 @@
       <div class="p-3.5 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 flex items-center justify-between text-xs font-mono">
         <span class="text-slate-400 uppercase">Kode Referensi:</span>
         <span id="pendingTicketCode" class="font-display text-xl text-[#FFDC17] font-bold">-</span>
+      </div>
+
+      <!-- Announcement Banner Cek Folder Spam -->
+      <div class="p-3.5 rounded-xl bg-gradient-to-r from-[#14032B] via-[#2A0859] to-[#14032B] border border-[#FFDC17]/40 text-left flex items-start gap-2.5 shadow-sm">
+        <span class="text-base flex-shrink-0 leading-none">📢</span>
+        <p class="text-[11px] sm:text-xs text-[#E2D9F3] leading-relaxed">
+          <strong class="text-[#FFDC17]">Info Pengiriman E-Ticket:</strong> Setelah pesanan di-ACC oleh Admin, E-Ticket PDF akan dikirim otomatis ke email Anda. Jika email tidak ditemukan di Kotak Masuk (Inbox), silakan periksa folder <strong class="text-white underline decoration-[#FFDC17]">Spam</strong> atau <strong class="text-white underline decoration-[#FFDC17]">Promosi</strong>.
+        </p>
       </div>
 
       <div class="pt-2 space-y-2.5">

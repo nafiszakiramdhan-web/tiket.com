@@ -925,9 +925,14 @@ async function handleCheckStatusSubmit(e) {
 
           ${isApproved ? `
             <div class="pt-2">
-              <div class="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm font-sans flex items-start gap-2.5 shadow-sm">
-                <span class="text-base leading-none">📩</span>
-                <p class="leading-relaxed">E-Ticket PDF resmi telah dikirim otomatis ke email kamu. Silakan cek kotak masuk (Inbox) atau folder Spam.</p>
+              <div class="p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/80 via-[#14032B] to-emerald-950/80 border border-emerald-400/50 text-emerald-200 text-xs sm:text-sm font-sans flex items-start gap-2.5 shadow-md">
+                <span class="text-lg leading-none flex-shrink-0">📢</span>
+                <div class="space-y-1">
+                  <p class="font-bold text-emerald-300">Info Pengiriman E-Ticket (Status: Terverifikasi / APPROVED):</p>
+                  <p class="leading-relaxed text-white text-xs sm:text-[13px]">
+                    Setelah pesanan di-ACC oleh Admin, E-Ticket PDF akan dikirim otomatis ke email Anda. Jika email tidak ditemukan di Kotak Masuk (Inbox), silakan periksa folder <strong class="text-[#FFDC17] underline decoration-white">Spam</strong> atau <strong class="text-[#FFDC17] underline decoration-white">Promosi</strong>.
+                  </p>
+                </div>
               </div>
             </div>
           ` : `
@@ -1103,9 +1108,14 @@ async function handleModalCheckStatusSubmit(e) {
 
           ${isApproved ? `
             <div class="pt-1">
-              <div class="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs font-sans flex items-start gap-2 shadow-sm">
-                <span class="text-sm leading-none">📩</span>
-                <p class="leading-relaxed text-[11px]">E-Ticket PDF resmi telah dikirim ke email kamu. Cek inbox atau folder spam.</p>
+              <div class="p-3 rounded-xl bg-gradient-to-r from-emerald-950/80 via-[#14032B] to-emerald-950/80 border border-emerald-400/50 text-emerald-200 text-xs font-sans flex items-start gap-2 shadow-sm">
+                <span class="text-base leading-none flex-shrink-0">📢</span>
+                <div class="space-y-0.5">
+                  <p class="font-bold text-emerald-300 text-[11px] sm:text-xs">Info Pengiriman E-Ticket (APPROVED):</p>
+                  <p class="leading-relaxed text-[11px] text-white">
+                    Setelah pesanan di-ACC oleh Admin, E-Ticket PDF akan dikirim otomatis ke email Anda. Jika email tidak ditemukan di Kotak Masuk (Inbox), silakan periksa folder <strong class="text-[#FFDC17] underline">Spam</strong> atau <strong class="text-[#FFDC17] underline">Promosi</strong>.
+                  </p>
+                </div>
               </div>
             </div>
           ` : `
