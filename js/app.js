@@ -84,7 +84,7 @@ const VARIANTS = Object.freeze({
 // ============================================================
 let currentSelectedVariant = "tiket_1hari";
 let currentQuantity = 1;
-let currentPresaleQuotaRemaining = 100;
+let currentPresaleQuotaRemaining = 95;
 let selectedProofBase64 = null;
 let selectedProofFileName = "bukti_qris.jpg";
 let currentHoldId = null;
@@ -343,7 +343,7 @@ async function refreshTicketStock(isManualClick = false) {
 
     if (res && (res.sisaKuota !== undefined || res.quotaBundling)) {
       currentPresaleQuotaRemaining = res.sisaKuota !== undefined ? parseInt(res.sisaKuota, 10) : parseInt(res.quotaBundling.sisa, 10);
-      if (isNaN(currentPresaleQuotaRemaining)) currentPresaleQuotaRemaining = 100;
+      if (isNaN(currentPresaleQuotaRemaining)) currentPresaleQuotaRemaining = 95;
 
       const badge = document.getElementById("badgeQuotaPresale");
       const cardPresale = document.getElementById("cardVariant4");
@@ -363,7 +363,7 @@ async function refreshTicketStock(isManualClick = false) {
         }
       } else {
         if (badge) {
-          badge.textContent = `Tersisa ${currentPresaleQuotaRemaining} / 100 Kuota`;
+          badge.textContent = `Tersisa ${currentPresaleQuotaRemaining} / 95 Kuota`;
           badge.className = "px-2.5 py-0.5 rounded-full bg-[#FFDC17]/20 text-[10px] font-mono font-bold text-[#FFDC17] border border-[#FFDC17]/40";
         }
         if (cardPresale) cardPresale.classList.remove("opacity-60", "pointer-events-none");
@@ -504,7 +504,7 @@ function validateQuotaAndCalculateTotal() {
   if (variant.isPresale) {
     if (currentPresaleQuotaRemaining <= 0) {
       if (warningBox) warningBox.classList.remove("hidden");
-      if (warningText) warningText.textContent = "⚠️ Maaf, kuota Presale (100 tiket) telah habis terjual (SOLD OUT).";
+      if (warningText) warningText.textContent = "⚠️ Maaf, kuota Presale (95 tiket) telah habis terjual (SOLD OUT).";
       if (submitBtn) submitBtn.disabled = true;
       return;
     } else if (qty > currentPresaleQuotaRemaining) {
@@ -648,7 +648,7 @@ async function handleProceedToPayment() {
         if (res.sisaKuota !== undefined) {
           currentPresaleQuotaRemaining = res.sisaKuota;
           const badge = document.getElementById("badgeQuotaPresale");
-          if (badge) badge.textContent = `Tersisa ${currentPresaleQuotaRemaining} / 100 Kuota`;
+          if (badge) badge.textContent = `Tersisa ${currentPresaleQuotaRemaining} / 95 Kuota`;
         }
 
         setTimeout(() => {
