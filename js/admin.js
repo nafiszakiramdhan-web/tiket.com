@@ -239,7 +239,7 @@ async function loadOrdersData(isManual = false) {
       redirect: "follow",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({ action: "get_quota" })
-    }).then(r => r.json()).catch(() => ({ quotaBundling: { sisa: 100 } }));
+    }).then(r => r.json()).catch(() => ({ quotaBundling: { sisa: 95 } }));
 
     const [resPending, resApproved, resQuota] = await Promise.all([pendingPromise, approvedPromise, quotaPromise]);
 
