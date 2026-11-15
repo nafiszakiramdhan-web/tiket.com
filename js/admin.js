@@ -417,6 +417,20 @@ function renderCurrentTabTable() {
 
   emptyBox.classList.add("hidden");
 
+  // Hitung pengelompokan transaksi untuk tab pending (berdasarkan bukti transfer atau timestamp + WA)
+  const txGroupCounts = {};
+  const txGroupTotals = {};
+  if (currentTab === "pending") {
+    items.forEach(it => {
+      const rawBukti = (it.linkBukti || it.fileUrl || "").trim();
+      const cleanWa = (it.whatsapp || "").toString().replace(/['\s-]/g, "");
+      const time = (it.waktu || it.timestamp || "").trim();
+      const k = (rawBukti && rawBukti !== "-") ? rawBukti : (time + "_" + cleanWa);
+      txGroupCounts[k] = (txGroupCounts[k] || 0) + 1;
+      txGroupTotals[k] = (txGroupTotals[k] || 0) + (Number(it.total) || 0);
+    });
+  }
+
   items.forEach((item, idx) => {
     const tr = document.createElement("tr");
     tr.className = "hover:bg-white/[0.03] transition-colors";
@@ -436,6 +450,13 @@ function renderCurrentTabTable() {
     const rawPdf = item.linkPdf || item.pdfUrl || "https://drive.google.com";
     const safePdf = escapeHtml(rawPdf);
     const isApproved = currentTab === "approved" || (item.statusBayar || "").toUpperCase() === "APPROVED";
+
+    const timeKey = (item.waktu || item.timestamp || "").trim();
+    const txKey = (rawBukti && rawBukti !== "-") ? rawBukti : (timeKey + "_" + cleanWa);
+    const txCount = txGroupCounts[txKey] || 1;
+    const txTotal = txGroupTotals[txKey] || item.total;
+    item.txCount = txCount;
+    item.txTotal = txTotal;
 
     tr.innerHTML = `
       <td class="py-3.5 px-4 text-center font-mono text-slate-400">${idx + 1}</td>
@@ -465,9 +486,17 @@ function renderCurrentTabTable() {
       <td class="py-3.5 px-4">
         <span class="block font-medium text-white">${safeVarian}</span>
         <span class="text-[11px] text-[#FFDC17] font-semibold">${safeJumlah} Tiket</span>
+        ${(!isApproved && txCount > 1) ? `
+          <div class="mt-1">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold border border-purple-500/30" title="Total ${txCount} tiket dalam 1 bukti bayar transaksi ini">
+              <i data-lucide="layers" class="w-3 h-3"></i>
+              <span>Transaksi: ${txCount} Tiket (${formatRupiah(txTotal)})</span>
+            </span>
+          </div>
+        ` : ''}
       </td>
       <td class="py-3.5 px-4 font-display font-bold text-white whitespace-nowrap text-sm">
-        ${formatRupiah(item.total || (item.jumlah * 4000))}
+        ${formatRupiah(item.total || 2000)}
       </td>
       <td class="py-3.5 px-4 text-center whitespace-nowrap">
         ${rawBukti && rawBukti !== "-" ? `
@@ -515,9 +544,10 @@ function renderCurrentTabTable() {
             type="button"
             onclick="executeAccTicket(pendingOrdersList[${idx}], this)"
             class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#FFDC17] text-[#2D2A1A] font-black text-xs uppercase hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 select-none cursor-pointer shadow-glow-yellow"
+            title="${txCount > 1 ? `Sekali klik ACC untuk semua ${txCount} tiket dalam transaksi bukti bayar ini` : `ACC Tiket`}"
           >
             <i data-lucide="check-circle" class="w-3.5 h-3.5 stroke-[2.5]"></i>
-            <span>ACC Tiket</span>
+            <span>${txCount > 1 ? `ACC Semua (${txCount} Tiket)` : `ACC Tiket`}</span>
           </button>
         `}
       </td>
@@ -556,7 +586,14 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
 
   if (!item) return;
 
-  if (!confirm(`Konfirmasi ACC dan terbitkan tiket resmi untuk pemesan: ${item.nama || "-"} (${item.email || "-"})?`)) {
+  const cleanNama = (item.nama || "-").replace(/\s*\(Tiket\s+\d+\/\d+\)/i, "").trim();
+  const txCount = item.txCount || 1;
+  const txTotal = item.txTotal || item.total;
+  const confirmMsg = txCount > 1
+    ? `Konfirmasi ACC transaksi untuk ${cleanNama}?\n\nSemua ${txCount} tiket (Total ${formatRupiah(txTotal)}) akan disetujui dan seluruh berkas PDF E-Ticket dikirim sekaligus dalam 1 email ke ${item.email || "-"}.`
+    : `Konfirmasi ACC dan terbitkan tiket resmi untuk pemesan: ${cleanNama} (${item.email || "-"})?`;
+
+  if (!confirm(confirmMsg)) {
     return;
   }
 
@@ -613,7 +650,8 @@ async function executeAccTicket(itemOrRowIndex, rawNamaOrBtn, rawEmail, btnEleme
     }
 
     if (result && result.status === "SUCCESS") {
-      showAccToast(`Tiket ${result.kodeTiket || ""} (${item.nama || ""}) berhasil di-ACC! File PDF telah otomatis terkirim ke email: ${result.targetEmail || item.email || "-"}`, "success");
+      const countAcc = result.totalApproved || txCount || 1;
+      showAccToast(`Berhasil ACC ${countAcc} tiket untuk ${cleanNama}! Seluruh berkas PDF E-Ticket resmi telah dikirim dalam 1 email ke: ${result.targetEmail || item.email || "-"}`, "success");
       closeReceiptModal();
       loadOrdersData();
     } else {

@@ -874,7 +874,13 @@ async function handleOrderSubmit(e) {
 
       if (elName) elName.textContent = nama;
       if (elEmail) elEmail.textContent = email;
-      if (elCode) elCode.textContent = res.ticketCode || "#BB26-PENDING";
+      if (elCode) {
+        if (res.ticketCodes && res.ticketCodes.length > 1) {
+          elCode.textContent = res.ticketCodes.join(" • ");
+        } else {
+          elCode.textContent = res.ticketCode || "#BB26-PENDING";
+        }
+      }
 
       const btnSuci = document.getElementById("btnPendingKonfirmasiSuci");
       if (btnSuci) {
@@ -969,6 +975,19 @@ async function handleCheckStatusSubmit(e) {
       if (boxNotFound) boxNotFound.classList.add("hidden");
       cardsList.innerHTML = "";
 
+      if (res.data.length > 1) {
+        const summaryBox = document.createElement("div");
+        summaryBox.className = "p-3.5 rounded-xl bg-[#14032B] border border-[#FFDC17]/40 text-xs text-[#E2D9F3] flex items-center justify-between shadow-sm";
+        summaryBox.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="text-base">🎫</span>
+            <span>Ditemukan <strong>${res.data.length} E-Ticket</strong> untuk pemesanan ini:</span>
+          </div>
+          <span class="font-mono text-[10px] text-[#FFDC17] bg-[#FFDC17]/15 px-2 py-0.5 rounded border border-[#FFDC17]/30">1 Tiket = 1 QR Masuk</span>
+        `;
+        cardsList.appendChild(summaryBox);
+      }
+
       res.data.forEach((item) => {
         const isApproved = (item.status || "").toUpperCase() === "APPROVED";
         // Sanitasi seluruh data database/input sebelum dimasukkan ke innerHTML
@@ -976,6 +995,8 @@ async function handleCheckStatusSubmit(e) {
         const kategoriTiket = escapeHtml(item.varian || item.kategori || "Tiket Festival");
         const jumlahTiket = escapeHtml(item.jumlah || 1);
         const kodeTiket = escapeHtml(item.kodeTiket || item.ticketCode || "-");
+        const checkinVal = (item.checkin || "BELUM MASUK").toUpperCase();
+        const isCheckedIn = checkinVal.includes("SUDAH");
 
         const suciUrl = getSuciWhatsAppConfirmationUrl({
           nama: item.nama,
@@ -998,14 +1019,26 @@ async function handleCheckStatusSubmit(e) {
             </div>
             <div>
               ${isApproved ? `
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold text-xs border border-emerald-500/30">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  <span>TERVERIFIKASI</span>
-                </span>
+                <div class="flex items-center gap-1.5 flex-wrap justify-end">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold text-xs border border-emerald-500/30">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>TERVERIFIKASI</span>
+                  </span>
+                  ${isCheckedIn ? `
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono text-[10px] font-bold border border-cyan-500/30">
+                      <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                      <span>SUDAH MASUK GATE</span>
+                    </span>
+                  ` : `
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-500/20 text-slate-300 font-mono text-[10px] border border-white/20">
+                      <span>BELUM MASUK GATE</span>
+                    </span>
+                  `}
+                </div>
               ` : `
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 font-mono font-bold text-xs border border-amber-500/30">
                   <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                  <span>MENUNGGU VERIFIKASI PANITIA</span>
+                  <span>MENUNGGU VERIFIKASI</span>
                 </span>
               `}
             </div>
@@ -1013,7 +1046,7 @@ async function handleCheckStatusSubmit(e) {
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-[#E2D9F3] pt-1">
             <div>
-              <span class="text-[11px] text-slate-400 block">Nama Pemesan:</span>
+              <span class="text-[11px] text-slate-400 block">Nama Pemegang Tiket:</span>
               <strong class="text-white text-sm block">${namaPemesan}</strong>
             </div>
             <div>
@@ -1021,23 +1054,35 @@ async function handleCheckStatusSubmit(e) {
               <strong class="text-white text-sm block">${kategoriTiket}</strong>
             </div>
             <div>
-              <span class="text-[11px] text-slate-400 block">Jumlah Tiket:</span>
-              <strong class="text-[#FFDC17] font-mono text-sm block">${jumlahTiket} Tiket</strong>
+              <span class="text-[11px] text-slate-400 block">Jumlah Akses:</span>
+              <strong class="text-[#FFDC17] font-mono text-sm block">${jumlahTiket} Tiket (1 Orang)</strong>
             </div>
             <div>
-              <span class="text-[11px] text-slate-400 block">Kode Tiket:</span>
+              <span class="text-[11px] text-slate-400 block">Kode Masuk Gerbang:</span>
               <strong class="text-[#FFDC17] font-mono text-sm block">${kodeTiket}</strong>
             </div>
           </div>
 
           ${isApproved ? `
-            <div class="pt-2">
+            <div class="pt-2 space-y-2">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <button
+                  type="button"
+                  onclick="copySingleTicketCode('${kodeTiket}', this)"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFDC17]/15 hover:bg-[#FFDC17]/25 text-[#FFDC17] font-mono text-xs font-bold border border-[#FFDC17]/30 active:scale-95 transition-all cursor-pointer"
+                  title="Salin Kode Tiket untuk dibagikan ke rekan"
+                >
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  <span>Salin Kode Tiket</span>
+                </button>
+                <span class="text-[11px] text-[#A69AB8]">Bagikan kode ke rekan Anda jika masuk terpisah</span>
+              </div>
               <div class="p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/80 via-[#14032B] to-emerald-950/80 border border-emerald-400/50 text-emerald-200 text-xs sm:text-sm font-sans flex items-start gap-2.5 shadow-md">
                 <span class="text-lg leading-none flex-shrink-0">📢</span>
                 <div class="space-y-1">
                   <p class="font-bold text-emerald-300">Info Pengiriman E-Ticket (Status: Terverifikasi / APPROVED):</p>
                   <p class="leading-relaxed text-white text-xs sm:text-[13px]">
-                    Setelah pesanan di-ACC oleh Admin, E-Ticket PDF akan dikirim otomatis ke email Anda. Jika email tidak ditemukan di Kotak Masuk (Inbox), silakan periksa folder <strong class="text-[#FFDC17] underline decoration-white">Spam</strong> atau <strong class="text-[#FFDC17] underline decoration-white">Promosi</strong>.
+                    Setelah pesanan di-ACC oleh Admin, seluruh file E-Ticket PDF dikirim otomatis ke email Anda. Jika email tidak ditemukan di Kotak Masuk (Inbox), silakan periksa folder <strong class="text-[#FFDC17] underline decoration-white">Spam</strong> atau <strong class="text-[#FFDC17] underline decoration-white">Promosi</strong>.
                   </p>
                 </div>
               </div>
@@ -1153,12 +1198,27 @@ async function handleModalCheckStatusSubmit(e) {
       if (boxNotFound) boxNotFound.classList.add("hidden");
       cardsList.innerHTML = "";
 
+      if (res.data.length > 1) {
+        const summaryBox = document.createElement("div");
+        summaryBox.className = "p-3 rounded-xl bg-[#14032B] border border-[#FFDC17]/40 text-xs text-[#E2D9F3] flex items-center justify-between shadow-sm";
+        summaryBox.innerHTML = `
+          <div class="flex items-center gap-1.5">
+            <span class="text-sm">🎫</span>
+            <span class="text-[11px] sm:text-xs">Ditemukan <strong>${res.data.length} Tiket</strong>:</span>
+          </div>
+          <span class="font-mono text-[9px] sm:text-[10px] text-[#FFDC17] bg-[#FFDC17]/15 px-2 py-0.5 rounded border border-[#FFDC17]/30">1 Tiket = 1 QR Masuk</span>
+        `;
+        cardsList.appendChild(summaryBox);
+      }
+
       res.data.forEach((item) => {
         const isApproved = (item.status || "").toUpperCase() === "APPROVED";
         const namaPemesan = escapeHtml(item.nama || "-");
         const kategoriTiket = escapeHtml(item.varian || item.kategori || "Tiket Festival");
         const jumlahTiket = escapeHtml(item.jumlah || 1);
         const kodeTiket = escapeHtml(item.kodeTiket || item.ticketCode || "-");
+        const checkinVal = (item.checkin || "BELUM MASUK").toUpperCase();
+        const isCheckedIn = checkinVal.includes("SUDAH");
 
         const suciUrl = getSuciWhatsAppConfirmationUrl({
           nama: item.nama,
@@ -1181,10 +1241,21 @@ async function handleModalCheckStatusSubmit(e) {
             </div>
             <div>
               ${isApproved ? `
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold text-[10px] sm:text-xs border border-emerald-500/30">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  <span>TERVERIFIKASI</span>
-                </span>
+                <div class="flex items-center gap-1 flex-wrap justify-end">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold text-[10px] sm:text-xs border border-emerald-500/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>TERVERIFIKASI</span>
+                  </span>
+                  ${isCheckedIn ? `
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono text-[10px] font-bold border border-cyan-500/30">
+                      <span>SUDAH MASUK</span>
+                    </span>
+                  ` : `
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-300 font-mono text-[10px] border border-white/20">
+                      <span>BELUM MASUK</span>
+                    </span>
+                  `}
+                </div>
               ` : `
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-mono font-bold text-[10px] sm:text-xs border border-amber-500/30">
                   <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
@@ -1204,23 +1275,35 @@ async function handleModalCheckStatusSubmit(e) {
               <strong class="text-white text-xs block truncate">${kategoriTiket}</strong>
             </div>
             <div>
-              <span class="text-[10px] text-slate-400 block">Jumlah Tiket:</span>
-              <strong class="text-[#FFDC17] font-mono text-xs block">${jumlahTiket} Tiket</strong>
+              <span class="text-[10px] text-slate-400 block">Akses Masuk:</span>
+              <strong class="text-[#FFDC17] font-mono text-xs block">${jumlahTiket} Tiket (1 Orang)</strong>
             </div>
             <div>
-              <span class="text-[10px] text-slate-400 block">Kode:</span>
+              <span class="text-[10px] text-slate-400 block">Kode Masuk:</span>
               <strong class="text-[#FFDC17] font-mono text-xs block">${kodeTiket}</strong>
             </div>
           </div>
 
           ${isApproved ? `
-            <div class="pt-1">
+            <div class="pt-1 space-y-2">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <button
+                  type="button"
+                  onclick="copySingleTicketCode('${kodeTiket}', this)"
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#FFDC17]/15 hover:bg-[#FFDC17]/25 text-[#FFDC17] font-mono text-xs font-bold border border-[#FFDC17]/30 active:scale-95 transition-all cursor-pointer"
+                  title="Salin Kode Tiket"
+                >
+                  <i data-lucide="copy" class="w-3 h-3"></i>
+                  <span>Salin Kode</span>
+                </button>
+                <span class="text-[10px] text-slate-400">Gunakan untuk check-in terpisah</span>
+              </div>
               <div class="p-3 rounded-xl bg-gradient-to-r from-emerald-950/80 via-[#14032B] to-emerald-950/80 border border-emerald-400/50 text-emerald-200 text-xs font-sans flex items-start gap-2 shadow-sm">
                 <span class="text-base leading-none flex-shrink-0">📢</span>
                 <div class="space-y-0.5">
                   <p class="font-bold text-emerald-300 text-[11px] sm:text-xs">Info Pengiriman E-Ticket (APPROVED):</p>
                   <p class="leading-relaxed text-[11px] text-white">
-                    Setelah pesanan di-ACC oleh Admin, E-Ticket PDF akan dikirim otomatis ke email Anda. Jika email tidak ditemukan di Kotak Masuk (Inbox), silakan periksa folder <strong class="text-[#FFDC17] underline">Spam</strong> atau <strong class="text-[#FFDC17] underline">Promosi</strong>.
+                    Setelah pesanan di-ACC oleh Admin, seluruh file E-Ticket PDF dikirim otomatis ke email Anda. Jika email tidak ditemukan di Kotak Masuk (Inbox), silakan periksa folder <strong class="text-[#FFDC17] underline">Spam</strong> atau <strong class="text-[#FFDC17] underline">Promosi</strong>.
                   </p>
                 </div>
               </div>
@@ -1330,6 +1413,17 @@ function handleAdminPinSubmit(e) {
 // ============================================================
 // 8. HELPER SHARING & INISIALISASI
 // ============================================================
+function copySingleTicketCode(code, btn) {
+  if (!code || code === "-") return;
+  navigator.clipboard.writeText(code).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = `<span class="text-[#FFDC17] font-bold text-xs">✓ Tersalin!</span>`;
+    setTimeout(() => { btn.innerHTML = orig; if (window.lucide) lucide.createIcons(); }, 1600);
+  }).catch(() => {
+    alert("Kode Tiket: " + code);
+  });
+}
+
 function copyPageUrl(btn) {
   navigator.clipboard.writeText(window.location.href).then(() => {
     const orig = btn.innerHTML;
