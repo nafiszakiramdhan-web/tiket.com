@@ -178,10 +178,11 @@
           </div>
           <button 
             type="button" 
+            id="heroBtnPilihTiket"
             onclick="scrollToTicketsSection()" 
             class="px-4 py-2 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 text-[#240638] font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-1.5 transition select-none cursor-pointer"
           >
-            <span>PILIH TIKET</span>
+            <span id="heroBtnPilihTiketText">PILIH TIKET</span>
             <span class="text-sm font-bold">↓</span>
           </button>
         </div>
@@ -336,6 +337,50 @@
               </svg>
               <span>Muat Ulang Ketersediaan Tiket</span>
             </button>
+          </div>
+
+          <!-- Informasi Batas Waktu Pemesanan Online -->
+          <div id="orderDeadlineNotice" class="p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-[#1E053D] via-[#2A0859] to-[#1E053D] border border-[#FFDC17]/40 shadow-sm flex items-start sm:items-center gap-3">
+            <span class="text-xl flex-shrink-0 leading-none">⏳</span>
+            <div class="text-xs sm:text-[13px] text-[#E2D9F3] leading-relaxed">
+              <strong class="text-[#FFDC17] font-semibold">Batas Waktu Pemesanan:</strong>
+              <span>Pemesanan tiket online dibuka hingga <strong class="text-white font-bold underline decoration-[#FFDC17]">20 November 2026 pukul 23:59 WIB</strong>.</span>
+            </div>
+          </div>
+
+          <!-- Kartu Pengumuman Penutupan Pemesanan (Tampil jika sudah melewati deadline) -->
+          <div id="closedOrderNotice" class="hidden p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-[#2E071A] to-[#19020F] border-2 border-red-500/60 shadow-glow-plum text-center space-y-4">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-500/20 text-red-400 text-3xl mx-auto border border-red-500/40 shadow-inner">
+              🔒
+            </div>
+            <div class="space-y-1.5">
+              <h3 class="font-display text-xl sm:text-2xl text-white font-bold tracking-wide">
+                Pemesanan Tiket Online Sudah Ditutup
+              </h3>
+              <p class="text-xs sm:text-sm text-red-200/90 max-w-md mx-auto font-sans leading-relaxed">
+                Batas akhir pemesanan tiket resmi telah berakhir pada <strong>20 November 2026 pukul 23:59 WIB</strong>. Terima kasih atas antusiasme dan apresiasi Anda!
+              </p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-[#14032B]/80 border border-[#FFDC17]/30 max-w-lg mx-auto text-xs text-[#E2D9F3]">
+              <span>Bagi Anda yang sudah melakukan pemesanan sebelumnya, silakan pantau status tiket Anda secara berkala melalui menu <strong>Cek Status Pesanan</strong>.</span>
+            </div>
+            <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
+              <button 
+                type="button" 
+                onclick="switchMainTab('cek')" 
+                class="px-5 py-2.5 rounded-xl bg-[#FFDC17] hover:bg-[#ECC90E] text-[#240638] font-bold text-xs uppercase tracking-wider shadow-md transition-all active:scale-95 cursor-pointer"
+              >
+                🔍 Cek Status Pesanan Saya
+              </button>
+              <a 
+                href="https://wa.me/6288221178916?text=Halo%20Kak%20Arini,%20saya%20ingin%20bertanya%20mengenai%20tiket%20Bingkai%20Bisu%202026" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="px-4 py-2.5 rounded-xl bg-[#240847] hover:bg-[#2d0a59] border border-[#FFDC17]/40 text-[#FFDC17] font-semibold text-xs transition-all active:scale-95 cursor-pointer"
+              >
+                Hubungi CS Panitia
+              </a>
+            </div>
           </div>
 
           <!-- DAFTAR 4 VARIAN TIKET RESMI BERJEJER VERTIKAL (.WEBP) -->
@@ -1001,14 +1046,20 @@
             </div>
           </div>
 
+          <!-- Informasi Batas Waktu Pemesanan di Sidebar -->
+          <div id="sidebarDeadlineInfo" class="px-3 py-2 rounded-xl bg-[#14032B] border border-[#FFDC17]/30 text-[11px] text-[#E2D9F3] text-center font-sans">
+            <span>⏳ Dibuka s/d <strong class="text-[#FFDC17]">20 Nov 2026, 23:59 WIB</strong></span>
+          </div>
+
           <!-- Tombol CTA Dapatkan Tiket -->
           <button 
             type="button" 
+            id="sidebarBtnDapatkanTiket"
             onclick="scrollToTicketsSection()" 
             class="w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider text-[#240638] bg-[#FFDC17] hover:bg-[#ECC90E] active:scale-95 active:brightness-90 transition-all duration-100 cursor-pointer select-none shadow-glow-gold flex items-center justify-center gap-2"
           >
             <i data-lucide="shopping-cart" class="w-4 h-4 stroke-[2.5]"></i>
-            <span>DAPATKAN TIKET</span>
+            <span id="sidebarBtnDapatkanTiketText">DAPATKAN TIKET</span>
           </button>
 
           <!-- Bagikan Event -->

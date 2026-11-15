@@ -29,6 +29,85 @@ function getSuciWhatsAppConfirmationUrl(data = {}) {
 }
 
 // ============================================================
+// BATAS WAKTU PEMESANAN TIKET ONLINE (ORDER DEADLINE)
+// ============================================================
+const ORDER_DEADLINE = new Date("2026-11-20T23:59:59+07:00");
+
+function isOrderClosed() {
+  return new Date().getTime() > ORDER_DEADLINE.getTime();
+}
+
+function checkAndApplyOrderDeadline(forceClosed = null) {
+  const closed = (forceClosed === true) || isOrderClosed();
+
+  const deadlineNotice = document.getElementById("orderDeadlineNotice");
+  const closedNotice = document.getElementById("closedOrderNotice");
+  const checkoutContainer = document.getElementById("checkoutFormContainer");
+  const sidebarBtn = document.getElementById("sidebarBtnDapatkanTiket");
+  const sidebarBtnText = document.getElementById("sidebarBtnDapatkanTiketText");
+  const heroBtn = document.getElementById("heroBtnPilihTiket");
+  const heroBtnText = document.getElementById("heroBtnPilihTiketText");
+  const sidebarDeadline = document.getElementById("sidebarDeadlineInfo");
+  const ticketList = document.getElementById("ticketVariantsList");
+  const btnRefresh = document.getElementById("btnRefreshQuota");
+
+  if (closed) {
+    if (deadlineNotice) deadlineNotice.classList.add("hidden");
+    if (closedNotice) closedNotice.classList.remove("hidden");
+    if (checkoutContainer) {
+      checkoutContainer.classList.add("hidden");
+      const inputs = checkoutContainer.querySelectorAll("input, button, select, textarea");
+      inputs.forEach(el => { el.disabled = true; });
+    }
+    
+    // Sidebar CTA
+    if (sidebarBtn) {
+      sidebarBtn.disabled = true;
+      sidebarBtn.classList.remove("bg-[#FFDC17]", "hover:bg-[#ECC90E]", "text-[#240638]", "cursor-pointer", "shadow-glow-gold");
+      sidebarBtn.classList.add("bg-[#2c1b42]", "text-[#A69AB8]", "cursor-not-allowed", "border", "border-white/10");
+      if (sidebarBtnText) sidebarBtnText.textContent = "PEMESANAN DITUTUP";
+    }
+
+    // Hero CTA
+    if (heroBtn) {
+      heroBtn.disabled = true;
+      heroBtn.classList.remove("bg-[#FFDC17]", "hover:bg-[#ECC90E]", "text-[#240638]", "cursor-pointer");
+      heroBtn.classList.add("bg-[#2c1b42]", "text-[#A69AB8]", "cursor-not-allowed", "border", "border-white/10");
+      if (heroBtnText) heroBtnText.textContent = "PEMESANAN DITUTUP";
+    }
+
+    // Sidebar Deadline Text
+    if (sidebarDeadline) {
+      sidebarDeadline.innerHTML = `<span class="text-red-400 font-semibold">🔒 Pemesanan Ditutup (Batas akhir: 20 Nov 2026)</span>`;
+      sidebarDeadline.className = "px-3.5 py-2.5 rounded-xl bg-red-950/40 border border-red-500/40 text-xs text-center font-sans";
+    }
+
+    // Lock ticket cards
+    if (ticketList) {
+      const cards = ticketList.querySelectorAll(".variant-card");
+      cards.forEach(card => {
+        card.classList.add("opacity-50", "pointer-events-none");
+      });
+      const btns = ticketList.querySelectorAll(".btn-select-variant");
+      btns.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add("opacity-50", "cursor-not-allowed");
+      });
+    }
+
+    if (btnRefresh) {
+      btnRefresh.classList.add("opacity-60");
+    }
+  } else {
+    if (deadlineNotice) deadlineNotice.classList.remove("hidden");
+    if (closedNotice) closedNotice.classList.add("hidden");
+    if (checkoutContainer) checkoutContainer.classList.remove("hidden");
+  }
+
+  if (window.lucide) lucide.createIcons();
+}
+
+// ============================================================
 // HELPER: SANITASI XSS (DOM-BASED)
 // ============================================================
 function escapeHtml(str) {
@@ -318,6 +397,14 @@ function initTabsSwipe() {
 
 function scrollToTicketsSection() {
   switchMainTab('tiket');
+  if (isOrderClosed()) {
+    const closedNotice = document.getElementById("closedOrderNotice");
+    if (closedNotice) {
+      closedNotice.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    showFloatingToast("Pemesanan tiket online telah resmi ditutup.");
+    return;
+  }
   const ticketSection = document.getElementById("tabContentTiket");
   if (ticketSection) {
     ticketSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -340,6 +427,10 @@ async function refreshTicketStock(isManualClick = false) {
       body: JSON.stringify({ action: "get_quota" })
     });
     const res = await response.json();
+
+    if (res && res.isOrderClosed !== undefined) {
+      checkAndApplyOrderDeadline(res.isOrderClosed === true);
+    }
 
     if (res && (res.sisaKuota !== undefined || res.quotaBundling)) {
       currentPresaleQuotaRemaining = res.sisaKuota !== undefined ? parseInt(res.sisaKuota, 10) : parseInt(res.quotaBundling.sisa, 10);
@@ -383,7 +474,9 @@ async function refreshTicketStock(isManualClick = false) {
     console.warn("Gagal refresh kuota:", err);
   } finally {
     if (refreshIcon) refreshIcon.classList.remove("animate-spin");
-    validateQuotaAndCalculateTotal();
+    if (!isOrderClosed()) {
+      validateQuotaAndCalculateTotal();
+    }
   }
 }
 
@@ -391,6 +484,11 @@ async function refreshTicketStock(isManualClick = false) {
 // 3. SELEKSI VARIAN TIKET & INTEGRITAS DATA CHECKOUT
 // ============================================================
 function selectTicketVariant(variantKey) {
+  if (isOrderClosed()) {
+    showFloatingToast("Pemesanan tiket online telah resmi ditutup!", "error");
+    return;
+  }
+
   // Integritas: Validasi bahwa variantKey ada di dalam objek VARIANTS resmi
   if (!VARIANTS[variantKey]) {
     console.warn("Varian tiket tidak sah:", variantKey);
@@ -691,6 +789,12 @@ async function handleProceedToPayment() {
 async function handleOrderSubmit(e) {
   e.preventDefault();
 
+  if (isOrderClosed()) {
+    alert("Mohon maaf, pemesanan tiket online telah resmi ditutup pada 20 November 2026 pukul 23:59 WIB.");
+    checkAndApplyOrderDeadline(true);
+    return;
+  }
+
   const nama = document.getElementById("inputName").value.trim();
   const email = document.getElementById("inputEmail").value.trim();
   const whatsapp = document.getElementById("inputWa").value.trim();
@@ -799,6 +903,9 @@ async function handleOrderSubmit(e) {
       refreshTicketStock();
     } else {
       alert("Pemesanan gagal diproses: " + (res.message || "Terjadi kendala pada server."));
+      if (res && res.message && res.message.toLowerCase().includes("ditutup")) {
+        checkAndApplyOrderDeadline(true);
+      }
     }
 
   } catch (err) {
@@ -1246,6 +1353,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (copyrightEl) copyrightEl.addEventListener("click", handleStealthTapEvent);
 
   initTabsSwipe();
+  checkAndApplyOrderDeadline();
   selectTicketVariant("tiket_1hari");
   refreshTicketStock(false);
   if (window.lucide) lucide.createIcons();
